@@ -1,6 +1,6 @@
 --T4 Defences NuttyB version
 -- Authors: Hedgehogzs
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 
 local unitDefs, tableMerge, legendary_pulsar, legendary_bulwark, legendary_bastion =
 	UnitDefs or {},

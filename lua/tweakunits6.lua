@@ -1,5 +1,5 @@
 --NuttyB lrpc rebalance v2
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 return {
 	armbrtha = {
 		health = 13000,

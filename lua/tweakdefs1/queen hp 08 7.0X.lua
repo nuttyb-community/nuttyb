@@ -1,5 +1,5 @@
 --NuttyB v1.52 7X QHP
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 for b, c in pairs(UnitDefs) do
 	if b:match('^raptor_queen_.*') then
 		c.repairable = 0

@@ -1,6 +1,7 @@
 # Compiled Lua sources
 luac.out
 base64url/*
+misc_base64url/*
 !base64url/.gitkeep
 
 # luarocks build files

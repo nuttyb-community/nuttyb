@@ -1,6 +1,6 @@
 --NuttyB Experimental Wave Challenge
 -- Authors: BackBash
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 return {
     raptor_air_scout_basic_t2_v1 = {
         customparams = {

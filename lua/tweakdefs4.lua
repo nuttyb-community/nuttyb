@@ -1,6 +1,6 @@
---Mini Bosses v2e
+--Mini Bosses v2f
 -- Authors: RCore
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs, tableMerge, tableCopy, raptor_matriarch_basic, customfusionexplo, spring = UnitDefs or {}, table.merge, table.copy, 'raptor_matriarch_basic', 'customfusionexplo', Spring
 
 local nbQhpMult, nbHpMult = 1.3, 1.3
@@ -9,7 +9,8 @@ nbHpMult = unitDefs[raptor_matriarch_basic].health / 60000
 nbQhpMult = unitDefs['raptor_queen_epic'].health / 1250000
 
 local playerCountScale = 1
-if spring.Utilities.Gametype.IsRaptors() then
+local isRaptors = spring.Utilities.Gametype.IsRaptors()
+if isRaptors or spring.Utilities.Gametype.IsScavengers() then
 	playerCountScale = (#spring.GetTeamList() - 2)/12
 end
 
@@ -143,21 +144,22 @@ newUnit(
 		customparams = {
 			i18n_en_humanname = 'Doombringer',
 			i18n_en_tooltip = 'Your time is up. The Queens called for backup.'
-		}		
+		}
 	}
 )
 
-local function raptorSquad(p, q, e, r, s, t)
+local function pveSquad(p, q, e, r, s, t)
+	local mode_prefix = isRaptors and 'raptor' or 'scav'
 	return {
-		raptorcustomsquad = true,
-		raptorsquadunitsamount = s or 1,
-		raptorsquadminanger = p,
-		raptorsquadmaxanger = q,
-		raptorsquadweight = t or 5,
-		raptorsquadrarity = r or 'basic',
-		raptorsquadbehavior = e,
-		raptorsquadbehaviordistance = 500,
-		raptorsquadbehaviorchance = 0.75
+		[mode_prefix .. 'customsquad'] = true,
+		[mode_prefix .. 'squadunitsamount'] = s or 1,
+		[mode_prefix .. 'squadminanger'] = p,
+		[mode_prefix .. 'squadmaxanger'] = q,
+		[mode_prefix .. 'squadweight'] = t or 5,
+		[mode_prefix .. 'squadrarity'] = r or 'basic',
+		[mode_prefix .. 'squadbehavior'] = e,
+		[mode_prefix .. 'squadbehaviordistance'] = 500,
+		[mode_prefix .. 'squadbehaviorchance'] = 0.75
 	}
 end
 
@@ -172,7 +174,7 @@ local miniQueenCommon = {
 for f, u in pairs {
 	raptor_miniq_a = tableMerge(miniQueenCommon, {
 		maxthisunit = scaledMax(2),
-		customparams = raptorSquad(mqAnger[1], mqAnger[2], 'berserk'),
+		customparams = pveSquad(mqAnger[1], mqAnger[2], 'berserk'),
 		weapondefs = {
 			goo = { damage = { default = 750 } },
 			melee = { damage = { default = 4000 } },
@@ -180,7 +182,7 @@ for f, u in pairs {
 	}),
 	raptor_miniq_b = tableMerge(miniQueenCommon, {
 		maxthisunit = scaledMax(3),
-		customparams = raptorSquad(mqAnger[3], mqAnger[4], 'berserk'),
+		customparams = pveSquad(mqAnger[3], mqAnger[4], 'berserk'),
 		weapondefs = {
 			acidgoo = {
 				burst = 8,
@@ -217,7 +219,7 @@ for f, u in pairs {
 	}),
 	raptor_miniq_c = tableMerge(miniQueenCommon, {
 		maxthisunit = scaledMax(4),
-		customparams = raptorSquad(mqAnger[5], mqAnger[6], 'berserk'),
+		customparams = pveSquad(mqAnger[5], mqAnger[6], 'berserk'),
 		weapondefs = {
 			empgoo = {
 				burst = 10,
@@ -255,7 +257,7 @@ for f, u in pairs {
 	raptor_consort = {
 		explodeas = 'raptor_empdeath_big',
 		maxthisunit = scaledMax(6),
-		customparams = raptorSquad(mqAnger[2], 1000, 'berserk'),
+		customparams = pveSquad(mqAnger[2], 1000, 'berserk'),
 		weapondefs = {
 			eyelaser = {
 				name = 'Angry Eyes',
@@ -263,7 +265,7 @@ for f, u in pairs {
 				rgbcolor = '1 0 0.3',
 				range = 500,
 				damage = { default = 6000, commanders = 6000 }
-			},		
+			},
 			goo = {
 				name = 'Snowball Barrage',
 				soundstart = 'penbray2',
@@ -292,17 +294,17 @@ for f, u in pairs {
 			}
 		},
 	},
-	
+
 	raptor_doombringer = {
 		explodeas = "ScavComBossExplo",
 		maxthisunit = maxDoombringers,
-		customparams = raptorSquad(mqAngerBoss, 1000, 'berserk', nil, 1, 99),
+		customparams = pveSquad(mqAngerBoss, 1000, 'berserk', nil, 1, 99),
 		weapondefs = {
 			eyelaser = {
 				name = 'Eyes of Doom',
 				reloadtime = 3,
 				rgbcolor = '0.3 1 0',
-				range = 500,			
+				range = 500,
 				damage = { default = 48000, commanders = 24000  }
 			},
 			goo = {
@@ -330,12 +332,12 @@ for f, u in pairs {
 				maxangledif = 180,
 				badtargetcategory = "VTOL OBJECT"
 			}
-		}		
+		}
 	},
-	
+
 	raptor_mama_ba = {
 		maxthisunit = scaledMax(4),
-		customparams = raptorSquad(55, mqAnger[3]-1, 'berserk'),
+		customparams = pveSquad(55, mqAnger[3]-1, 'berserk'),
 		weapondefs = {
 			goo = { damage = { default = 750 } },
 			melee = { damage = { default = 750 } }
@@ -344,7 +346,7 @@ for f, u in pairs {
 	raptor_mama_fi = {
 		explodeas = 'raptor_empdeath_big',
 		maxthisunit = scaledMax(4),
-		customparams = raptorSquad(55, mqAnger[3]-1, 'berserk'),
+		customparams = pveSquad(55, mqAnger[3]-1, 'berserk'),
 		weapondefs = {
 			flamethrowerspike = { damage = { default = 80 } },
 			flamethrowermain = { damage = { default = 160 } }
@@ -352,22 +354,22 @@ for f, u in pairs {
 	},
 	raptor_mama_el = {
 		maxthisunit = scaledMax(4),
-		customparams = raptorSquad(65, 1000, 'berserk')
+		customparams = pveSquad(65, 1000, 'berserk')
 	},
 	raptor_mama_ac = {
 		maxthisunit = scaledMax(4),
-		customparams = raptorSquad(60, 1000, 'berserk'),
+		customparams = pveSquad(60, 1000, 'berserk'),
 		weapondefs = {
 			melee = { damage = { default = 750 } }
 		}
 	},
 	raptor_land_assault_basic_t4_v2 = {
 		maxthisunit = scaledMax(8),
-		customparams = raptorSquad(33, 50, 'raider')
+		customparams = pveSquad(33, 50, 'raider')
 	},
 	raptor_land_assault_basic_t4_v1 = {
 		maxthisunit = scaledMax(12),
-		customparams = raptorSquad(51, 64, 'raider', 'basic', 2)
+		customparams = pveSquad(51, 64, 'raider', 'basic', 2)
 	}
 } do
 	unitDefs[f] = unitDefs[f] or {}

@@ -1,6 +1,6 @@
 --Cross Faction Tax 70%
 -- Authors: TetrisCo
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs, tax, t2Factories, taxedT2Factories, unitI18N, _taxed, taxedTitlePostfix =
 	UnitDefs or {}, 1.7, {}, {}, Json.decode(VFS.LoadFile('language/en/units.json')), '_taxed', ' (Taxed)'
 
