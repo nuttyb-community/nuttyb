@@ -1,5 +1,5 @@
 --T3 Eco builtin v6
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs, cons =
 	UnitDefs or {},
 	{

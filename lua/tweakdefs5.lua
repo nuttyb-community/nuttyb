@@ -1,5 +1,5 @@
 --Slow playable raptors/scav
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs = UnitDefs or {}
 for key, value in pairs(unitDefs) do
 	if key.name:find('raptor') or key.name:find('_scav') then

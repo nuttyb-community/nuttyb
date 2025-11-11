@@ -1,6 +1,6 @@
 --T3 Cons & Taxed Factories
 -- Authors: Nervensaege, TetrisCo
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs, factions, tableMerge, factionPrefix, _taxed, taxMultiplier, tableContains =
 	UnitDefs or {},
 	{'arm', 'cor', 'leg'},
@@ -234,7 +234,7 @@ for _, faction in pairs(factions) do
 
 	-- Buildoptions for T3 Gantrys (Ground)
 	local factoryName = isArm and 'armshltx' or isCor and 'corgant' or 'leggant'
-    
+
     -- Limit Bot Gantrys to 1
     unitDefs[factoryName].maxthisunit = 1
 

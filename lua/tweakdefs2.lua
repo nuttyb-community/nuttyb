@@ -1,6 +1,6 @@
 --NuttyB v1.52b Def Main
 -- Authors: ChrispyNut, BackBash
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 local unitDefs, repulsor, pairs, tableMerge = UnitDefs or {}, 'repulsor', pairs, table.merge
 
 function addWeapon(h, i, j)

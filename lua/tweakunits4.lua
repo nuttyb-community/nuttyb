@@ -1,5 +1,5 @@
 --NuttyB v1.52 Mega Nuke
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 return {
 	armsilo = {
 		energycost = 1500000,

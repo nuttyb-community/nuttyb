@@ -1,6 +1,6 @@
 --NuttyB v1.52c Armada Com
 -- Authors: ChrispyNut, BackBash
--- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko
+-- bar-nuttyb-collective.github.io/configurator
 return {
 	armcom = {
 		customparams = {
