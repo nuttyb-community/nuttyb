@@ -213,6 +213,8 @@ async function luaFileToBase64Url(
 	tweakKey: string,
 	order: number,
 ) {
+	console.log("Processing %s to %s", srcPath, destPath)
+
 	const content = (await fs.readFile(srcPath, 'utf-8')).trim()
 	if (!content) return Promise.resolve({ ...defaultTweakResult, order })
 
@@ -256,9 +258,7 @@ async function luaFileToBase64Url(
 
 		minified = topComments + minifiedCode
 	} catch (err) {
-		console.error(err)
-		process.exit(0)
-		throw err
+		throw err;
 	}
 
 	const destContent = await fs.readFile(destPath, 'utf-8').catch(() => null)
