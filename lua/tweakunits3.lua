@@ -1,15 +1,11 @@
+-- CORTEX_COMMANDER_START
 --NuttyB v1.52c Cortex Com
--- Authors: ChrispyNut, BackBash
--- bar-nuttyb-collective.github.io/configurator
-return {
+{
 	corcom = {
 		customparams = {
 			evolution_target = 'corcomlvl2',
 			evolution_condition = 'timer_global',
 			evolution_timer = 420,
-			inheritxpratemultiplier = 0.5,
-			childreninheritxp = "TURRET MOBILEBUILT",
-			parentsinheritxp = "TURRET MOBILEBUILT"
 		},
 		autoheal = 80,
 		speed = 45,
@@ -17,11 +13,45 @@ return {
 		metalmake = 6,
 		health = 5500,
 		buildoptions = {
-			[28] = 'corhllt',
-			[29] = 'cornecro',
-			[30] = 'corlevlr',
-			[31] = 'corak',
-			[32] = 'cormaw'
+			'corsolar',
+			'coradvsol',
+			'corwin',
+			'cormstor',
+			'corestor',
+			'cormex',
+			'corexp',
+			'cormakr',
+			'corlab',
+			'corvp',
+			'corap',
+			'corhp',
+			'coreyes',
+			'corrad',
+			'cordrag',
+			'corllt',
+			'corrl',
+			'cordl',
+			'corhllt',
+			'corcan',
+			'correap',
+			'corlevlr',
+			'corak',
+			'cormaw',
+			'corjamt',
+			'cornecro',
+			'cortide',
+			'corsy',
+			'corfhp',
+			'coruwms',
+			'coruwes',
+			'coruwmex',
+			'corfmkr',
+			'corfdrag',
+			'cortl',
+			'corfrt',
+			'corfrad',
+			'corgeo',
+			'coruwgeo',
 		},
 		weapondefs = {
 			corcomlaser = {
@@ -30,71 +60,72 @@ return {
 					bombers = 180,
 					default = 260,
 					fighters = 110,
-					subs = 5
-				}
+					subs = 5,
+				},
 			},
 			disintegrator = {
 				energypershot = 1000,
-				reloadtime = 8
-			}
-		}
+				reloadtime = 8,
+			},
+		},
 	},
 	corcomlvl2 = {
 		speed = 62,
 		health = 8500,
-		energymake = 255,
-		metalmake = 16,
+		energymake = 315,
+		metalmake = 30,
 		autoheal = 300,
 		builddistance = 200,
 		workertime = 600,
 		buildoptions = {
-			[1] = 'corsolar',
-			[2] = 'coradvsol',
-			[3] = 'corwin',
-			[4] = 'corgeo',
-			[5] = 'cormstor',
-			[6] = 'corestor',
-			[7] = 'cormex',
-			[8] = 'corexp',
-			[9] = 'cormakr',
-			[10] = 'corcan',
-			[11] = 'correap',
-			[12] = 'corlab',
-			[13] = 'corvp',
-			[14] = 'corap',
-			[15] = 'corhp',
-			[16] = 'cornanotc',
-			[17] = 'coreyes',
-			[18] = 'corrad',
-			[19] = 'cordrag',
-			[20] = 'cormaw',
-			[21] = 'corllt',
-			[22] = 'corhllt',
-			[23] = 'corhlt',
-			[24] = 'corpun',
-			[25] = 'corrl',
-			[26] = 'cormadsam',
-			[27] = 'corerad',
-			[28] = 'cordl',
-			[29] = 'corjamt',
-			[30] = 'corjuno',
-			[31] = 'corsy',
-			[32] = 'coruwgeo',
-			[33] = 'corfasp',
-			[34] = 'cornerco',
-			[35] = 'coruwes',
-			[36] = 'corplat',
-			[37] = 'corfhp',
-			[38] = 'coruwms',
-			[39] = 'corfhlt',
-			[40] = 'cornanotcplat',
-			[41] = 'corfmkr',
-			[42] = 'cortide',
-			[43] = 'corfrad',
-			[44] = 'corfrt',
-			[45] = 'corfdrag',
-			[46] = 'cortl',
-			[47] = 'cornecro'
+			'corsolar',
+			'coradvsol',
+			'corwin',
+			'corgeo',
+			'cormstor',
+			'corestor',
+			'cormex',
+			'coruwmex',
+			'corexp',
+			'cormakr',
+			'corcan',
+			'correap',
+			'corlab',
+			'corvp',
+			'corap',
+			'corhp',
+			'cornanotc',
+			'coreyes',
+			'corrad',
+			'cordrag',
+			'cormaw',
+			'corllt',
+			'corhllt',
+			'corhlt',
+			'corpun',
+			'corrl',
+			'cormadsam',
+			'corerad',
+			'cordl',
+			'corjamt',
+			'corjuno',
+			'corsy',
+			'coruwgeo',
+			'corfasp',
+			'cornerco',
+			'coruwes',
+			'corplat',
+			'corfhp',
+			'coruwms',
+			'corfhlt',
+			'cornanotct2',
+			'corfmkr',
+			'cortide',
+			'corfrad',
+			'corfrt',
+			'corfdrag',
+			'cortl',
+			'cornecro',
 		},
 		customparams = {
 			evolution_target = 'corcomlvl3',
@@ -142,8 +173,8 @@ return {
 					bombers = 180,
 					default = 1500,
 					fighters = 110,
-					subs = 5
-				}
+					subs = 5,
+				},
 			},
 			disintegrator = {
 				areaofeffect = 36,
@@ -184,79 +215,80 @@ return {
 				damage = {
 					commanders = 0,
 					default = 20000,
-					raptors = 10000
-				}
-			}
+					raptors = 10000,
+				},
+			},
 		},
 		weapons = {
 			[1] = {
 				def = 'armcomlaser',
 				onlytargetcategory = 'NOTSUB',
-				fastautoretargeting = true
+				fastautoretargeting = true,
 			},
 			[3] = {
 				def = 'DISINTEGRATOR',
-				onlytargetcategory = 'NOTSUB'
-			}
-		}
+				onlytargetcategory = 'NOTSUB',
+			},
+		},
 	},
 	corcomlvl3 = {
-		speed = 80,
+		speed = 88,
 		health = 30000,
 		energymake = 2180,
 		metalmake = 49,
 		autoheal = 1500,
 		workertime = 1200,
-		builddistance = 250,
+		builddistance = 350,
 		buildoptions = {
-				[1] = 'corfus',
-				[2] = 'corafus',
-				[3] = 'corageo',
-				[4] = 'cormoho',
-				[5] = 'cormexp',
-				[6] = 'cormmkr',
-				[7] = 'coruwadves',
-				[8] = 'coruwadvms',
-				[9] = 'corarad',
-				[10] = 'corshroud',
-				[11] = 'corfort',
-				[12] = 'corlab',
-				[13] = 'cortarg',
-				[14] = 'corsd',
-				[15] = 'corgate',
-				[16] = 'cortoast',
-				[17] = 'corvipe',
-				[18] = 'cordoom',
-				[19] = 'corflak',
-				[20] = 'corscreamer',
-				[21] = 'corvp',
-				[22] = 'corfmd',
-				[23] = 'corap',
-				[24] = 'corint',
-				[25] = 'corplat',
-				[26] = 'corsy',
-				[27] = 'coruwmme',
-				[28] = 'coruwmmm',
-				[29] = 'corenaa',
-				[30] = 'corfdoom',
-				[31] = 'coratl',
-				[32] = 'coruwfus',
-				[33] = 'corjugg',
-				[34] = 'corshiva',
-				[35] = 'corsumo',
-				[36] = 'corgol',
-				[37] = 'corkorg',
-				[38] = 'cornanotc2plat',
-				[39] = 'cornanotct2',
-				[40] = 'cornecro',
-				[41] = 'cordoomt3',
-				[42] = 'corhllllt',
-				[43] = 'cormaw',
-				[44] = 'cormwall',
-				[45] = 'corgatet3',
-				[46] = 'legendary_bulwark',
-				[47] = 'cornanotct3',
-				[48] = 'epic_calamity',
+			'corfus',
+			'corafus',
+			'corageo',
+			'corbhmth',
+			'cormoho',
+			'cormexp',
+			'cormmkr',
+			'coruwadves',
+			'coruwadvms',
+			'corarad',
+			'corshroud',
+			'corfort',
+			'corlab',
+			'cortarg',
+			'corsd',
+			'corgate',
+			'cortoast',
+			'corvipe',
+			'cordoom',
+			'corflak',
+			'corscreamer',
+			'corvp',
+			'corfmd',
+			'corap',
+			'corint',
+			'corplat',
+			'corsy',
+			'coruwmme',
+			'coruwmmm',
+			'corenaa',
+			'corfdoom',
+			'coratl',
+			'coruwfus',
+			'corjugg',
+			'corshiva',
+			'corsumo',
+			'corgol',
+			'corkorg',
+			'cornanotc2plat',
+			'cornanotct2',
+			'cornecro',
+			'cordoomt3',
+			'corhllllt',
+			'cormaw',
+			'cormwall',
+			'corgatet3',
+			'legendary_bulwark',
+			'cornanotct3',
+			'epic_calamity',
 		},
 		customparams = {
 			evolution_target = 'corcomlvl4',
@@ -300,8 +332,8 @@ return {
 				weaponvelocity = 900,
 				damage = {
 					default = 2000,
-					subs = 5
-				}
+					subs = 5,
+				},
 			},
 			disintegrator = {
 				areaofeffect = 36,
@@ -344,20 +376,20 @@ return {
 					commanders = 0,
 					default = 20000,
 					scavboss = 1000,
-					raptors = 10000
-				}
-			}
+					raptors = 10000,
+				},
+			},
 		},
 		weapons = {
 			[1] = {
 				def = 'CORCOMLASER',
 				onlytargetcategory = 'NOTSUB',
-				fastautoretargeting = true
+				fastautoretargeting = true,
 			},
 			[5] = {
-				def = ''
-			}
-		}
+				def = '',
+			},
+		},
 	},
 	corcomlvl4 = {
 		speed = 80,
@@ -366,7 +398,7 @@ return {
 		metalmake = 56,
 		autoheal = 3550,
 		workertime = 1800,
-		builddistance = 300,
+		builddistance = 500,
 		buildoptions = {
 			'corfus',
 			'corafus',
@@ -459,8 +491,8 @@ return {
 				weaponvelocity = 900,
 				damage = {
 					default = 2500,
-					subs = 5
-				}
+					subs = 5,
+				},
 			},
 			disintegratorxl = {
 				areaofeffect = 105,
@@ -504,8 +536,8 @@ return {
 					commanders = 0,
 					default = 20000,
 					scavboss = 1000,
-					raptors = 10000
-				}
+					raptors = 10000,
+				},
 			},
 			corcomeyelaser = {
 				allowNonBlockingAim = true,
@@ -544,29 +576,30 @@ return {
 				weapontype = 'BeamLaser',
 				weaponvelocity = 1500,
 				damage = {
-					default = 185
-				}
-			}
+					default = 185,
+				},
+			},
 		},
 		weapons = {
 			[1] = {
 				def = 'CORCOMLASER',
 				onlytargetcategory = 'NOTSUB',
-				fastautoretargeting = true
+				fastautoretargeting = true,
 			},
 			[3] = {
 				badtargetcategory = 'VTOL',
 				def = 'disintegratorxl',
-				onlytargetcategory = 'SURFACE'
+				onlytargetcategory = 'SURFACE',
 			},
 			[6] = {
-				def = ''
+				def = '',
 			},
 			[5] = {
 				badtargetcategory = 'VTOL GROUNDSCOUT',
 				def = 'corcomeyelaser',
-				onlytargetcategory = 'SURFACE'
-			}
-		}
-	}
+				onlytargetcategory = 'SURFACE',
+			},
+		},
+	},
 }
+-- CORTEX_COMMANDER_END
