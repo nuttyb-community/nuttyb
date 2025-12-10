@@ -16,7 +16,7 @@ interface Bundle {
 
 const DATA_STORE_PATH = './public/data' as const;
 const BUNDLE_FILE_NAME = 'lua-bundle.json' as const;
-const LUA_PREFIX = '~lua/' as const;
+const LUA_PREFIX = '~' as const;
 
 /**
  * Reads the lua-bundle.json file
