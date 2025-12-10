@@ -16,21 +16,24 @@ function getGitSha(): string {
 
 /**
  * Detect if we're building for GitHub Pages deployment.
- * The GITHUB_PAGES env var is set by the actions/configure-pages action.
+ * The GITHUB_PAGES env var is set manually in the GitHub Actions workflow.
  */
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
+
+/** Base path for GitHub Pages subdirectory deployment */
+const BASE_PATH = '/NuttyB-Raptors';
 
 const nextConfig: NextConfig = {
     /* config options here */
     reactCompiler: true,
     env: {
         NEXT_PUBLIC_GIT_SHA: getGitSha(),
+        NEXT_PUBLIC_BASE_PATH: isGitHubPages ? BASE_PATH : '',
     },
     // Static export for GitHub Pages
     output: 'export',
-    // Base path for GitHub Pages subdirectory deployment
-    // Deployed to: https://goldjee.github.io/NuttyB-Raptors-Configurator/
-    basePath: isGitHubPages ? '/NuttyB-Raptors' : '',
+    // Deployed to: https://bar-nuttyb-collective.github.io/configurator
+    basePath: isGitHubPages ? BASE_PATH : '',
     // Disable image optimization (not supported in static export)
     images: {
         unoptimized: true,

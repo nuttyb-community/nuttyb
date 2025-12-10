@@ -60,10 +60,42 @@ interface StoredData {
 
 const DEFAULT_STORED_DATA: StoredData = { tweaks: [], enabledIds: [] };
 
+/**
+ * Validates stored custom tweaks data.
+ * Returns null if data is invalid/corrupted to reset to defaults.
+ */
+function validateStoredData(stored: StoredData): StoredData | null {
+    // Ensure required structure exists
+    if (!stored || typeof stored !== 'object') {
+        return null;
+    }
+
+    // Ensure arrays exist and are valid
+    if (!Array.isArray(stored.tweaks) || !Array.isArray(stored.enabledIds)) {
+        return null;
+    }
+
+    // Validate each tweak has required properties
+    for (const tweak of stored.tweaks) {
+        if (
+            typeof tweak.id !== 'number' ||
+            typeof tweak.type !== 'string' ||
+            typeof tweak.code !== 'string'
+        ) {
+            return null;
+        }
+    }
+
+    return stored;
+}
+
 export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
     const [storedData, setStoredData, isLoaded] = useLocalStorage<StoredData>(
         CUSTOM_TWEAKS_STORAGE_KEY,
-        DEFAULT_STORED_DATA
+        DEFAULT_STORED_DATA,
+        {
+            onLoad: validateStoredData,
+        }
     );
 
     const customTweaks = storedData.tweaks;
