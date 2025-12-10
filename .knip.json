@@ -1,0 +1,12 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "entry": ["src/app/**/*.{ts,tsx}", "scripts/sync/sync.ts"],
+    "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{ts,tsx,js,jsx}"],
+    "ignore": ["**/*.config.*"],
+    "ignoreDependencies": ["eslint-nibble", "tailwindcss"],
+    "ignoreExportsUsedInFile": {
+        "interface": true,
+        "type": true
+    },
+    "tags": ["-lintignore"]
+}
