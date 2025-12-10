@@ -2,6 +2,10 @@
 
 Collective NuttyB is a mod for BAR Raptors and Scavengers on steroids!
 
+This is a monorepo that contains:
+- The source code for various tweaks for the NuttyB mod (`lua` directory).
+- The source code for Configurator web application.
+
 ## 📚 Documentation
 
 - **[Wiki](https://github.com/BAR-NuttyB-collective/NuttyB/wiki)** - Complete guides and documentation
@@ -16,25 +20,25 @@ Use the [Collective NuttyB Configurator](https://bar-nuttyb-collective.github.io
 
 ### Building Tweaks
 
-Convert Lua tweaks to base64url format and copy SPADS commands to clipboard:
-```shell
-make b64-local
+Whenever you make changes to the tweak source files, you need to generate the Lua bundle that Configurator will use. You can do this by running:
+
+```bash
+bun run sync .
 ```
 
-Convert base64url tweaks back to Lua format:
-```shell
-make lua
+You can test that the generated bundle is sufficient by running:
+
+```bash
+bun run bundle-test
 ```
 
-For debugging purposes you can use https://nntpaul.github.io/ to decode/encode tweaks.
+### Running a Local Dev Server for Configurator
 
-Additional commands are available in the [Makefile](Makefile).
+To test your changes in the Configurator, you can run a local development server with:
 
-### Release Process
-
-1. Use the [Collective NuttyB Configurator](https://github.com/BAR-NuttyB-collective/configurator) to update configurations, it has a [sync script](https://github.com/BAR-NuttyB-collective/configurator?tab=readme-ov-file#sync) for that.
-2. Make sure to update the [CHANGELOG](CHANGELOG.md) with any significant changes.
-2. Update the [Wiki](https://github.com/BAR-NuttyB-collective/NuttyB/wiki) with any significant changes
+```bash
+bun run dev
+```
 
 ## 👥 Contributors
 
@@ -47,6 +51,7 @@ This project has been made possible by the contributions of:
 - [timuela](https://github.com/timuela) - Unit launcher range adjustments
 - [Lu5ck](https://github.com/Lu5ck) - Base64 automation, LRPC rebalance review
 - [autolumn](https://github.com/autolumn) - Helper commands
+- [Insider](https://github.com/goldjee) - Configurator web application, CI/CD
 
 ## 📜 License
 
