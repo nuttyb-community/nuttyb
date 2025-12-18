@@ -87,7 +87,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
                     '!unit_restrictions_nonukes 0',
                     '!draft_mode disabled',
                     '!unit_restrictions_notacnukes 0',
-                    '$welcome-message See https://github.com/BAR-NuttyB-collective',
+                    '$welcome-message See https://nuttyb.org',
                     '!unit_market 0',
                     '!evocom 0',
                     '!nowasting all',
