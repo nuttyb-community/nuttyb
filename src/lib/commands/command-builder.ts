@@ -6,50 +6,28 @@ import {
 } from './slot-packer';
 import type { LuaFile, TweakValue } from '../../types/types';
 import {
+    BASE_COMMANDS,
+    BASE_TWEAKS,
     CONFIGURATION_MAPPING,
     MAX_COMMAND_LENGTH,
 } from '../data/configuration-mapping';
 
 /**
- * Interpolates placeholders in command strings.
+ * Builds the !rename command for custom lobby naming.
  *
- * Supported placeholders:
- * - %%MODE%% → 'raptor' or 'scav' based on game mode
- *
- * @param command The command string with placeholders
- * @param mode The current game mode ('Raptors' or 'Scavengers')
- * @returns The interpolated command string
- */
-function interpolateCommand(
-    command: string,
-    mode: Configuration['mode']
-): string {
-    const modePrefix = mode === 'Scavengers' ? 'scav' : 'raptor';
-    return command.replaceAll('%%MODE%%', modePrefix);
-}
-
-/**
- * Builds the $rename command for custom lobby naming.
- *
- * Format: $rename Community NuttyB <Mode> [<user_input>] [<enemyHealth>xHP / <bossHealth>xQHP]
+ * Format: !rename Community NuttyB [<PresetDifficulty>] [<CustomName>]
  *
  * @param configuration User's selected configuration
- * @returns The $rename command string, or undefined if no custom name
+ * @returns The !rename command string
  */
-function buildRenameCommand(configuration: Configuration): string | undefined {
+function buildRenameCommand(configuration: Configuration): string {
     const customName = configuration.lobbyName?.trim();
+    const preset = configuration.presetDifficulty;
 
-    const mode = configuration.mode;
-    const difficulty = configuration.difficulty;
-    const enemyHealth = configuration.enemyHealth;
-    const bossHealth = configuration.bossHealth;
+    let command = `!rename Community NuttyB [${preset}]`;
+    if (customName) command += ` [${customName}]`;
 
-    let command = `!rename Community NuttyB ${mode} `;
-    if (difficulty !== 'Default') command += `[${difficulty}] `;
-    if (customName) command += `[${customName}] `;
-    command += `[${enemyHealth.toString()}HP | ${bossHealth.toString()}QHP]`;
-
-    return command.replaceAll('.', '_');
+    return command;
 }
 
 /**
@@ -78,6 +56,34 @@ export function buildLobbySections(
 
     const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
 
+    // Always include Raptor base commands
+    rawCommands.push(...BASE_COMMANDS);
+
+    // Always include always-enabled tweaks
+    for (const path of BASE_TWEAKS.tweakdefs) {
+        const luaFilePath = path.replace(/^~/, '');
+        const luaContent = luaFileMap.get(luaFilePath);
+        if (luaContent) {
+            tweakdefsSources.push(luaContent.trim());
+        } else {
+            console.warn(
+                `Always-enabled Lua file not found in bundle: ${luaFilePath}`
+            );
+        }
+    }
+
+    for (const path of BASE_TWEAKS.tweakunits) {
+        const luaFilePath = path.replace(/^~/, '');
+        const luaContent = luaFileMap.get(luaFilePath);
+        if (luaContent) {
+            tweakunitsSources.push(luaContent.trim());
+        } else {
+            console.warn(
+                `Always-enabled Lua file not found in bundle: ${luaFilePath}`
+            );
+        }
+    }
+
     // Process each configuration option
     for (const configKey in configuration) {
         const configValue = configuration[configKey as keyof Configuration];
@@ -91,11 +97,7 @@ export function buildLobbySections(
         // Process commands
         const commands = tweakValue.command;
         if (commands && commands.length > 0) {
-            rawCommands.push(
-                ...commands.map((cmd) =>
-                    interpolateCommand(cmd, configuration.mode)
-                )
-            );
+            rawCommands.push(...commands);
         }
 
         // Process Lua files (tweakdefs and tweakunits)
@@ -146,7 +148,7 @@ export function buildLobbySections(
         customTweaks
     );
 
-    // Generate rename command if custom lobby name is set
+    // Generate rename command
     const renameCommand = buildRenameCommand(configuration);
 
     // Sort raw commands: !preset first, then others
@@ -161,7 +163,7 @@ export function buildLobbySections(
     // Order: commands first (with !preset at the start), then tweaks
     const allCommands = [
         ...sortedRawCommands,
-        ...(renameCommand ? [renameCommand] : []),
+        renameCommand,
         ...standardBsetCommands,
         ...customTweakCommands,
     ];

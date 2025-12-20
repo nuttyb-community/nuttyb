@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Grid, Stack, Title } from '@mantine/core';
+import { Stack, Title } from '@mantine/core';
 
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 
@@ -17,19 +17,9 @@ const Configurator: React.FC = () => {
         <Stack gap='md'>
             <Title order={2}>Configurator</Title>
 
-            <Grid columns={12} gutter='xl'>
-                <Grid.Col span={4}>
-                    <GeneralSection />
-                </Grid.Col>
-
-                <Grid.Col span={4}>
-                    <DifficultySection />
-                </Grid.Col>
-
-                <Grid.Col span={4}>
-                    <ExtrasSection />
-                </Grid.Col>
-            </Grid>
+            <GeneralSection />
+            <DifficultySection />
+            <ExtrasSection />
             {hasCustomTweaks && <CustomTweaksSection />}
         </Stack>
     );

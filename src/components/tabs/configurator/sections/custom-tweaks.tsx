@@ -11,7 +11,10 @@ import {
     findFirstAvailableSlot,
     getAvailableSlotCount,
 } from '@/lib/commands/custom-tweaks';
-import { CONFIGURATION_MAPPING } from '@/lib/data/configuration-mapping';
+import {
+    BASE_TWEAKS,
+    CONFIGURATION_MAPPING,
+} from '@/lib/data/configuration-mapping';
 import type { TweakValue } from '@/types/types';
 
 /**
@@ -24,10 +27,11 @@ import type { TweakValue } from '@/types/types';
 function calculateStandardSlotUsage(
     configuration: ReturnType<typeof useConfiguratorContext>['configuration']
 ): SlotUsage {
-    // Count how many Lua sources will be assigned per type
-    let tweakdefsCount = 0;
-    let tweakunitsCount = 0;
+    // Count always-enabled tweaks
+    let tweakdefsCount = BASE_TWEAKS.tweakdefs.length;
+    let tweakunitsCount = BASE_TWEAKS.tweakunits.length;
 
+    // Count configuration-specific tweaks
     for (const configKey in configuration) {
         const configValue =
             configuration[configKey as keyof typeof configuration];

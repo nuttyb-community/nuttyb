@@ -27,6 +27,8 @@ interface CustomTweaksContextValue {
     isEnabled: (id: number) => boolean;
     /** Get all enabled tweaks for command generation */
     getEnabledTweaks: () => EnabledCustomTweak[];
+    /** Clear all enabled tweaks (disable all) */
+    clearEnabledTweaks: () => void;
     /** Set of currently enabled tweak IDs */
     enabledIds: Set<number>;
     /** Whether the custom tweaks are still loading from storage */
@@ -160,6 +162,13 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             .map((tweak) => ({ ...tweak, enabled: true }));
     }, [customTweaks, enabledIds]);
 
+    const clearEnabledTweaks = useCallback(() => {
+        setStoredData((prev) => ({
+            ...prev,
+            enabledIds: [],
+        }));
+    }, [setStoredData]);
+
     const value = useMemo<CustomTweaksContextValue>(
         () => ({
             customTweaks,
@@ -168,6 +177,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             toggleTweak,
             isEnabled,
             getEnabledTweaks,
+            clearEnabledTweaks,
             enabledIds,
             isLoading: !isLoaded,
         }),
@@ -178,6 +188,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             toggleTweak,
             isEnabled,
             getEnabledTweaks,
+            clearEnabledTweaks,
             enabledIds,
             isLoaded,
         ]

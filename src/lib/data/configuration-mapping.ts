@@ -11,144 +11,112 @@ export const MAX_COMMAND_LENGTH = 51_000;
  */
 export const MAX_SLOTS_PER_TYPE = 10;
 
+/**
+ * Base commands always included for Raptors mode.
+ */
+export const BASE_COMMANDS = [
+    '!preset coop',
+    '!teamsize 12',
+    '!autobalance off',
+    '!assistdronesbuildpowermultiplier 1',
+    '!assistdronesenabled enabled',
+    '!commanderbuildersbuildpower 1000',
+    '!commanderbuildersenabled enabled',
+    '!commanderbuildersrange 1000',
+    '!disablemapdamage 1',
+    '!experimentalextraunits 1',
+    '!experimentallegionfaction 1',
+    '!experimentalshields bounceeverything',
+    '!maxunits 10000',
+    '!multiplier_builddistance 1.5',
+    '!multiplier_buildpower 1',
+    '!multiplier_buildtimecost 1',
+    '!multiplier_energyconversion 1',
+    '!multiplier_energycost 1',
+    '!multiplier_energyproduction 1',
+    '!multiplier_losrange 1',
+    '!multiplier_maxdamage 1',
+    '!multiplier_maxvelocity 1',
+    '!multiplier_metalcost 1',
+    '!multiplier_metalextraction 1',
+    '!multiplier_radarrange 1',
+    '!multiplier_resourceincome 1',
+    '!multiplier_shieldpower 2',
+    '!multiplier_turnrate 1',
+    '!multiplier_weapondamage 1',
+    '!multiplier_weaponrange 1',
+    '!raptor_difficulty epic',
+    '!raptor_spawntimemult 1',
+    '!releasecandidates 1',
+    '!startenergy 10000',
+    '!startenergystorage 10000',
+    '!startmetal 10000',
+    '!startmetalstorage 10000',
+    '!scavunitsforplayers 1',
+    '!forceallunits 1',
+    '!unit_restrictions_noair 0',
+    '!unit_restrictions_noendgamelrpc 0',
+    '!unit_restrictions_noextractors 1',
+    '!unit_restrictions_nolrpc 0',
+    '!unit_restrictions_nonukes 0',
+    '!draft_mode disabled',
+    '!unit_restrictions_notacnukes 0',
+    '$welcome-message See https://nuttyb.org for mod info and setup instructions',
+    '!unit_market 0',
+    '!evocom 0',
+    '!nowasting all',
+    '!bSet unit_restrictions_nonukes 1',
+    '!bSet raptor_queen_count 8',
+    '!balance',
+] as const;
+
+/**
+ * Tweaks always enabled (not configurable).
+ */
+export const BASE_TWEAKS = {
+    tweakdefs: [
+        '~lua/main-defs.lua',
+        '~lua/eco-t3.lua',
+        '~lua/builders-t3.lua',
+        '~lua/unit-launchers.lua',
+    ],
+    tweakunits: [
+        '~lua/main-units.lua',
+        '~lua/evocom-leg.lua',
+        '~lua/evocom-arm.lua',
+        '~lua/evocom-cor.lua',
+        '~lua/lrpc-rebalance.lua',
+        '~lua/air-rework-t4.lua',
+    ],
+} as const;
+
 // References to actual Lua files are prefixed with ~
 export const CONFIGURATION_MAPPING: ValueMapping = {
-    isMainTweaks: {
-        description: 'Main NuttyB tweaks',
+    presetDifficulty: {
+        description: 'Preset difficulty level',
         values: {
-            true: {
-                tweakdefs: ['~lua/main-defs.lua'],
-                tweakunits: ['~lua/main-units.lua'],
-            },
-            false: undefined,
-        },
-    },
-    isEvolvingCommanders: {
-        description: 'NuttyB Evolving Commanders',
-        values: {
-            true: {
-                tweakunits: [
-                    '~lua/evocom-leg.lua',
-                    '~lua/evocom-arm.lua',
-                    '~lua/evocom-cor.lua',
+            Easy: {
+                tweakdefs: [
+                    '~lua/raptor-hp/raptor-hp-1.3x.lua',
+                    '~lua/queen-hp/queen-hp-1.3x.lua',
+                    '~lua/cross-faction-t2.lua',
+                    '~lua/defences-t4.lua',
                 ],
             },
-            false: undefined,
-        },
-    },
-    mode: {
-        description: 'Game mode presets',
-        values: {
-            Raptors: {
-                command: [
-                    '!preset coop',
-                    '!teamsize 12',
-                    '!autobalance off',
-                    '!assistdronesbuildpowermultiplier 1',
-                    '!assistdronesenabled enabled',
-                    '!commanderbuildersbuildpower 1000',
-                    '!commanderbuildersenabled enabled',
-                    '!commanderbuildersrange 1000',
-                    '!disablemapdamage 1',
-                    '!experimentalextraunits 1',
-                    '!experimentallegionfaction 1',
-                    '!experimentalshields bounceeverything',
-                    '!maxunits 10000',
-                    '!multiplier_builddistance 1.5',
-                    '!multiplier_buildpower 1',
-                    '!multiplier_buildtimecost 1',
-                    '!multiplier_energyconversion 1',
-                    '!multiplier_energycost 1',
-                    '!multiplier_energyproduction 1',
-                    '!multiplier_losrange 1',
-                    '!multiplier_maxdamage 1',
-                    '!multiplier_maxvelocity 1',
-                    '!multiplier_metalcost 1',
-                    '!multiplier_metalextraction 1',
-                    '!multiplier_radarrange 1',
-                    '!multiplier_resourceincome 1',
-                    '!multiplier_shieldpower 2',
-                    '!multiplier_turnrate 1',
-                    '!multiplier_weapondamage 1',
-                    '!multiplier_weaponrange 1',
-                    '!raptor_difficulty epic',
-                    '!raptor_spawntimemult 1',
-                    '!releasecandidates 1',
-                    '!startenergy 10000',
-                    '!startenergystorage 10000',
-                    '!startmetal 10000',
-                    '!startmetalstorage 10000',
-                    '!scavunitsforplayers 1',
-                    '!forceallunits 1',
-                    '!unit_restrictions_noair 0',
-                    '!unit_restrictions_noendgamelrpc 0',
-                    '!unit_restrictions_noextractors 1',
-                    '!unit_restrictions_nolrpc 0',
-                    '!unit_restrictions_nonukes 0',
-                    '!draft_mode disabled',
-                    '!unit_restrictions_notacnukes 0',
-                    '$welcome-message See https://nuttyb.org',
-                    '!unit_market 0',
-                    '!evocom 0',
-                    '!nowasting all',
-                    '!bSet unit_restrictions_nonukes 1',
-                    '!bSet raptor_queen_count 8',
-                    '!balance',
+            Medium: {
+                tweakdefs: [
+                    '~lua/raptor-hp/raptor-hp-1.5x.lua',
+                    '~lua/queen-hp/queen-hp-1.5x.lua',
+                    '~lua/cross-faction-t2.lua',
+                    '~lua/defences-t4.lua',
                 ],
             },
-            Scavengers: {
-                command: [
-                    '!scav_boss_count 8',
-                    '!scav_bosstimemult 1.3',
-                    '!scav_difficulty epic',
-                    '!scav_spawncountmult 2',
-                    '!bSet ruins disabled',
-                    '!shieldsrework 1',
-                    '!unit_restrictions_noextractors 0',
+            Hard: {
+                tweakdefs: [
+                    '~lua/raptor-hp/raptor-hp-3.0x.lua',
+                    '~lua/queen-hp/queen-hp-3.0x.lua',
                 ],
             },
-        },
-    },
-    difficulty: {
-        description: 'Game difficulty',
-        values: {
-            Default: undefined,
-            'Very Easy': { command: ['!%%MODE%%_difficulty veryeasy'] },
-            Easy: { command: ['!%%MODE%%_difficulty easy'] },
-            Normal: { command: ['!%%MODE%%_difficulty normal'] },
-            Hard: { command: ['!%%MODE%%_difficulty hard'] },
-            'Very Hard': { command: ['!%%MODE%%_difficulty veryhard'] },
-            Epic: { command: ['!%%MODE%%_difficulty epic'] },
-        },
-    },
-    enemyHealth: {
-        description: 'Enemy health multiplier',
-        values: {
-            '1.3x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-1.3x.lua'] },
-            '1.5x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-1.5x.lua'] },
-            '1.7x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-1.7x.lua'] },
-            '2.0x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-2.0x.lua'] },
-            '2.5x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-2.5x.lua'] },
-            '3.0x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-3.0x.lua'] },
-            '4.0x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-4.0x.lua'] },
-            '5.0x': { tweakdefs: ['~lua/raptor-hp/raptor-hp-5.0x.lua'] },
-        },
-    },
-    bossHealth: {
-        description: 'Boss health multiplier',
-        values: {
-            '1.3x': { tweakdefs: ['~lua/queen-hp/queen-hp-1.3x.lua'] },
-            '1.5x': { tweakdefs: ['~lua/queen-hp/queen-hp-1.5x.lua'] },
-            '1.7x': { tweakdefs: ['~lua/queen-hp/queen-hp-1.7x.lua'] },
-            '2.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-2.0x.lua'] },
-            '2.5x': { tweakdefs: ['~lua/queen-hp/queen-hp-2.5x.lua'] },
-            '3.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-3.0x.lua'] },
-            '4.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-4.0x.lua'] },
-            '5.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-5.0x.lua'] },
-            '7.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-7.0x.lua'] },
-            '9.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-9.0x.lua'] },
-            '11.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-11.0x.lua'] },
-            '13.0x': { tweakdefs: ['~lua/queen-hp/queen-hp-13.0x.lua'] },
         },
     },
     extras: {
@@ -169,6 +137,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
                     '!map Full Metal Plate',
                     '!addbox 82 82 117 117 2',
                     '!clearbox 1',
+                    '!teamsize 12',
                 ],
             },
             'Raptor Crater (16P)': {
@@ -308,55 +277,6 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'Custom lobby name',
         values: {
             '': undefined, // Empty string means no custom name - handled dynamically
-        },
-    },
-    isCrossFactionT2: {
-        description: 'Cross-faction T2 labs',
-        values: {
-            true: { tweakdefs: ['~lua/cross-faction-t2.lua'] },
-            false: undefined,
-        },
-    },
-    isT3Eco: {
-        description: 'T3 Economy buildings',
-        values: {
-            true: { tweakdefs: ['~lua/eco-t3.lua'] },
-            false: undefined,
-        },
-    },
-    isT3Builders: {
-        description: 'T3 Builder aides',
-        values: {
-            true: { tweakdefs: ['~lua/builders-t3.lua'] },
-            false: undefined,
-        },
-    },
-    isUnitLaunchers: {
-        description: 'Unit Launchers',
-        values: {
-            true: { tweakdefs: ['~lua/unit-launchers.lua'] },
-            false: undefined,
-        },
-    },
-    isLrpcRebalance: {
-        description: 'LRPC Rebalance',
-        values: {
-            true: { tweakunits: ['~lua/lrpc-rebalance.lua'] },
-            false: undefined,
-        },
-    },
-    isT4Defences: {
-        description: 'T4 Defences',
-        values: {
-            true: { tweakdefs: ['~lua/defences-t4.lua'] },
-            false: undefined,
-        },
-    },
-    isT4AirRework: {
-        description: 'T4 Air Rework',
-        values: {
-            true: { tweakunits: ['~lua/air-rework-t4.lua'] },
-            false: undefined,
         },
     },
     isMegaNuke: {
