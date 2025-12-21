@@ -5,6 +5,7 @@ import React from 'react';
 import {
     Alert,
     Button,
+    Flex,
     Group,
     Stack,
     Text,
@@ -63,20 +64,23 @@ const GeneratedCommands: React.FC = () => {
 
     return (
         <Stack gap='md'>
-            <Title order={2}>Generated Commands</Title>
+            <Flex gap='md' align='baseline'>
+                <Title order={2}>Generated Commands</Title>
+                {slotUsage && !error && (
+                    <Text size='xs' c='dimmed'>
+                        Available slots:{' '}
+                        {slotUsage.tweakdefs.total - slotUsage.tweakdefs.used}{' '}
+                        tweakdefs,{' '}
+                        {slotUsage.tweakunits.total - slotUsage.tweakunits.used}{' '}
+                        tweakunits
+                    </Text>
+                )}
+            </Flex>
 
             {error && (
                 <Alert color='red' title='Command Generation Error'>
                     {error}
                 </Alert>
-            )}
-
-            {slotUsage && !error && (
-                <Text size='sm' c='dimmed'>
-                    Using {slotUsage.tweakdefs.used}/{slotUsage.tweakdefs.total}{' '}
-                    tweakdefs slots, {slotUsage.tweakunits.used}/
-                    {slotUsage.tweakunits.total} tweakunits slots
-                </Text>
             )}
 
             {hasMultipleSections && (

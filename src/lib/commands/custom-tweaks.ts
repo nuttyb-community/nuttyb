@@ -132,27 +132,6 @@ export function calculateUsedSlots(commands: string[]): SlotUsage {
 
     return usage;
 }
-
-/**
- * Gets the count of available numbered slots (1-9) for a given type.
- *
- * @param usage Current slot usage
- * @param type Tweak type to check
- * @returns Number of available slots (0-9)
- */
-export function getAvailableSlotCount(
-    usage: SlotUsage,
-    type: LuaTweakType
-): number {
-    let available = 0;
-    for (let i = 1; i <= MAX_NUMBERED_SLOTS; i++) {
-        if (!usage[type].has(i)) {
-            available++;
-        }
-    }
-    return available;
-}
-
 /**
  * Finds the first available numbered slot (1-9) for a given type.
  *
