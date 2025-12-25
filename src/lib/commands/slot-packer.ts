@@ -5,6 +5,7 @@ import {
     MAX_SLOTS_PER_TYPE,
     TARGET_SLOT_SIZE,
 } from '../data/configuration-mapping';
+import { extractTopComments, stripCommentPrefix } from '../lua-utils';
 
 /**
  * Base64 encoding overhead estimate (~37% expansion + padding).
@@ -26,7 +27,7 @@ export interface SlotPackingResult {
 /**
  * A Lua source with its path and priority for packing.
  */
-interface LuaSourceWithMetadata {
+export interface LuaSourceWithMetadata {
     path: string;
     content: string;
     priority: number;
@@ -35,14 +36,15 @@ interface LuaSourceWithMetadata {
 /**
  * Wraps Lua source in an IIFE (Immediately Invoked Function Expression).
  * Each file runs in its own scope to prevent variable collisions.
+ * Includes source path comment for debugging.
  *
  * @param content Lua source code
- * @param path Source file path for debugging comments
- * @returns IIFE-wrapped Lua code
+ * @param path Source file path for debugging comment
+ * @returns IIFE-wrapped Lua code with source comment
  */
 function wrapInIIFE(content: string, path: string): string {
-    return `(function()
--- Source: ${path}
+    return `-- Source: ${path}
+(function()
 ${content}
 end)()`;
 }
@@ -69,6 +71,29 @@ function groupByPriority(
 }
 
 /**
+ * Builds a merged header from source descriptions.
+ * Extracts first-line comments from each source and combines them.
+ *
+ * @param sources Sources to extract descriptions from
+ * @returns Merged header comment or undefined if no descriptions found
+ */
+function buildMergedHeader(
+    sources: readonly LuaSourceWithMetadata[]
+): string | undefined {
+    const descriptions = sources
+        .map((source) => {
+            const topComments = extractTopComments(source.content);
+            const firstLine = topComments.split('\n')[0] ?? '';
+            return stripCommentPrefix(firstLine);
+        })
+        .filter((desc) => desc.length > 0);
+
+    return descriptions.length > 0
+        ? `-- ${descriptions.join(', ')}\n\n`
+        : undefined;
+}
+
+/**
  * Packs sources within a single priority group using greedy bin-packing.
  * Single Responsibility: Only handles packing logic for one priority level.
  *
@@ -83,6 +108,7 @@ function packPriorityGroup(
 ): string[] {
     const slots: string[] = [];
     let currentSlot: string[] = [];
+    let currentSlotSources: LuaSourceWithMetadata[] = [];
     let currentSize = 0;
 
     for (const source of sources) {
@@ -97,18 +123,31 @@ function packPriorityGroup(
             currentSlot.length > 0 &&
             currentSize + estimatedEncoded > TARGET_SLOT_SIZE
         ) {
-            slots.push(currentSlot.join('\n\n'));
+            // Finalize current slot with merged header
+            const mergedHeader = buildMergedHeader(currentSlotSources);
+            const slotContent = mergedHeader
+                ? mergedHeader + currentSlot.join('\n\n')
+                : currentSlot.join('\n\n');
+            slots.push(slotContent);
+
+            // Start new slot
             currentSlot = [wrapped];
+            currentSlotSources = [source];
             currentSize = estimatedEncoded;
         } else {
             currentSlot.push(wrapped);
+            currentSlotSources.push(source);
             currentSize += estimatedEncoded;
         }
     }
 
-    // Finalize last slot
+    // Finalize last slot with merged header
     if (currentSlot.length > 0) {
-        slots.push(currentSlot.join('\n\n'));
+        const mergedHeader = buildMergedHeader(currentSlotSources);
+        const slotContent = mergedHeader
+            ? mergedHeader + currentSlot.join('\n\n')
+            : currentSlot.join('\n\n');
+        slots.push(slotContent);
     }
 
     return slots;

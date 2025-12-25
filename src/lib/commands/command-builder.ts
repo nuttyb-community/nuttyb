@@ -4,6 +4,7 @@ import type {
     EnabledCustomTweak,
 } from './custom-tweaks';
 import { allocateCustomTweakSlots } from './custom-tweaks';
+import type { LuaSourceWithMetadata } from './slot-packer';
 import { packLuaSourcesIntoSlots } from './slot-packer';
 import { resolveLuaReference } from './template-interpolator';
 import type { LuaFile, TweakValue } from '../../types/types';
@@ -26,15 +27,6 @@ export interface LobbySectionsResult {
         tweakunits: { used: number; total: number };
     };
     droppedCustomTweaks: EnabledCustomTweak[];
-}
-
-/**
- * A Lua source with its path and priority for packing.
- */
-interface LuaSourceWithMetadata {
-    path: string;
-    content: string;
-    priority: number;
 }
 
 /**

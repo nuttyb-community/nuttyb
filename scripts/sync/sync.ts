@@ -64,10 +64,14 @@ async function main() {
         log('Generating Lua bundle');
         const bundle: { sha: string; files: LuaFile[] } = {
             sha: commitHashSource,
-            files: fileData.map((file) => ({
-                path: file.path,
-                data: minify(file.data),
-            })),
+            files: fileData.map((file) => {
+                // Minificator will fail to parse templates due to syntax errors, so skip them
+                const isTemplate = file.path.endsWith('-template.lua');
+                return {
+                    path: file.path,
+                    data: isTemplate ? file.data : minify(file.data),
+                };
+            }),
         };
 
         log('Clearing existing data');

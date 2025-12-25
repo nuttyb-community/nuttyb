@@ -1,14 +1,6 @@
 import luamin from 'lua-format';
 
-function extractTopComments(content: string) {
-    const lines = content.split('\n');
-    let out = '';
-    for (let i = 0; i < Math.min(3, lines.length); i++) {
-        if (/^\s*--.*/.test(lines[i])) out += lines[i] + '\n';
-        else break;
-    }
-    return out;
-}
+import { extractTopComments } from '@/lib/lua-utils';
 
 export function minify(lua: string): string {
     // Extract top comments first (first 3 lines starting with --).
@@ -39,6 +31,7 @@ export function minify(lua: string): string {
         console.error(
             `lua-format minification failed: ${(error as Error).message}, using unminified content`
         );
+        console.error(error);
         minifiedCode = contentWithoutComments;
     }
 
