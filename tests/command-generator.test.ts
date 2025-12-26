@@ -11,6 +11,8 @@ import {
     BASE_COMMANDS,
     BASE_TWEAKS,
     CONFIGURATION_MAPPING,
+    DEFAULT_LUA_PRIORITY,
+    LUA_PRIORITIES,
     MAX_COMMAND_LENGTH,
     MAX_SLOTS_PER_TYPE,
 } from '@/lib/data/configuration-mapping';
@@ -59,6 +61,26 @@ function mapSettingsToConfig(configuration: Configuration): string[] {
     return mapped;
 }
 
+/**
+ * Validates that Lua sources are ordered by priority group (relative order).
+ * Ensures dependencies load before dependent code.
+ *
+ * @param sources Array of source paths extracted from commands
+ */
+function validatePriorityOrder(sources: string[]): void {
+    let maxPriority = -1;
+
+    for (const sourceRef of sources) {
+        // Clean path for lookup (strip ~ prefix and template variables)
+        const cleanPath = sourceRef.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
+        const priority = LUA_PRIORITIES[cleanPath] ?? DEFAULT_LUA_PRIORITY;
+
+        // Priority should never decrease (monotonic non-decreasing)
+        expect(priority).toBeGreaterThanOrEqual(maxPriority);
+        maxPriority = Math.max(maxPriority, priority);
+    }
+}
+
 describe('Command generation', () => {
     test('Default configuration generates expected commands', () => {
         const config = DEFAULT_CONFIGURATION;
@@ -78,6 +100,8 @@ describe('Command generation', () => {
 
         // Decode generated tweaks to extract source references
         const tweaks = [];
+        const tweakdefsSources = [];
+        const tweakunitsSources = [];
         let tweakdefsCnt = 0;
         let tweakunitsCnt = 0;
         for (const generatedTweak of generatedTweaks) {
@@ -86,8 +110,11 @@ describe('Command generation', () => {
                 continue;
             }
 
-            if (generatedTweak.startsWith('!bset tweakdefs')) tweakdefsCnt++;
-            if (generatedTweak.startsWith('!bset tweakunits')) tweakunitsCnt++;
+            const isTweakdefs = generatedTweak.startsWith('!bset tweakdefs');
+            const isTweakunits = generatedTweak.startsWith('!bset tweakunits');
+
+            if (isTweakdefs) tweakdefsCnt++;
+            if (isTweakunits) tweakunitsCnt++;
             const base64 = generatedTweak.replace(
                 /^!bset tweakdefs\d* |^!bset tweakunits\d* /,
                 ''
@@ -96,9 +123,14 @@ describe('Command generation', () => {
             const sourceRefs = [];
             for (const line of decodedLines) {
                 if (line.startsWith('-- Source: ')) {
-                    sourceRefs.push(
-                        stripCommentPrefix(line).trim().replace('Source: ', '')
-                    );
+                    const sourceRef = stripCommentPrefix(line)
+                        .trim()
+                        .replace('Source: ', '');
+                    sourceRefs.push(sourceRef);
+
+                    // Separate by slot type for priority validation
+                    if (isTweakdefs) tweakdefsSources.push(sourceRef);
+                    if (isTweakunits) tweakunitsSources.push(sourceRef);
                 }
             }
             tweaks.push(...sourceRefs);
@@ -107,6 +139,10 @@ describe('Command generation', () => {
         // Verify slot counts are within limits
         expect(tweakdefsCnt).toBeLessThanOrEqual(MAX_SLOTS_PER_TYPE);
         expect(tweakunitsCnt).toBeLessThanOrEqual(MAX_SLOTS_PER_TYPE);
+
+        // Validate priority ordering (dependencies load before dependents)
+        validatePriorityOrder(tweakdefsSources);
+        validatePriorityOrder(tweakunitsSources);
 
         const expectedTweaks = mapSettingsToConfig(config);
         for (const expectedTweak of expectedTweaks) {

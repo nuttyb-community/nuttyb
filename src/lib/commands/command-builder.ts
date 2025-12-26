@@ -61,8 +61,9 @@ function buildRenameCommand(configuration: Configuration): string {
 }
 
 /**
- * Splits commands into sections using greedy bin-packing.
+ * Splits commands into sections while preserving order.
  * Each section respects the maximum length constraint.
+ * Commands are added to the last section if they fit, otherwise a new section is created.
  *
  * @param commands Array of command strings
  * @param maxLength Maximum length per section (including newline separators)
@@ -86,24 +87,30 @@ function splitCommandsIntoSections(
     for (const cmd of commands) {
         if (!cmd) continue;
 
-        let placed = false;
+        // Validate individual command length
+        if (cmd.length > maxLength) {
+            throw new Error(
+                `Command exceeds maximum length: ${cmd.length} > ${maxLength}. ` +
+                    'Command content cannot be split across sections.'
+            );
+        }
 
-        for (const section of sections) {
-            // Account for newline separator (+1) unless it's the first command
-            const neededLength =
-                section.commands.length === 0 ? cmd.length : cmd.length + 1;
+        // Only try to fit into the last section to preserve order
+        const lastSection = sections.at(-1);
 
-            if (section.length + neededLength <= maxLength) {
-                section.commands.push(cmd);
-                section.length += neededLength;
-                placed = true;
-                break;
+        if (lastSection) {
+            // Account for newline separator (+1)
+            const neededLength = cmd.length + 1;
+
+            if (lastSection.length + neededLength <= maxLength) {
+                lastSection.commands.push(cmd);
+                lastSection.length += neededLength;
+                continue;
             }
         }
 
-        if (!placed) {
-            sections.push({ commands: [cmd], length: cmd.length });
-        }
+        // Doesn't fit in last section (or no sections yet), create new section
+        sections.push({ commands: [cmd], length: cmd.length });
     }
 
     return sections.map((section) => section.commands.join('\n'));
