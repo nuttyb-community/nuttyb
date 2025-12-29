@@ -5,6 +5,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import { generateCommandSections } from '@/lib/command-generator/command-generator';
+import { interpolateCommands } from '@/lib/command-generator/command-template';
 import {
     MAX_CHUNK_SIZE,
     MAX_SLOTS_PER_TYPE,
@@ -36,8 +37,14 @@ import { getBundle } from './utils/bundle';
  * @returns The list of expected commands and Lua file paths
  */
 function mapSettingsToConfig(configuration: Configuration): string[] {
+    // Interpolate any command templates in BASE_COMMANDS
+    const interpolatedBaseCommands = interpolateCommands(
+        BASE_COMMANDS,
+        configuration
+    );
+
     const mapped: string[] = [
-        ...BASE_COMMANDS,
+        ...interpolatedBaseCommands,
         ...BASE_TWEAKS.tweakdefs,
         ...BASE_TWEAKS.tweakunits,
     ];

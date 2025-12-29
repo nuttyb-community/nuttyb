@@ -33,6 +33,10 @@ export const DEFAULT_LUA_PRIORITY = 99;
 
 /**
  * Base commands always included for Raptors mode.
+ *
+ * Supports template syntax for dynamic values:
+ * - $variable$ : Required variable from configuration
+ * - $?content?$ : Optional section, removed if any variable inside is empty
  */
 export const BASE_COMMANDS = [
     '!preset coop',
@@ -87,6 +91,7 @@ export const BASE_COMMANDS = [
     '!nowasting all',
     '!bSet unit_restrictions_nonukes 1',
     '!bSet raptor_queen_count 8',
+    '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
     '!balance',
 ] as const;
 

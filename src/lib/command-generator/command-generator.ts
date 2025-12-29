@@ -8,6 +8,7 @@ import type { LuaFile, LuaTweakType } from '@/types/types';
 
 // Re-export for convenience
 
+import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
 import type { Configuration } from './data/configuration';
 import {
@@ -95,16 +96,6 @@ export interface LobbySectionsResult {
 function getLuaPriority(path: string): number {
     const clean = path.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
     return LUA_PRIORITIES[clean] ?? DEFAULT_LUA_PRIORITY;
-}
-
-/**
- * Builds the !rename command for lobby naming.
- */
-function buildRenameCommand(config: Configuration): string {
-    const name = config.lobbyName?.trim();
-    let cmd = `!rename Community NuttyB [${config.presetDifficulty}]`;
-    if (name) cmd += ` [${name}]`;
-    return cmd;
 }
 
 /** Result of allocating custom tweaks to slots */
@@ -218,6 +209,12 @@ export function generateCommandSections(
         tweakunits: unitsPaths,
     } = getMappedData(configuration);
 
+    // Interpolate any command templates with configuration values
+    const interpolatedCommands = interpolateCommands(
+        rawCommands,
+        configuration
+    );
+
     // Resolve Lua sources with content and priority
     const tweakdefsSources = resolveLuaSources(luaFileMap, defsPaths);
     const tweakunitsSources = resolveLuaSources(luaFileMap, unitsPaths);
@@ -245,23 +242,15 @@ export function generateCommandSections(
         customTweaks?.filter((t) => t.enabled)
     );
 
-    // Build rename command
-    const renameCommand = buildRenameCommand(configuration);
-
-    // Sort raw commands: !preset first
-    const sortedCommands = rawCommands.toSorted((a, b) => {
+    // Sort commands: !preset first
+    const sortedCommands = interpolatedCommands.toSorted((a, b) => {
         if (a.startsWith('!preset') && !b.startsWith('!preset')) return -1;
         if (!a.startsWith('!preset') && b.startsWith('!preset')) return 1;
         return 0;
     });
 
     // Combine all commands in order
-    const allCommands = [
-        ...sortedCommands,
-        renameCommand,
-        ...bsetCommands,
-        ...customCommands,
-    ];
+    const allCommands = [...sortedCommands, ...bsetCommands, ...customCommands];
 
     return {
         sections: packCommandsIntoSections(allCommands),
