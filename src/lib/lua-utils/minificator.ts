@@ -1,18 +1,12 @@
 import luamin from 'lua-format';
 
-import {
-    extractSourceManifests,
-    removeCommentsFromLine,
-} from '@/lib/lua-utils/comment-handler';
+import { removeCommentsFromLine } from '@/lib/lua-utils/comment-handler';
 
 export function minify(lua: string): string {
     // Remove comments from input before minifying to avoid luafmt header inclusion.
     let data = lua;
     // Remove multi-line block comments: --[[ ... --]].
     data = data.replaceAll(/--\[\[[\s\S]*?--\]\]/g, '');
-
-    // Extract source manifest comments to preserve them.
-    const sourceManifests = extractSourceManifests(data);
 
     // Remove single-line comments entirely.
     data = data
@@ -38,10 +32,7 @@ export function minify(lua: string): string {
     // Strip a leading 'return' if present (converter.ts strips it before encoding).
     minifiedCode = minifiedCode.replace(/^return\s*/, '');
 
-    // Compose final output: source manifests + processed code.
-    const manifestHeader =
-        sourceManifests.length > 0 ? sourceManifests.join('\n') + '\n' : '';
-    return manifestHeader + minifiedCode;
+    return minifiedCode;
 }
 
 /**

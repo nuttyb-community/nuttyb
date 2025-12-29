@@ -109,8 +109,9 @@ export function packLuaSources(
 
     // Generate !bset commands with source manifests
     const commands = slots.map((slot, i) => {
-        const finalContent = `-- Source: ${JSON.stringify(slot.sources)}\n${slot.content}`;
-        const encoded = encode(minify(finalContent));
+        const minifiedContent = minify(slot.content);
+        const sourceManifest = `-- Source: ${JSON.stringify(slot.sources)}`;
+        const encoded = encode(`${sourceManifest}\n${minifiedContent}`);
         const slotName = formatSlotName(slotType, i);
         return `!bset ${slotName} ${encoded}`;
     });

@@ -7,6 +7,7 @@ import { describe, expect, test } from 'bun:test';
 import { generateCommandSections } from '@/lib/command-generator/command-generator';
 import {
     MAX_CHUNK_SIZE,
+    // MAX_SLOT_SIZE,
     MAX_SLOTS_PER_TYPE,
 } from '@/lib/command-generator/constants';
 import {
@@ -21,28 +22,13 @@ import {
     LUA_PRIORITIES,
 } from '@/lib/command-generator/data/configuration-mapping';
 import { decode } from '@/lib/encoders/base64';
+import {
+    extractSourceManifest,
+    parseSourceManifest,
+} from '@/lib/lua-utils/comment-handler';
 import { TweakValue } from '@/types/types';
 
 import { getBundle } from './utils/bundle';
-
-/** Pattern for source manifest comments: -- Source: ["path1", "path2"] */
-const SOURCE_MANIFEST_PATTERN = /^--\s*Source:\s*(\[.*\])$/;
-
-/**
- * Parses source paths from a source manifest comment.
- * @param line Line containing -- Source: ["path1", "path2"]
- * @returns Array of source paths or empty array if parsing fails
- */
-function parseSourceManifest(line: string): string[] {
-    const match = line.trim().match(SOURCE_MANIFEST_PATTERN);
-    if (!match) return [];
-
-    try {
-        return JSON.parse(match[1]) as string[];
-    } catch {
-        return [];
-    }
-}
 
 /**
  * Helper function to map configuration settings to expected commands and Lua files.
@@ -151,19 +137,14 @@ describe('Command generation', () => {
             // TODO: Investigate why some commands may exceed the limit
             // expect(generatedTweak.length).toBeLessThanOrEqual(MAX_SLOT_SIZE);
 
-            const decodedLines = decode(base64).split('\n');
-            const sourceRefs: string[] = [];
-            for (const line of decodedLines) {
-                // Parse source manifest: -- Source: ["path1", "path2"]
-                const sources = parseSourceManifest(line);
-                if (sources.length > 0) {
-                    sourceRefs.push(...sources);
+            const decoded = decode(base64);
+            const manifest = extractSourceManifest(decoded);
+            const sourceRefs = manifest ? parseSourceManifest(manifest) : [];
 
-                    // Separate by slot type for priority validation
-                    if (isTweakdefs) tweakdefsSources.push(...sources);
-                    if (isTweakunits) tweakunitsSources.push(...sources);
-                }
-            }
+            // Separate by slot type for priority validation
+            if (isTweakdefs) tweakdefsSources.push(...sourceRefs);
+            if (isTweakunits) tweakunitsSources.push(...sourceRefs);
+
             tweaks.push(...sourceRefs);
         }
 
