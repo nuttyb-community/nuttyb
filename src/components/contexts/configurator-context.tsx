@@ -3,7 +3,10 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { Configuration } from '@/lib/command-generator/data/configuration';
+import {
+    type Configuration,
+    DEFAULT_CONFIGURATION,
+} from '@/lib/command-generator/data/configuration';
 import { CONFIGURATION_STORAGE_KEY } from '@/lib/configuration-storage/keys';
 import {
     createStoredConfiguration,
@@ -18,6 +21,8 @@ interface ConfiguratorContextValue {
         key: K,
         value: Configuration[K]
     ) => void;
+    /** Resets configuration to default values */
+    resetConfiguration: () => void;
     /** Whether configuration is still loading from localStorage */
     isLoading: boolean;
 }
@@ -65,13 +70,18 @@ export function ConfiguratorProvider({ children }: ConfiguratorProviderProps) {
         [setStoredConfig]
     );
 
+    const resetConfiguration = useCallback(() => {
+        setStoredConfig(createStoredConfiguration(DEFAULT_CONFIGURATION));
+    }, [setStoredConfig]);
+
     const value = useMemo<ConfiguratorContextValue>(
         () => ({
             configuration,
             setProperty,
+            resetConfiguration,
             isLoading: !isLoaded,
         }),
-        [configuration, setProperty, isLoaded]
+        [configuration, setProperty, resetConfiguration, isLoaded]
     );
 
     return (
