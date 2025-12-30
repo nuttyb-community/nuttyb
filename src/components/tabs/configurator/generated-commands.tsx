@@ -14,7 +14,9 @@ import {
     Title,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
+import { IconCheck, IconCopy } from '@tabler/icons-react';
 
+import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 
 interface CopySectionProps {
@@ -32,6 +34,13 @@ function CopySection({ content, label }: CopySectionProps) {
                 onClick={() => clipboard.copy(content)}
                 w={120}
                 style={{ flexShrink: 0 }}
+                leftSection={
+                    clipboard.copied ? (
+                        <IconCheck {...ICON_SIZE_MD} />
+                    ) : (
+                        <IconCopy {...ICON_SIZE_MD} />
+                    )
+                }
             >
                 {clipboard.copied ? 'Copied!' : label}
             </Button>
