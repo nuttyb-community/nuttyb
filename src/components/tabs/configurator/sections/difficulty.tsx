@@ -48,7 +48,7 @@ const DifficultySection: React.FC = () => {
 
     const handlePresetChange = (value: string) => {
         setProperty('presetDifficulty', value as PresetDifficulty);
-        setProperty('extras', 'None');
+        setProperty('challenges', 'None');
         setProperty('isMegaNuke', false);
         clearEnabledTweaks();
     };

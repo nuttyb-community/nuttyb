@@ -144,7 +144,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
         },
     },
-    extras: {
+    challenges: {
         description: 'Extra challenges',
         values: {
             None: undefined,

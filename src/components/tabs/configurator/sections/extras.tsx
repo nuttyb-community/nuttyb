@@ -5,7 +5,10 @@ import React from 'react';
 import { Checkbox, NativeSelect, Stack, Title } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
-import { EXTRAS, Extras } from '@/lib/command-generator/data/configuration';
+import {
+    Challenges,
+    CHALLENGES,
+} from '@/lib/command-generator/data/configuration';
 
 const ExtrasSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
@@ -14,11 +17,14 @@ const ExtrasSection: React.FC = () => {
         <Stack gap='sm'>
             <Title order={3}>Extras</Title>
             <NativeSelect
-                label='Extras'
-                data={EXTRAS}
-                value={configuration.extras}
+                label='Challenges'
+                data={CHALLENGES}
+                value={configuration.challenges}
                 onChange={(event) =>
-                    setProperty('extras', event.currentTarget.value as Extras)
+                    setProperty(
+                        'challenges',
+                        event.currentTarget.value as Challenges
+                    )
                 }
             />
             <Checkbox

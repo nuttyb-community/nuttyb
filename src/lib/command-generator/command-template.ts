@@ -149,7 +149,7 @@ export function buildTemplateContext(config: Configuration): TemplateContext {
     return {
         presetDifficulty: config.presetDifficulty,
         lobbyName: config.lobbyName?.trim() ?? '',
-        extras: config.extras,
+        extras: config.challenges,
         gameMap: config.gameMap,
         start: config.start,
         isMegaNuke: String(config.isMegaNuke),
