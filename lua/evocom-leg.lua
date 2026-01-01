@@ -696,7 +696,7 @@
                 movingaccuracy = 600,
                 name = 'Raptor Boomer',
                 noselfdamage = true,
-                proximitypriority = {},
+                proximitypriority = nil,
                 range = 700,
                 reloadtime = 1,
                 smoketrail = true,

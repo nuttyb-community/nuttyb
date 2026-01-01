@@ -384,7 +384,7 @@
                 rgbcolor = '1 0.25 0.1',
                 range = 700,
                 size = 2,
-                proximitypriority = {},
+                proximitypriority = nil,
                 impactonly = 1,
                 trajectoryheight = 1,
                 targetmoveerror = 0.2,
