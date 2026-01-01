@@ -358,6 +358,8 @@
         },
     },
     legcomlvl4 = {
+				footprintx = 2,
+        footprintz = 2,
         energymake = 1980,
         metalmake = 46,
         speed = 88.5,
