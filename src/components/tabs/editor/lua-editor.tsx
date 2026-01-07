@@ -22,12 +22,12 @@ import {
     IconCheck,
     IconCode,
     IconCopy,
-    IconDeviceFloppy,
     IconDownload,
     IconFile,
     IconPackage,
     IconRefresh,
     IconSearch,
+    IconTransform,
 } from '@tabler/icons-react';
 import type { editor } from 'monaco-editor';
 
@@ -803,7 +803,7 @@ const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
                                         {base64Clipboard.copied ? (
                                             <IconCheck {...ICON_STYLE} />
                                         ) : (
-                                            <IconDeviceFloppy {...ICON_STYLE} />
+                                                <IconTransform {...ICON_STYLE} />
                                         )}
                                     </ActionIcon>
                                 </Tooltip>
