@@ -41,8 +41,8 @@ import {
     LUA_PRIORITIES,
 } from '@/lib/command-generator/data/configuration-mapping';
 import { resolveLuaReference } from '@/lib/command-generator/interpolator';
-import { formatSlotName } from '@/lib/command-generator/slot';
-import { encode } from '@/lib/encoders/base64';
+import { type LuaSource, packLuaSources } from '@/lib/command-generator/packer';
+import { decode, encode } from '@/lib/encoders/base64';
 import { minify } from '@/lib/lua-utils/minificator';
 import type { LuaFile, LuaTweakType } from '@/types/types';
 
@@ -71,11 +71,10 @@ function getLuaPriority(path: string): number {
     return LUA_PRIORITIES[clean] ?? DEFAULT_LUA_PRIORITY;
 }
 
-function isPlainTableFormat(content: string): boolean {
-    const stripped = content.replaceAll(/^(\s*--[^\n]*\n)*/g, '').trimStart();
-    return stripped.startsWith('{') || stripped.startsWith('return {');
-}
-
+/**
+ * Computes slot contents using the same packing logic as the command generator.
+ * This extracts the slot manifest comments and content from packed commands.
+ */
 function computeSlotContents(
     luaFileMap: Map<string, string>,
     paths: string[],
@@ -83,70 +82,51 @@ function computeSlotContents(
 ): SlotContent[] {
     if (paths.length === 0) return [];
 
-    // Resolve and sort sources
-    const sources = paths.map((originalRef) => ({
+    // Resolve and sort sources (same as command generator)
+    const sources: LuaSource[] = paths.map((originalRef) => ({
         path: originalRef,
         content: resolveLuaReference(originalRef, luaFileMap).trim(),
         priority: getLuaPriority(originalRef),
     }));
     sources.sort((a, b) => a.priority - b.priority);
 
-    // Pack into slots
-    const slots: SlotContent[] = [];
-    let currentSources: string[] = [];
-    let currentContent = '';
+    // Use the shared packing logic to generate commands
+    const { commands } = packLuaSources(sources, slotType);
 
-    for (const source of sources) {
-        const sourceIsPlainTable =
-            slotType === 'tweakunits' && isPlainTableFormat(source.content);
-        const currentHasPlainTable =
-            currentSources.length > 0 &&
-            slotType === 'tweakunits' &&
-            sources.some(
-                (s) =>
-                    currentSources.includes(s.path) &&
-                    isPlainTableFormat(s.content)
-            );
+    // Extract slot content from the commands by decoding them
+    return commands.map((command) => {
+        // Command format: !bset <slotName> <base64EncodedContent>
+        const parts = command.split(' ');
+        const slotName = parts[1];
+        const encodedContent = parts[2];
 
-        const needsNewSlot =
-            currentHasPlainTable || (sourceIsPlainTable && currentContent);
+        // Decode to get the manifest + minified content
+        const decoded = decode(encodedContent);
+        // Extract the source manifest line
+        const manifestMatch = decoded.match(/^-- Source: (\[.*?\])\n/);
+        const sourcePaths: string[] = manifestMatch
+            ? (JSON.parse(manifestMatch[1]) as string[])
+            : [];
 
-        const combinedContent = currentContent
-            ? currentContent + '\n\n' + source.content
-            : source.content;
-        const manifest = `-- Source: ${JSON.stringify([...currentSources, source.path])}`;
-        const encoded = encode(`${manifest}\n${minify(combinedContent)}`);
-        const fits = encoded.length <= MAX_SLOT_SIZE;
+        // For display, we want the original (non-minified) content with manifest
+        // Reconstruct by getting original content for each source
+        const originalContents = sourcePaths
+            .map((path) => {
+                const source = sources.find((s) => s.path === path);
+                return source?.content ?? '';
+            })
+            .filter(Boolean);
 
-        if (!needsNewSlot && fits) {
-            currentSources.push(source.path);
-            currentContent = combinedContent;
-        } else {
-            if (currentContent) {
-                const slotManifest = `-- Source: ${JSON.stringify(currentSources)}`;
-                slots.push({
-                    slotName: formatSlotName(slotType, slots.length),
-                    type: slotType,
-                    sources: currentSources,
-                    content: `${slotManifest}\n${currentContent}`,
-                });
-            }
-            currentSources = [source.path];
-            currentContent = source.content;
-        }
-    }
+        const manifest = `-- Source: ${JSON.stringify(sourcePaths)}`;
+        const content = `${manifest}\n${originalContents.join('\n\n')}`;
 
-    if (currentContent) {
-        const slotManifest = `-- Source: ${JSON.stringify(currentSources)}`;
-        slots.push({
-            slotName: formatSlotName(slotType, slots.length),
+        return {
+            slotName,
             type: slotType,
-            sources: currentSources,
-            content: `${slotManifest}\n${currentContent}`,
-        });
-    }
-
-    return slots;
+            sources: sourcePaths,
+            content,
+        };
+    });
 }
 
 const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
