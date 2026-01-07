@@ -32,7 +32,9 @@ import {
 import type { editor } from 'monaco-editor';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
+import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import type { EnabledCustomTweak } from '@/lib/command-generator/command-generator';
 import { getMappedData } from '@/lib/command-generator/configuration/mapper';
 import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
 import type { Configuration } from '@/lib/command-generator/data/configuration';
@@ -42,7 +44,9 @@ import {
 } from '@/lib/command-generator/data/configuration-mapping';
 import { resolveLuaReference } from '@/lib/command-generator/interpolator';
 import { type LuaSource, packLuaSources } from '@/lib/command-generator/packer';
+import { formatSlotName } from '@/lib/command-generator/slot';
 import { decode, encode } from '@/lib/encoders/base64';
+import { beautify } from '@/lib/lua-utils/beautifier';
 import { minify } from '@/lib/lua-utils/minificator';
 import type { LuaFile, LuaTweakType } from '@/types/types';
 
@@ -78,84 +82,144 @@ function getLuaPriority(path: string): number {
 function computeSlotContents(
     luaFileMap: Map<string, string>,
     paths: string[],
-    slotType: LuaTweakType
+    slotType: LuaTweakType,
+    enabledCustomTweaks: EnabledCustomTweak[]
 ): SlotContent[] {
-    if (paths.length === 0) return [];
+    if (paths.length === 0 && enabledCustomTweaks.length === 0) return [];
 
-    // Resolve and sort sources (same as command generator)
-    const sources: LuaSource[] = paths.map((originalRef) => ({
-        path: originalRef,
-        content: resolveLuaReference(originalRef, luaFileMap).trim(),
-        priority: getLuaPriority(originalRef),
-    }));
-    sources.sort((a, b) => a.priority - b.priority);
+    const slots: SlotContent[] = [];
 
-    // Use the shared packing logic to generate commands
-    const { commands } = packLuaSources(sources, slotType);
+    // First, add slots from packed sources (slot 0)
+    if (paths.length > 0) {
+        // Resolve and sort sources (same as command generator)
+        const sources: LuaSource[] = paths.map((originalRef) => ({
+            path: originalRef,
+            content: resolveLuaReference(originalRef, luaFileMap).trim(),
+            priority: getLuaPriority(originalRef),
+        }));
+        sources.sort((a, b) => a.priority - b.priority);
 
-    // Extract slot content from the commands by decoding them
-    return commands.map((command) => {
-        // Command format: !bset <slotName> <base64EncodedContent>
-        const parts = command.split(' ');
-        const slotName = parts[1];
-        const encodedContent = parts[2];
+        // Use the shared packing logic to generate commands
+        const { commands } = packLuaSources(sources, slotType);
 
-        // Decode to get the manifest + minified content
-        const decoded = decode(encodedContent);
-        // Extract the source manifest line
-        const manifestMatch = decoded.match(/^-- Source: (\[.*?\])\n/);
-        const sourcePaths: string[] = manifestMatch
-            ? (JSON.parse(manifestMatch[1]) as string[])
-            : [];
+        // Extract slot content from the commands by decoding them
+        for (const command of commands) {
+            // Command format: !bset <slotName> <base64EncodedContent>
+            const parts = command.split(' ');
+            const slotName = parts[1];
+            const encodedContent = parts[2];
 
-        // For display, we want the original (non-minified) content with manifest
-        // Reconstruct by getting original content for each source
-        const originalContents = sourcePaths
-            .map((path) => {
-                const source = sources.find((s) => s.path === path);
-                return source?.content ?? '';
-            })
-            .filter(Boolean);
+            // Decode to get the manifest + minified content
+            const decoded = decode(encodedContent);
+            // Extract the source manifest line
+            const manifestMatch = decoded.match(/^-- Source: (\[.*?\])\n/);
+            const sourcePaths: string[] = manifestMatch
+                ? (JSON.parse(manifestMatch[1]) as string[])
+                : [];
 
-        const manifest = `-- Source: ${JSON.stringify(sourcePaths)}`;
-        const content = `${manifest}\n${originalContents.join('\n\n')}`;
+            // For display, we want the original (non-minified) content with manifest
+            // Reconstruct by getting original content for each source
+            const originalContents = sourcePaths
+                .map((path) => {
+                    const source = sources.find((s) => s.path === path);
+                    return source?.content ?? '';
+                })
+                .filter(Boolean);
 
-        return {
-            slotName,
-            type: slotType,
-            sources: sourcePaths,
-            content,
-        };
-    });
+            const manifest = `-- Source: ${JSON.stringify(sourcePaths)}`;
+            const content = `${manifest}\n${originalContents.join('\n\n')}`;
+
+            slots.push({
+                slotName,
+                type: slotType,
+                sources: sourcePaths,
+                content,
+            });
+        }
+    }
+
+    // Add custom tweaks (slots 1-9) - same allocation logic as command generator
+    const customTweaksOfType = enabledCustomTweaks.filter(
+        (t) => t.type === slotType
+    );
+
+    // Track which slots are already used by packed sources
+    const usedSlots = new Set<number>();
+    for (const slot of slots) {
+        const match = slot.slotName.match(/\d+$/);
+        if (match) {
+            usedSlots.add(Number.parseInt(match[0], 10));
+        }
+    }
+
+    for (const tweak of customTweaksOfType) {
+        // Find first available slot (1-9, slot 0 reserved for packed sources)
+        let slotNumber: number | null = null;
+        for (let i = 1; i <= 9; i++) {
+            if (!usedSlots.has(i)) {
+                slotNumber = i;
+                break;
+            }
+        }
+
+        if (slotNumber === null) {
+            // No available slots, skip this tweak
+            continue;
+        }
+
+        usedSlots.add(slotNumber);
+
+        try {
+            const decoded = beautify(decode(tweak.code));
+            const manifest = `-- Custom Tweak: ${tweak.description}`;
+            const content = `${manifest}\n${decoded}`;
+            const slotName = formatSlotName(slotType, slotNumber);
+
+            slots.push({
+                slotName,
+                type: slotType,
+                sources: [`custom:${tweak.description}`],
+                content,
+            });
+        } catch {
+            // Skip tweaks that fail to decode
+        }
+    }
+
+    return slots;
 }
 
 const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
     const [viewMode, setViewMode] = useState<ViewMode>('slots');
+    const { getEnabledTweaks } = useCustomTweaksContext();
 
     // Only include files from the lua/ folder (and subfolders)
     const luaFolderFiles = useMemo(() => {
         return luaFiles.filter((file) => file.path.startsWith('lua/'));
     }, [luaFiles]);
 
-    // Compute slot contents based on configuration
+    // Compute slot contents based on configuration and enabled custom tweaks
     const slotContents = useMemo(() => {
         const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
         const { tweakdefs: defsPaths, tweakunits: unitsPaths } =
             getMappedData(configuration);
+        const enabledCustomTweaks = getEnabledTweaks();
 
         const tweakdefsSlots = computeSlotContents(
             luaFileMap,
             defsPaths,
-            'tweakdefs'
+            'tweakdefs',
+            enabledCustomTweaks
         );
         const tweakunitsSlots = computeSlotContents(
             luaFileMap,
             unitsPaths,
-            'tweakunits'
+            'tweakunits',
+            enabledCustomTweaks
         );
 
         return [...tweakdefsSlots, ...tweakunitsSlots];
-    }, [luaFiles, configuration]);
+    }, [luaFiles, configuration, getEnabledTweaks]);
 
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
