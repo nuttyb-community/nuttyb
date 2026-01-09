@@ -118,6 +118,20 @@ const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
         [getSlotContent]
     );
 
+    // File size calculation
+    const getFileB64Size = useCallback(
+        (path: string): number => {
+            try {
+                const content = getCurrentContent(path);
+                return encode(minify(content.trim())).length;
+            } catch {
+                const content = getCurrentContent(path);
+                return encode(content.trim()).length;
+            }
+        },
+        [getCurrentContent]
+    );
+
     // Editor change handler
     const handleEditorChange = useCallback(
         (value: string | undefined) => {
@@ -261,6 +275,7 @@ const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
                 isFileModified={isFileModified}
                 isSlotModified={isSlotModified}
                 getSlotSize={getSlotB64Size}
+                getFileSize={getFileB64Size}
                 modifiedFileCount={modifiedFileCount}
                 modifiedSlotCount={modifiedSlotCount}
             />

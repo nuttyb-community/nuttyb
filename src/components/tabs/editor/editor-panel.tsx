@@ -59,12 +59,13 @@ export function EditorPanel({
     }, [currentContent, clipboard]);
 
     const handleCopyBase64 = useCallback(() => {
-        if (viewMode === 'slots') {
-            base64Clipboard.copy(encode(minify(currentContent.trim())));
-        } else {
+        try {
+            const minified = minify(currentContent.trim());
+            base64Clipboard.copy(encode(minified));
+        } catch {
             base64Clipboard.copy(encode(currentContent.trim()));
         }
-    }, [viewMode, currentContent, base64Clipboard]);
+    }, [currentContent, base64Clipboard]);
 
     if (!currentTitle) {
         return (

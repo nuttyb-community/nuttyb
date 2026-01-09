@@ -3,19 +3,23 @@ import { useMemo, useState } from 'react';
 import {
     Badge,
     Group,
+    Menu,
     Paper,
     ScrollArea,
     SegmentedControl,
     Stack,
     Text,
     TextInput,
+    UnstyledButton,
 } from '@mantine/core';
-import { IconSearch } from '@tabler/icons-react';
+import { IconArrowsSort, IconSearch } from '@tabler/icons-react';
 
 import { FileListItem } from '@/components/tabs/editor/file-list-item';
 import { SlotListItem } from '@/components/tabs/editor/slot-list-item';
-import type { SlotContent } from '@/hooks/use-slot-contents';
-import type { LuaFile } from '@/types/types';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { SlotContent } from '@/hooks/use-slot-contents';
+import { EDITOR_SORT_MODE_STORAGE_KEY } from '@/lib/configuration-storage/keys';
+import type { LuaFile, LuaTweakType } from '@/types/types';
 
 type ViewMode = 'sources' | 'slots';
 
@@ -31,6 +35,7 @@ interface EditorSidebarProps {
     isFileModified: (path: string) => boolean;
     isSlotModified: (slotName: string) => boolean;
     getSlotSize: (slotName: string) => number;
+    getFileSize: (path: string) => number;
     modifiedFileCount: number;
     modifiedSlotCount: number;
 }
@@ -47,18 +52,78 @@ export function EditorSidebar({
     isFileModified,
     isSlotModified,
     getSlotSize,
+    getFileSize,
     modifiedFileCount,
     modifiedSlotCount,
 }: EditorSidebarProps) {
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortMode, setSortMode] = useLocalStorage<'alphabet' | 'tweaktype'>(
+        EDITOR_SORT_MODE_STORAGE_KEY,
+        'alphabet'
+    );
+
+    // Determine which files are used in the configurator and map them to slots with types
+    const fileToSlotsMap = useMemo(() => {
+        const map = new Map<
+            string,
+            Array<{ slotName: string; slotType: LuaTweakType }>
+        >();
+        for (const slot of slotContents) {
+            for (const source of slot.sources) {
+                // Extract file path from source reference
+                const cleanPath = source.replace(/^~/, '').split('{')[0];
+                if (cleanPath.startsWith('lua/')) {
+                    const existing = map.get(cleanPath) || [];
+                    existing.push({
+                        slotName: slot.slotName,
+                        slotType: slot.type,
+                    });
+                    map.set(cleanPath, existing);
+                }
+            }
+        }
+        return map;
+    }, [slotContents]);
+
+    const usedFiles = useMemo(() => {
+        return new Set(fileToSlotsMap.keys());
+    }, [fileToSlotsMap]);
 
     const filteredFiles = useMemo(() => {
-        if (!searchQuery) return luaFiles;
-        const query = searchQuery.toLowerCase();
-        return luaFiles.filter((file) =>
-            file.path.toLowerCase().includes(query)
-        );
-    }, [luaFiles, searchQuery]);
+        let files = searchQuery
+            ? luaFiles.filter((file) =>
+                  file.path.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+            : luaFiles;
+
+        if (sortMode === 'alphabet') {
+            files = [...files].toSorted((a, b) => a.path.localeCompare(b.path));
+        } else if (sortMode === 'tweaktype') {
+            files = [...files].toSorted((a, b) => {
+                const aSlotsInfo = fileToSlotsMap.get(a.path) || [];
+                const bSlotsInfo = fileToSlotsMap.get(b.path) || [];
+
+                // Files not loaded go to the end
+                if (aSlotsInfo.length === 0 && bSlotsInfo.length > 0) return 1;
+                if (aSlotsInfo.length > 0 && bSlotsInfo.length === 0) return -1;
+                if (aSlotsInfo.length === 0 && bSlotsInfo.length === 0)
+                    return a.path.localeCompare(b.path);
+
+                // Sort by first slot type
+                const aType = aSlotsInfo[0].slotType;
+                const bType = bSlotsInfo[0].slotType;
+
+                if (aType !== bType) {
+                    return aType === 'tweakdefs' ? -1 : 1;
+                }
+
+                // If same type, sort alphabetically
+                return a.path.localeCompare(b.path);
+            });
+        }
+
+        return files;
+    }, [luaFiles, searchQuery, sortMode, fileToSlotsMap]);
 
     const filteredSlots = useMemo(() => {
         if (!searchQuery) return slotContents;
@@ -84,9 +149,35 @@ export function EditorSidebar({
                 />
 
                 <Group justify='space-between'>
-                    <Text fw={600} size='sm'>
-                        {viewMode === 'sources' ? 'Files' : 'Slots'}
-                    </Text>
+                    <Group gap='xs'>
+                        <Text fw={600} size='sm'>
+                            {viewMode === 'sources' ? 'Files' : 'Slots'}
+                        </Text>
+                        {viewMode === 'sources' && (
+                            <Menu position='bottom-start' shadow='md'>
+                                <Menu.Target>
+                                    <UnstyledButton>
+                                        <IconArrowsSort
+                                            size={14}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </UnstyledButton>
+                                </Menu.Target>
+                                <Menu.Dropdown>
+                                    <Menu.Item
+                                        onClick={() => setSortMode('alphabet')}
+                                    >
+                                        Alphabet
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        onClick={() => setSortMode('tweaktype')}
+                                    >
+                                        Tweak Type
+                                    </Menu.Item>
+                                </Menu.Dropdown>
+                            </Menu>
+                        )}
+                    </Group>
                     {viewMode === 'sources' && modifiedFileCount > 0 && (
                         <Badge size='sm' color='yellow'>
                             {modifiedFileCount} modified
@@ -120,6 +211,13 @@ export function EditorSidebar({
                                       fileName={file.path.split('/').pop()!}
                                       isSelected={selectedFile === file.path}
                                       isModified={isFileModified(file.path)}
+                                      isUsedInConfigurator={usedFiles.has(
+                                          file.path
+                                      )}
+                                      loadedInSlots={
+                                          fileToSlotsMap.get(file.path) || []
+                                      }
+                                      fileSize={getFileSize(file.path)}
                                       onClick={() => onSelectFile(file.path)}
                                   />
                               ))
