@@ -14,7 +14,7 @@ interface SlotListItemProps {
     onClick: () => void;
 }
 
-export function SlotListItem({
+export const SlotListItem: React.FC<SlotListItemProps> = ({
     slotName,
     slotType,
     sources,
@@ -22,7 +22,7 @@ export function SlotListItem({
     isModified,
     slotSize,
     onClick,
-}: SlotListItemProps) {
+}) => {
     const displaySources = sources
         .map((s) => s.replace(/^~?lua\//, '').split('{')[0])
         .join(', ');
@@ -70,4 +70,4 @@ export function SlotListItem({
             </Stack>
         </Box>
     );
-}
+};

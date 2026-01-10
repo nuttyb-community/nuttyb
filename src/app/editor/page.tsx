@@ -5,7 +5,7 @@ import { Stack, Text, Title } from '@mantine/core';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import PageLoader from '@/components/page-loader';
-import Editor from '@/components/tabs/editor/editor';
+import { LuaEditor } from '@/components/tabs/editor/editor';
 
 export default function Page() {
     const { luaFiles, isLoading: isLuaLoading, error } = useLuaBundleContext();
@@ -26,7 +26,7 @@ export default function Page() {
                 </Text>
             </Stack>
 
-            <Editor luaFiles={luaFiles} configuration={configuration} />
+            <LuaEditor luaFiles={luaFiles} configuration={configuration} />
         </Stack>
     );
 }

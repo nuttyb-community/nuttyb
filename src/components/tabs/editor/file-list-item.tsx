@@ -13,7 +13,7 @@ interface FileListItemProps {
     onClick: () => void;
 }
 
-export function FileListItem({
+export const FileListItem: React.FC<FileListItemProps> = ({
     fileName,
     isSelected,
     isModified,
@@ -21,7 +21,7 @@ export function FileListItem({
     loadedInSlots,
     fileSize,
     onClick,
-}: FileListItemProps) {
+}) => {
     return (
         <Box
             p='xs'
@@ -90,4 +90,4 @@ export function FileListItem({
             </Stack>
         </Box>
     );
-}
+};

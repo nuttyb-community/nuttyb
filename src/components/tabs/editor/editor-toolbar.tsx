@@ -31,7 +31,7 @@ interface EditorToolbarProps {
     isBase64Copied: boolean;
 }
 
-export function EditorToolbar({
+export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     viewMode,
     currentTitle,
     isModified,
@@ -42,7 +42,7 @@ export function EditorToolbar({
     onDownload,
     isCopied,
     isBase64Copied,
-}: EditorToolbarProps) {
+}) => {
     return (
         <Group gap='xs' justify='space-between' style={{ width: '100%' }}>
             <Group gap='xs'>
@@ -139,4 +139,4 @@ export function EditorToolbar({
             </Group>
         </Group>
     );
-}
+};

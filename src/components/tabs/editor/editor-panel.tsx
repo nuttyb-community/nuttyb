@@ -27,7 +27,7 @@ interface EditorPanelProps {
     onDownload?: () => void;
 }
 
-export function EditorPanel({
+export const EditorPanel: React.FC<EditorPanelProps> = ({
     viewMode,
     currentTitle,
     currentContent,
@@ -36,7 +36,7 @@ export function EditorPanel({
     onChange,
     onReset,
     onDownload,
-}: EditorPanelProps) {
+}) => {
     const clipboard = useClipboard({ timeout: 2000 });
     const base64Clipboard = useClipboard({ timeout: 2000 });
 
@@ -178,4 +178,4 @@ export function EditorPanel({
             </Stack>
         </Paper>
     );
-}
+};

@@ -22,7 +22,10 @@ interface LuaEditorProps {
 
 type ViewMode = 'sources' | 'slots';
 
-const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
+export const LuaEditor: React.FC<LuaEditorProps> = ({
+    luaFiles,
+    configuration,
+}) => {
     const [viewMode, setViewMode] = useState<ViewMode>('slots');
     const { getEnabledTweaks } = useCustomTweaksContext();
 
@@ -183,5 +186,3 @@ const LuaEditor: React.FC<LuaEditorProps> = ({ luaFiles, configuration }) => {
         </Flex>
     );
 };
-
-export default LuaEditor;

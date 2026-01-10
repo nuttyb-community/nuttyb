@@ -40,7 +40,7 @@ interface EditorSidebarProps {
     modifiedSlotCount: number;
 }
 
-export function EditorSidebar({
+export const EditorSidebar: React.FC<EditorSidebarProps> = ({
     viewMode,
     onViewModeChange,
     luaFiles,
@@ -55,7 +55,7 @@ export function EditorSidebar({
     getFileSize,
     modifiedFileCount,
     modifiedSlotCount,
-}: EditorSidebarProps) {
+}) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortMode, setSortMode] = useLocalStorage<'alphabet' | 'tweaktype'>(
         EDITOR_SORT_MODE_STORAGE_KEY,
@@ -242,4 +242,4 @@ export function EditorSidebar({
             </Stack>
         </Paper>
     );
-}
+};
