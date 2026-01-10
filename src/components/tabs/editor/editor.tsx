@@ -34,11 +34,14 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
         return luaFiles.filter((file) => file.path.startsWith('lua/'));
     }, [luaFiles]);
 
+    // Get enabled custom tweaks
+    const enabledTweaks = getEnabledTweaks();
+
     // Compute slot contents
     const slotContents = useSlotContents(
         luaFiles,
         configuration,
-        getEnabledTweaks
+        enabledTweaks
     );
 
     // Storage management

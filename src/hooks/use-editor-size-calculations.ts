@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { encode } from '@/lib/encoders/base64';
 import { minify } from '@/lib/lua-utils/minificator';
 
@@ -13,34 +11,26 @@ export function useEditorSizeCalculations({
     getSlotContent,
 }: UseEditorSizeCalculationsProps) {
     // Slot size calculation
-    const getSlotB64Size = useMemo(
-        () =>
-            (slotName: string): number => {
-                try {
-                    const content = getSlotContent(slotName);
-                    return encode(minify(content.trim())).length;
-                } catch {
-                    const content = getSlotContent(slotName);
-                    return encode(content.trim()).length;
-                }
-            },
-        [getSlotContent]
-    );
+    const getSlotB64Size = (slotName: string): number => {
+        try {
+            const content = getSlotContent(slotName);
+            return encode(minify(content.trim())).length;
+        } catch {
+            const content = getSlotContent(slotName);
+            return encode(content.trim()).length;
+        }
+    };
 
     // File size calculation
-    const getFileB64Size = useMemo(
-        () =>
-            (path: string): number => {
-                try {
-                    const content = getCurrentContent(path);
-                    return encode(minify(content.trim())).length;
-                } catch {
-                    const content = getCurrentContent(path);
-                    return encode(content.trim()).length;
-                }
-            },
-        [getCurrentContent]
-    );
+    const getFileB64Size = (path: string): number => {
+        try {
+            const content = getCurrentContent(path);
+            return encode(minify(content.trim())).length;
+        } catch {
+            const content = getCurrentContent(path);
+            return encode(content.trim()).length;
+        }
+    };
 
     return {
         getSlotB64Size,

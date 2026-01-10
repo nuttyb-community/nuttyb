@@ -129,13 +129,13 @@ function computeSlotContents(
 export function useSlotContents(
     luaFiles: LuaFile[],
     configuration: Configuration,
-    getEnabledTweaks: () => EnabledCustomTweak[]
+    enabledTweaks: EnabledCustomTweak[]
 ) {
     return useMemo(() => {
         const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
         const { tweakdefs: defsPaths, tweakunits: unitsPaths } =
             getMappedData(configuration);
-        const enabledCustomTweaks = getEnabledTweaks();
+        const enabledCustomTweaks = enabledTweaks;
 
         const tweakdefsSlots = computeSlotContents(
             luaFileMap,
@@ -151,5 +151,5 @@ export function useSlotContents(
         );
 
         return [...tweakdefsSlots, ...tweakunitsSlots];
-    }, [luaFiles, configuration, getEnabledTweaks]);
+    }, [luaFiles, configuration, enabledTweaks]);
 }
