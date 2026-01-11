@@ -30,7 +30,7 @@ const initialFormState: FormState = {
     code: '',
 };
 
-const AddTweakForm: React.FC = () => {
+export const AddTweakForm: React.FC = () => {
     const { addTweak } = useCustomTweaksContext();
     const [form, setForm] = useState<FormState>(initialFormState);
     const [error, setError] = useState<string | null>(null);
@@ -156,5 +156,3 @@ const AddTweakForm: React.FC = () => {
         </form>
     );
 };
-
-export default AddTweakForm;

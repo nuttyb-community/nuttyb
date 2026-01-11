@@ -5,8 +5,8 @@ import { useMemo } from 'react';
 import { Code, Group, Stack, Table, Text, Title, Tooltip } from '@mantine/core';
 
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
-import PageLoader from '@/components/page-loader';
-import DataItem, { type DataItemProps } from '@/components/tabs/data/data-item';
+import { PageLoader } from '@/components/page-loader';
+import { DataItem, type DataItemProps } from '@/components/tabs/data/data-item';
 import {
     BASE_COMMANDS,
     BASE_TWEAKS,

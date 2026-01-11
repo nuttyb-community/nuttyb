@@ -8,7 +8,7 @@ interface Props {
     type: TweakType;
 }
 
-const TypeBadge: React.FC<Props> = ({ type }) => {
+export const TypeBadge: React.FC<Props> = ({ type }) => {
     const colorMap: Record<TweakType, string> = {
         tweakdefs: 'blue',
         tweakunits: 'green',
@@ -21,5 +21,3 @@ const TypeBadge: React.FC<Props> = ({ type }) => {
         </Badge>
     );
 };
-
-export default TypeBadge;

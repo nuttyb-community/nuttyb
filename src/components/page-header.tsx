@@ -8,11 +8,11 @@ import { usePathname } from 'next/navigation';
 
 import { Link, LINKS } from '@/lib/navigation';
 
-import PageWrapper from './page-wrapper';
+import { PageWrapper } from './page-wrapper';
 
 const links: Link[] = Object.values(LINKS);
 
-const Header: React.FC = () => {
+export const PageHeader: React.FC = () => {
     const pathname = usePathname();
 
     return (
@@ -41,5 +41,3 @@ const Header: React.FC = () => {
         </PageWrapper>
     );
 };
-
-export default Header;

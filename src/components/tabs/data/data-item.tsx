@@ -13,7 +13,7 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
-import TypeBadge from '@/components/common/type-badge';
+import { TypeBadge } from '@/components/common/type-badge';
 import type { TweakType } from '@/types/types';
 
 export interface DataItemProps {
@@ -23,7 +23,7 @@ export interface DataItemProps {
     isMissing?: boolean;
 }
 
-const DataItem: React.FC<DataItemProps> = ({
+export const DataItem: React.FC<DataItemProps> = ({
     type,
     source,
     data,
@@ -78,5 +78,3 @@ const DataItem: React.FC<DataItemProps> = ({
         </Card>
     );
 };
-
-export default DataItem;

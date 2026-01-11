@@ -24,7 +24,7 @@ interface CopySectionProps {
     label: string;
 }
 
-function CopySection({ content, label }: CopySectionProps) {
+const CopySection: React.FC<CopySectionProps> = ({ content, label }) => {
     const clipboard = useClipboard({ timeout: 2000 });
 
     return (
@@ -60,9 +60,9 @@ function CopySection({ content, label }: CopySectionProps) {
             />
         </Group>
     );
-}
+};
 
-const GeneratedCommands: React.FC = () => {
+export const GeneratedCommands: React.FC = () => {
     const { sections, slotUsage, droppedTweaks, error } = useTweakDataContext();
 
     // Hide section entirely when no commands
@@ -131,5 +131,3 @@ const GeneratedCommands: React.FC = () => {
         </Stack>
     );
 };
-
-export default GeneratedCommands;

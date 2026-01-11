@@ -16,17 +16,16 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy, IconX } from '@tabler/icons-react';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
+import { TypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import type { CustomTweak } from '@/lib/command-generator/command-generator';
-
-import TypeBadge from '../../common/type-badge';
 
 interface TweakRowProps {
     tweak: CustomTweak;
     onDelete: (id: number) => void;
 }
 
-function TweakRow({ tweak, onDelete }: TweakRowProps) {
+const TweakRow: React.FC<TweakRowProps> = ({ tweak, onDelete }) => {
     const clipboard = useClipboard({ timeout: 1500 });
 
     // Truncate code for display
@@ -83,9 +82,9 @@ function TweakRow({ tweak, onDelete }: TweakRowProps) {
             </Table.Td>
         </Table.Tr>
     );
-}
+};
 
-const SavedTweaksList: React.FC = () => {
+export const SavedTweaksList: React.FC = () => {
     const { customTweaks, deleteTweak } = useCustomTweaksContext();
 
     if (customTweaks.length === 0) {
@@ -124,5 +123,3 @@ const SavedTweaksList: React.FC = () => {
         </Stack>
     );
 };
-
-export default SavedTweaksList;

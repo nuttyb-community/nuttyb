@@ -19,7 +19,7 @@ import {
     StartOption,
 } from '@/lib/command-generator/data/configuration';
 
-const GeneralSection: React.FC = () => {
+export const GeneralSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
 
     return (
@@ -120,5 +120,3 @@ const GeneralSection: React.FC = () => {
         </Stack>
     );
 };
-
-export default GeneralSection;

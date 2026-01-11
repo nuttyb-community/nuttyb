@@ -4,12 +4,12 @@ import React from 'react';
 
 import { Checkbox, Flex, Stack, Title } from '@mantine/core';
 
-import TypeBadge from '@/components/common/type-badge';
+import { TypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 import type { LuaTweakType } from '@/types/types';
 
-const CustomTweaksSection: React.FC = () => {
+export const CustomTweaksSection: React.FC = () => {
     const { customTweaks, isEnabled, toggleTweak, enabledIds } =
         useCustomTweaksContext();
     const { slotUsage } = useTweakDataContext();
@@ -59,5 +59,3 @@ const CustomTweaksSection: React.FC = () => {
         </Stack>
     );
 };
-
-export default CustomTweaksSection;

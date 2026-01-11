@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
-import PageLoader from '@/components/page-loader';
+import { PageLoader } from '@/components/page-loader';
 import { LINKS } from '@/lib/navigation';
 
 // Dynamically import configurator to avoid circular dependencies

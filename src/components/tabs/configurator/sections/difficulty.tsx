@@ -42,7 +42,7 @@ const PRESET_DETAILS: Record<
     },
 };
 
-const DifficultySection: React.FC = () => {
+export const DifficultySection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
     const { clearEnabledTweaks } = useCustomTweaksContext();
 
@@ -102,5 +102,3 @@ const DifficultySection: React.FC = () => {
         </Stack>
     );
 };
-
-export default DifficultySection;

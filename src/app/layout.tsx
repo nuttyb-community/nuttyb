@@ -9,8 +9,8 @@ import {
 import type { Metadata } from 'next';
 
 import '@mantine/core/styles.css';
-import Header from '@/components/header';
-import PageWrapper from '@/components/page-wrapper';
+import { PageHeader } from '@/components/page-header';
+import { PageWrapper } from '@/components/page-wrapper';
 import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default function RootLayout({
                     <Providers>
                         <AppShell padding='md' header={{ height: 60 }}>
                             <AppShellHeader bg='dark' withBorder={false}>
-                                <Header />
+                                <PageHeader />
                             </AppShellHeader>
                             <AppShellMain>
                                 <PageWrapper>{children}</PageWrapper>

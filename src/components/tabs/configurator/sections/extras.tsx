@@ -16,7 +16,7 @@ import {
     CHALLENGES,
 } from '@/lib/command-generator/data/configuration';
 
-const ExtrasSection: React.FC = () => {
+export const ExtrasSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
 
     return (
@@ -82,5 +82,3 @@ const ExtrasSection: React.FC = () => {
         </Stack>
     );
 };
-
-export default ExtrasSection;

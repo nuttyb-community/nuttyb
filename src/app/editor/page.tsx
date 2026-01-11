@@ -4,7 +4,7 @@ import { Stack, Text, Title } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
-import PageLoader from '@/components/page-loader';
+import { PageLoader } from '@/components/page-loader';
 import { LuaEditor } from '@/components/tabs/editor/editor';
 
 export default function Page() {

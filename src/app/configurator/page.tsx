@@ -8,9 +8,9 @@ import { useConfiguratorContext } from '@/components/contexts/configurator-conte
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { TweakDataProvider } from '@/components/contexts/tweak-data-context';
-import PageLoader from '@/components/page-loader';
-import Configurator from '@/components/tabs/configurator/configurator';
-import GeneratedCommands from '@/components/tabs/configurator/generated-commands';
+import { PageLoader } from '@/components/page-loader';
+import { Configurator } from '@/components/tabs/configurator/configurator';
+import { GeneratedCommands } from '@/components/tabs/configurator/generated-commands';
 import { useTweakData } from '@/hooks/use-tweak-data';
 
 export default function Page() {

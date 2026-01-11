@@ -9,12 +9,12 @@ import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 
-import CustomTweaksSection from './sections/custom-tweaks';
-import DifficultySection from './sections/difficulty';
-import ExtrasSection from './sections/extras';
-import GeneralSection from './sections/general';
+import { CustomTweaksSection } from './sections/custom-tweaks';
+import { DifficultySection } from './sections/difficulty';
+import { ExtrasSection } from './sections/extras';
+import { GeneralSection } from './sections/general';
 
-const Configurator: React.FC = () => {
+export const Configurator: React.FC = () => {
     const { customTweaks, clearEnabledTweaks } = useCustomTweaksContext();
     const hasCustomTweaks = customTweaks.length > 0;
 
@@ -55,5 +55,3 @@ const Configurator: React.FC = () => {
         </Stack>
     );
 };
-
-export default Configurator;
