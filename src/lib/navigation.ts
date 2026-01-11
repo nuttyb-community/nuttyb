@@ -20,4 +20,8 @@ export const LINKS: { [key: string]: Link } = {
         href: '/base64',
         title: 'Base64',
     },
+    editor: {
+        href: '/editor',
+        title: 'Editor',
+    },
 } as const;

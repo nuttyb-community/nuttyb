@@ -14,3 +14,8 @@ export const CONFIGURATION_STORAGE_KEY = 'nuttyb-configuration';
  * This data is version-independent and persists across app updates.
  */
 export const CUSTOM_TWEAKS_STORAGE_KEY = 'nuttyb-custom-tweaks';
+
+/**
+ * Key for storing editor sort mode preference (alphabet or tweaktype).
+ */
+export const EDITOR_SORT_MODE_STORAGE_KEY = 'nuttyb-editor-sort-mode';
