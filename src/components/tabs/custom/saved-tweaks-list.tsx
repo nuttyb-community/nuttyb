@@ -16,7 +16,7 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy, IconX } from '@tabler/icons-react';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
-import { TypeBadge } from '@/components/common/type-badge';
+import { TweakTypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import type { CustomTweak } from '@/lib/command-generator/command-generator';
 
@@ -40,7 +40,7 @@ const TweakRow: React.FC<TweakRowProps> = ({ tweak, onDelete }) => {
                 </Text>
             </Table.Td>
             <Table.Td>
-                <TypeBadge type={tweak.type} />
+                <TweakTypeBadge type={tweak.type} />
             </Table.Td>
             <Table.Td>
                 <Flex

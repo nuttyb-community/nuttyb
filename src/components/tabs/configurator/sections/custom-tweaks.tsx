@@ -4,7 +4,7 @@ import React from 'react';
 
 import { Checkbox, Flex, Stack, Title } from '@mantine/core';
 
-import { TypeBadge } from '@/components/common/type-badge';
+import { TweakTypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 import type { LuaTweakType } from '@/types/types';
@@ -51,7 +51,7 @@ export const CustomTweaksSection: React.FC = () => {
                                 disabled={disabled}
                                 onChange={() => toggleTweak(tweak.id)}
                             />
-                            <TypeBadge type={tweak.type} />
+                            <TweakTypeBadge type={tweak.type} />
                         </Flex>
                     );
                 })}

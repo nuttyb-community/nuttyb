@@ -85,10 +85,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
         return map;
     }, [slotContents]);
 
-    const usedFiles = useMemo(() => {
-        return new Set(fileToSlotsMap.keys());
-    }, [fileToSlotsMap]);
-
     const filteredFiles = useMemo(() => {
         let files = searchQuery
             ? luaFiles.filter((file) =>
@@ -232,9 +228,6 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
                                       }
                                       isSelected={selectedFile === file.path}
                                       isModified={isFileModified(file.path)}
-                                      isUsedInConfigurator={usedFiles.has(
-                                          file.path
-                                      )}
                                       loadedInSlots={
                                           fileToSlotsMap.get(file.path) || []
                                       }

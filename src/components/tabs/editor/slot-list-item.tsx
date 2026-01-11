@@ -1,6 +1,8 @@
-import { Badge, Box, Group, Stack, Text } from '@mantine/core';
+import { Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { IconPackage } from '@tabler/icons-react';
 
+import { ICON_SIZE_MD } from '@/components/common/icon-style';
+import { TWEAK_COLOR_MAP } from '@/components/common/type-badge';
 import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
 import type { LuaTweakType } from '@/types/types';
 
@@ -28,46 +30,47 @@ export const SlotListItem: React.FC<SlotListItemProps> = ({
         .join(', ');
 
     return (
-        <Box
+        <Stack
+            gap={2}
             p='xs'
+            bdrs='sm'
+            bd={`1px solid ${isSelected ? 'var(--mantine-primary-color-filled)' : 'transparent'}`}
+            bg={isSelected ? 'var(--mantine-primary-color-light)' : undefined}
             style={{
                 cursor: 'pointer',
-                borderRadius: 4,
-                backgroundColor: isSelected
-                    ? 'var(--mantine-color-blue-9)'
-                    : 'transparent',
             }}
             onClick={onClick}
         >
-            <Stack gap={2}>
-                <Group gap='xs' wrap='nowrap'>
-                    <IconPackage size={14} />
-                    <Text size='sm' fw={500} truncate style={{ flex: 1 }}>
-                        {slotName}
-                    </Text>
-                    {isModified && (
-                        <Badge size='xs' color='yellow' variant='dot' />
-                    )}
-                    <Badge
-                        size='xs'
-                        color={slotType === 'tweakdefs' ? 'cyan' : 'grape'}
-                    >
+            <Group gap='xs' wrap='nowrap'>
+                <IconPackage
+                    {...ICON_SIZE_MD}
+                    color={isModified ? 'orange' : undefined}
+                />
+                <Text
+                    size='sm'
+                    fw={500}
+                    truncate
+                    c={isModified ? 'orange' : undefined}
+                    style={{ flex: 1 }}
+                >
+                    {slotName}
+                </Text>
+                <Tooltip
+                    label={`${sources.length} tweak(s) mapped to this slot`}
+                >
+                    <Badge size='xs' color={TWEAK_COLOR_MAP[slotType]}>
                         {sources.length}
                     </Badge>
-                </Group>
-                <Group gap='xs' justify='space-between'>
-                    <Text size='xs' c='dimmed' truncate style={{ flex: 1 }}>
-                        {displaySources}
-                    </Text>
-                    <Text
-                        size='xs'
-                        c={slotSize > MAX_SLOT_SIZE ? 'red' : 'dimmed'}
-                    >
-                        {slotSize.toLocaleString()}/
-                        {MAX_SLOT_SIZE.toLocaleString()}
-                    </Text>
-                </Group>
-            </Stack>
-        </Box>
+                </Tooltip>
+            </Group>
+            <Group gap='xs' justify='space-between'>
+                <Text size='xs' c='dimmed' truncate style={{ flex: 1 }}>
+                    {displaySources}
+                </Text>
+                <Text size='xs' c={slotSize > MAX_SLOT_SIZE ? 'red' : 'dimmed'}>
+                    {slotSize.toLocaleString()}/{MAX_SLOT_SIZE.toLocaleString()}
+                </Text>
+            </Group>
+        </Stack>
     );
 };

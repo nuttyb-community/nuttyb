@@ -13,7 +13,7 @@ import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
-import { TypeBadge } from '@/components/common/type-badge';
+import { TweakTypeBadge } from '@/components/common/type-badge';
 import type { TweakType } from '@/types/types';
 
 export interface DataItemProps {
@@ -37,7 +37,7 @@ export const DataItem: React.FC<DataItemProps> = ({
             <Stack gap='xs'>
                 <Flex align='center' justify='space-between'>
                     <Flex gap='xs' mb={4} align='baseline'>
-                        <TypeBadge type={type} />
+                        <TweakTypeBadge type={type} />
                         {fileName && (
                             <Text size='sm' c={isMissing ? 'red' : 'dimmed'}>
                                 {fileName}
