@@ -364,8 +364,12 @@ export function generateCommands(
     return {
         chunks,
         slotUsage: {
-            tweakdefs: tweakdefsResult.slotUsage.used,
-            tweakunits: tweakunitsResult.slotUsage.used,
+            tweakdefs:
+                tweakdefsResult.slotUsage.used +
+                allocationResult.allocated.tweakdefs,
+            tweakunits:
+                tweakunitsResult.slotUsage.used +
+                allocationResult.allocated.tweakunits,
         },
         droppedCustomTweaks: allocationResult.dropped,
     };
