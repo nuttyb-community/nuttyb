@@ -16,6 +16,7 @@ import {
 
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { validateBase64UrlTweak } from '@/lib/command-generator/command-generator';
+import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
 import { LUA_TWEAK_TYPES, LuaTweakType } from '@/types/types';
 
 interface FormState {
@@ -57,6 +58,15 @@ export const AddTweakForm: React.FC = () => {
 
         // Validate on change to show preview/errors
         if (code.trim()) {
+            // Check size first (before expensive base64 validation)
+            if (code.trim().length > MAX_SLOT_SIZE) {
+                setError(
+                    `Custom tweak is too large: ${code.trim().length} chars (maximum: ${MAX_SLOT_SIZE})`
+                );
+                setPreview(null);
+                return;
+            }
+
             const result = validateBase64UrlTweak(code);
             if (result.valid) {
                 setError(null);
@@ -127,6 +137,7 @@ export const AddTweakForm: React.FC = () => {
                     value={form.code}
                     onChange={handleCodeChange}
                     minRows={3}
+                    maxRows={25}
                     autosize
                     required
                     styles={{
@@ -150,7 +161,9 @@ export const AddTweakForm: React.FC = () => {
                 )}
 
                 <Group>
-                    <Button type='submit'>Save Tweak</Button>
+                    <Button type='submit' disabled={!!error}>
+                        Save Tweak
+                    </Button>
                 </Group>
             </Stack>
         </form>

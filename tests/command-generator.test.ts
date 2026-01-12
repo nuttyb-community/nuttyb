@@ -4,10 +4,14 @@
 
 import { describe, expect, test } from 'bun:test';
 
-import { generateCommands } from '@/lib/command-generator/command-generator';
+import {
+    type EnabledCustomTweak,
+    generateCommands,
+} from '@/lib/command-generator/command-generator';
 import { interpolateCommands } from '@/lib/command-generator/command-template';
 import {
     MAX_CHUNK_SIZE,
+    MAX_SLOT_SIZE,
     MAX_SLOTS_PER_TYPE,
 } from '@/lib/command-generator/constants';
 import {
@@ -22,7 +26,7 @@ import {
     LUA_PRIORITIES,
 } from '@/lib/command-generator/data/configuration-mapping';
 import { LuaSource, packLuaSources } from '@/lib/command-generator/packer';
-import { decode } from '@/lib/encoders/base64';
+import { decode, encode } from '@/lib/encoders/base64';
 import {
     extractSourceManifest,
     parseSourceManifest,
@@ -323,5 +327,88 @@ describe('Command-centric structure (generateCommands)', () => {
         );
         expect(result.slotUsage.tweakdefs).toBe(tweakdefsCmds.length);
         expect(result.slotUsage.tweakunits).toBe(tweakunitsCmds.length);
+    });
+});
+
+describe('Command size validation', () => {
+    test('Oversized custom tweaks are dropped gracefully', () => {
+        const config = DEFAULT_CONFIGURATION;
+        const bundle = getBundle();
+        if (!bundle) expect.unreachable('Bundle should exist');
+
+        const luaFiles = bundle.files;
+
+        // Create a custom tweak with base64 code that results in command > MAX_SLOT_SIZE
+        const oversizedCode = 'A'.repeat(MAX_SLOT_SIZE + 1000);
+        const customTweaks: EnabledCustomTweak[] = [
+            {
+                id: 1,
+                description: 'Oversized Tweak',
+                type: 'tweakdefs',
+                code: oversizedCode,
+                enabled: true,
+            },
+        ];
+
+        const result = generateCommands(config, luaFiles, customTweaks);
+
+        // Should be dropped, not cause error
+        expect(result.droppedCustomTweaks.length).toBe(1);
+        expect(result.droppedCustomTweaks[0].description).toBe(
+            'Oversized Tweak'
+        );
+
+        // All chunks should still be valid
+        for (const chunk of result.chunks) {
+            for (const cmd of chunk.commands) {
+                expect(cmd.command.length).toBeLessThanOrEqual(MAX_CHUNK_SIZE);
+            }
+        }
+    });
+
+    test('Valid custom tweaks are allocated while oversized ones are dropped', () => {
+        const config = DEFAULT_CONFIGURATION;
+        const bundle = getBundle();
+        if (!bundle) expect.unreachable('Bundle should exist');
+
+        const luaFiles = bundle.files;
+        const validCode = encode('-- Valid tweak\nlocal x = 1');
+        const oversizedCode = 'A'.repeat(MAX_SLOT_SIZE + 1000);
+
+        const customTweaks: EnabledCustomTweak[] = [
+            {
+                id: 1,
+                description: 'Valid',
+                type: 'tweakdefs',
+                code: validCode,
+                enabled: true,
+            },
+            {
+                id: 2,
+                description: 'Oversized',
+                type: 'tweakdefs',
+                code: oversizedCode,
+                enabled: true,
+            },
+            {
+                id: 3,
+                description: 'Also Valid',
+                type: 'tweakunits',
+                code: validCode,
+                enabled: true,
+            },
+        ];
+
+        const result = generateCommands(config, luaFiles, customTweaks);
+
+        expect(result.droppedCustomTweaks.length).toBe(1);
+        expect(result.droppedCustomTweaks[0].description).toBe('Oversized');
+
+        // Valid tweaks should be in chunks
+        const allCommands = result.chunks.flatMap((chunk) => chunk.commands);
+        const customCommands = allCommands.filter((cmd) =>
+            cmd.slot?.sources.some((s) => s.startsWith('custom:'))
+        );
+        expect(customCommands.length).toBe(2);
     });
 });

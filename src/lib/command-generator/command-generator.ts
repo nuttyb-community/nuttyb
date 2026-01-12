@@ -10,7 +10,7 @@ import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
-import { MAX_CHUNK_SIZE } from './constants';
+import { MAX_CHUNK_SIZE, MAX_SLOT_SIZE } from './constants';
 import type { Configuration } from './data/configuration';
 import {
     DEFAULT_LUA_PRIORITY,
@@ -197,6 +197,15 @@ function allocateCustomTweaks(
         const slotName = formatSlotName(tweak.type, slot);
         const command = `!bset ${slotName} ${tweak.code}`;
 
+        // Validate command size before allocation
+        // Oversized custom tweaks are dropped gracefully instead of failing
+        if (command.length > MAX_SLOT_SIZE) {
+            dropped.push(tweak);
+            usedSlots[tweak.type].delete(slot); // Free the slot
+            allocated[tweak.type]--;
+            continue;
+        }
+
         allocations.push({
             tweak,
             slotIndex: slot,
@@ -247,6 +256,14 @@ function groupIntoChunks(commands: Command[]): Chunk[] {
     let currentSize = 0;
 
     for (const cmd of commands) {
+        // Validate that individual command doesn't exceed MAX_SLOT_SIZE
+        if (cmd.command.length > MAX_SLOT_SIZE) {
+            throw new Error(
+                `Command exceeds maximum length: ${cmd.command.length} > ${MAX_SLOT_SIZE}. ` +
+                    'This indicates a bug in command generation.'
+            );
+        }
+
         const separatorLength = currentChunk.length > 0 ? 1 : 0;
         const cmdSize = cmd.command.length + separatorLength;
 
