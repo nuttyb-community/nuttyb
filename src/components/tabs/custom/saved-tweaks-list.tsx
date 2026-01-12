@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
     ActionIcon,
@@ -13,7 +13,13 @@ import {
     Tooltip,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { IconCheck, IconCopy, IconX } from '@tabler/icons-react';
+import {
+    IconArrowDown,
+    IconArrowUp,
+    IconCheck,
+    IconCopy,
+    IconX,
+} from '@tabler/icons-react';
 
 import { ICON_STYLE } from '@/components/common/icon-style';
 import { TweakTypeBadge } from '@/components/common/type-badge';
@@ -23,9 +29,20 @@ import type { CustomTweak } from '@/lib/command-generator/command-generator';
 interface TweakRowProps {
     tweak: CustomTweak;
     onDelete: (id: number) => void;
+    onMoveUp: (id: number) => void;
+    onMoveDown: (id: number) => void;
+    isFirst: boolean;
+    isLast: boolean;
 }
 
-const TweakRow: React.FC<TweakRowProps> = ({ tweak, onDelete }) => {
+const TweakRow: React.FC<TweakRowProps> = ({
+    tweak,
+    onDelete,
+    onMoveUp,
+    onMoveDown,
+    isFirst,
+    isLast,
+}) => {
     const clipboard = useClipboard({ timeout: 1500 });
 
     // Truncate code for display
@@ -53,6 +70,33 @@ const TweakRow: React.FC<TweakRowProps> = ({ tweak, onDelete }) => {
                         {displayCode}
                     </Code>
                     <Flex gap='xs' wrap='nowrap' align='center'>
+                        {/* Sort buttons */}
+                        <Tooltip label='Move up'>
+                            <ActionIcon
+                                variant='subtle'
+                                size='sm'
+                                color='gray'
+                                onClick={() => onMoveUp(tweak.id)}
+                                disabled={isFirst}
+                                aria-label='Move tweak up'
+                            >
+                                <IconArrowUp {...ICON_STYLE} />
+                            </ActionIcon>
+                        </Tooltip>
+                        <Tooltip label='Move down'>
+                            <ActionIcon
+                                variant='subtle'
+                                size='sm'
+                                color='gray'
+                                onClick={() => onMoveDown(tweak.id)}
+                                disabled={isLast}
+                                aria-label='Move tweak down'
+                            >
+                                <IconArrowDown {...ICON_STYLE} />
+                            </ActionIcon>
+
+                            {/* Other actions */}
+                        </Tooltip>
                         <Tooltip label='Copy'>
                             <ActionIcon
                                 variant='subtle'
@@ -85,9 +129,16 @@ const TweakRow: React.FC<TweakRowProps> = ({ tweak, onDelete }) => {
 };
 
 export const SavedTweaksList: React.FC = () => {
-    const { customTweaks, deleteTweak } = useCustomTweaksContext();
+    const { customTweaks, deleteTweak, moveTweakUp, moveTweakDown } =
+        useCustomTweaksContext();
 
-    if (customTweaks.length === 0) {
+    // Sort tweaks by priority for display
+    const sortedTweaks = useMemo(
+        () => customTweaks.toSorted((a, b) => a.priority - b.priority),
+        [customTweaks]
+    );
+
+    if (sortedTweaks.length === 0) {
         return (
             <Stack gap='md'>
                 <Title order={3}>Saved Tweaks</Title>
@@ -111,11 +162,15 @@ export const SavedTweaksList: React.FC = () => {
                     </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
-                    {customTweaks.map((tweak) => (
+                    {sortedTweaks.map((tweak, index) => (
                         <TweakRow
                             key={tweak.id}
                             tweak={tweak}
                             onDelete={deleteTweak}
+                            onMoveUp={moveTweakUp}
+                            onMoveDown={moveTweakDown}
+                            isFirst={index === 0}
+                            isLast={index === sortedTweaks.length - 1}
                         />
                     ))}
                 </Table.Tbody>

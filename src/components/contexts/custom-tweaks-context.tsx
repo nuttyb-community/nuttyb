@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+} from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type {
@@ -29,6 +35,10 @@ interface CustomTweaksContextValue {
     getEnabledTweaks: () => EnabledCustomTweak[];
     /** Clear all enabled tweaks (disable all) */
     clearEnabledTweaks: () => void;
+    /** Move a tweak up in priority order */
+    moveTweakUp: (id: number) => void;
+    /** Move a tweak down in priority order */
+    moveTweakDown: (id: number) => void;
     /** Set of currently enabled tweak IDs */
     enabledIds: Set<number>;
     /** Whether the custom tweaks are still loading from storage */
@@ -63,10 +73,11 @@ interface StoredData {
 const DEFAULT_STORED_DATA: StoredData = { tweaks: [], enabledIds: [] };
 
 /**
- * Validates stored custom tweaks data.
+ * Validates and migrates stored custom tweaks data.
+ * Assigns missing priority fields based on array index.
  * Returns null if data is invalid/corrupted to reset to defaults.
  */
-function validateStoredData(stored: StoredData): StoredData | null {
+function validateAndMigrateStoredData(stored: StoredData): StoredData | null {
     // Ensure required structure exists
     if (!stored || typeof stored !== 'object') {
         return null;
@@ -88,7 +99,16 @@ function validateStoredData(stored: StoredData): StoredData | null {
         }
     }
 
-    return stored;
+    // Migrate: assign missing priorities based on array index
+    const migratedTweaks = stored.tweaks.map((tweak, index) => ({
+        ...tweak,
+        priority: tweak.priority ?? index,
+    }));
+
+    return {
+        ...stored,
+        tweaks: migratedTweaks,
+    };
 }
 
 export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
@@ -96,9 +116,18 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
         CUSTOM_TWEAKS_STORAGE_KEY,
         DEFAULT_STORED_DATA,
         {
-            onLoad: validateStoredData,
+            onLoad: validateAndMigrateStoredData,
         }
     );
+
+    // Persist migrated data back to localStorage after initial load
+    useEffect(() => {
+        if (isLoaded) {
+            // This ensures localStorage has the current schema with priority field
+            setStoredData(storedData);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoaded]); // Only run once when data finishes loading
 
     const customTweaks = storedData.tweaks;
     const enabledIds = useMemo(
@@ -117,6 +146,10 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
                 description: description.trim(),
                 type,
                 code: code.trim(),
+                priority:
+                    customTweaks.length > 0
+                        ? Math.max(...customTweaks.map((t) => t.priority)) + 1
+                        : 0,
             };
             setStoredData((prev) => ({
                 ...prev,
@@ -124,7 +157,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             }));
             return newTweak;
         },
-        [setStoredData]
+        [setStoredData, customTweaks]
     );
 
     const deleteTweak = useCallback(
@@ -169,6 +202,62 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
         }));
     }, [setStoredData]);
 
+    const moveTweakUp = useCallback(
+        (id: number) => {
+            setStoredData((prev) => {
+                const sorted = prev.tweaks.toSorted(
+                    (a, b) => a.priority - b.priority
+                );
+                const index = sorted.findIndex((t) => t.id === id);
+
+                if (index <= 0) return prev; // Already first or not found
+
+                // Swap priorities with previous tweak
+                const updated = [...sorted];
+                const temp = updated[index - 1].priority;
+                updated[index - 1] = {
+                    ...updated[index - 1],
+                    priority: updated[index].priority,
+                };
+                updated[index] = { ...updated[index], priority: temp };
+
+                return {
+                    ...prev,
+                    tweaks: updated,
+                };
+            });
+        },
+        [setStoredData]
+    );
+
+    const moveTweakDown = useCallback(
+        (id: number) => {
+            setStoredData((prev) => {
+                const sorted = prev.tweaks.toSorted(
+                    (a, b) => a.priority - b.priority
+                );
+                const index = sorted.findIndex((t) => t.id === id);
+
+                if (index === -1 || index >= sorted.length - 1) return prev; // Not found or already last
+
+                // Swap priorities with next tweak
+                const updated = [...sorted];
+                const temp = updated[index + 1].priority;
+                updated[index + 1] = {
+                    ...updated[index + 1],
+                    priority: updated[index].priority,
+                };
+                updated[index] = { ...updated[index], priority: temp };
+
+                return {
+                    ...prev,
+                    tweaks: updated,
+                };
+            });
+        },
+        [setStoredData]
+    );
+
     const value = useMemo<CustomTweaksContextValue>(
         () => ({
             customTweaks,
@@ -178,6 +267,8 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             isEnabled,
             getEnabledTweaks,
             clearEnabledTweaks,
+            moveTweakUp,
+            moveTweakDown,
             enabledIds,
             isLoading: !isLoaded,
         }),
@@ -189,6 +280,8 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
             isEnabled,
             getEnabledTweaks,
             clearEnabledTweaks,
+            moveTweakUp,
+            moveTweakDown,
             enabledIds,
             isLoaded,
         ]

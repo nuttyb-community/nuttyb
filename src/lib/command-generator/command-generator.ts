@@ -73,6 +73,8 @@ export interface CustomTweak {
     type: LuaTweakType;
     /** Base64URL-encoded Lua code */
     code: string;
+    /** Priority for ordering (lower loads first) */
+    priority: number;
 }
 
 /** Custom tweak with enabled state */
@@ -322,7 +324,7 @@ export function generateCommands(
     const sortedTweakunits = sortLua(tweakunitsSources);
     const tweakunitsResult = packLuaSources(sortedTweakunits, 'tweakunits');
 
-    // 5. Allocate custom tweaks
+    // 5. Allocate custom tweaks (sorted by priority first)
     const tweakdefsCommands = tweakdefsResult.commands.map(
         (cmd) => cmd.command
     );
@@ -330,9 +332,15 @@ export function generateCommands(
         (cmd) => cmd.command
     );
     const existingBsetCommands = [...tweakdefsCommands, ...tweakunitsCommands];
+
+    // Sort custom tweaks by priority before allocation (lower priority loads first)
+    const sortedCustomTweaks = customTweaks
+        ?.filter((t) => t.enabled)
+        .toSorted((a, b) => a.priority - b.priority);
+
     const allocationResult = allocateCustomTweaks(
         existingBsetCommands,
-        customTweaks?.filter((t) => t.enabled)
+        sortedCustomTweaks
     );
 
     // 5b. Convert custom tweak allocations to Command objects

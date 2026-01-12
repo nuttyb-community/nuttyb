@@ -34,27 +34,29 @@ export const CustomTweaksSection: React.FC = () => {
             <Title order={3}>Custom Tweaks</Title>
 
             <Flex gap='md' align='baseline' direction='row' wrap='wrap'>
-                {customTweaks.map((tweak) => {
-                    const enabled = isEnabled(tweak.id);
-                    const disabled = !canEnable(tweak.type, tweak.id);
+                {customTweaks
+                    .toSorted((a, b) => a.priority - b.priority)
+                    .map((tweak) => {
+                        const enabled = isEnabled(tweak.id);
+                        const disabled = !canEnable(tweak.type, tweak.id);
 
-                    return (
-                        <Flex
-                            key={tweak.id}
-                            gap='xs'
-                            align='center'
-                            wrap='nowrap'
-                        >
-                            <Checkbox
-                                label={tweak.description}
-                                checked={enabled}
-                                disabled={disabled}
-                                onChange={() => toggleTweak(tweak.id)}
-                            />
-                            <TweakTypeBadge type={tweak.type} />
-                        </Flex>
-                    );
-                })}
+                        return (
+                            <Flex
+                                key={tweak.id}
+                                gap='xs'
+                                align='center'
+                                wrap='nowrap'
+                            >
+                                <Checkbox
+                                    label={tweak.description}
+                                    checked={enabled}
+                                    disabled={disabled}
+                                    onChange={() => toggleTweak(tweak.id)}
+                                />
+                                <TweakTypeBadge type={tweak.type} />
+                            </Flex>
+                        );
+                    })}
             </Flex>
         </Stack>
     );
