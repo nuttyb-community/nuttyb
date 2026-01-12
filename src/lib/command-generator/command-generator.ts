@@ -247,12 +247,13 @@ function groupIntoChunks(commands: Command[]): Chunk[] {
     let currentSize = 0;
 
     for (const cmd of commands) {
-        const cmdSize = cmd.command.length + 1; // +1 for newline
+        const separatorLength = currentChunk.length > 0 ? 1 : 0;
+        const cmdSize = cmd.command.length + separatorLength;
 
         if (currentSize + cmdSize > MAX_CHUNK_SIZE && currentChunk.length > 0) {
             chunks.push({ commands: currentChunk });
             currentChunk = [cmd];
-            currentSize = cmdSize;
+            currentSize = cmd.command.length;
         } else {
             currentChunk.push(cmd);
             currentSize += cmdSize;
