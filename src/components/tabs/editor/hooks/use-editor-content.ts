@@ -4,6 +4,7 @@ import { useDebouncedCallback } from '@mantine/hooks';
 
 import type { EditedFile } from '@/components/tabs/editor/hooks/use-editor-storage';
 import type { SlotContent } from '@/hooks/use-slot-content';
+import { beautify } from '@/lib/lua-utils/beautifier';
 import type { LuaFile } from '@/types/types';
 
 interface UseEditorContentProps {
@@ -94,7 +95,10 @@ export function useEditorContent({
             const edited = editedSlots.get(slotName);
             if (edited) return edited.currentData;
             const slot = slotContents.find((s) => s.slotName === slotName);
-            return slot?.content ?? '';
+            const content = slot?.content ?? '';
+
+            // Beautify slot content for display in editor while keeping commands minified
+            return beautify(content);
         },
         [pendingEdits, editedSlots, slotContents]
     );
