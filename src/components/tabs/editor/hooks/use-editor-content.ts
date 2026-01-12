@@ -194,7 +194,7 @@ export function useEditorContent({
             });
 
             // Debounce the storage write
-            debouncedSlotWrite(slotName, original.content, value);
+            debouncedSlotWrite(slotName, beautify(original.content), value);
         },
         [slotContents, debouncedSlotWrite]
     );
