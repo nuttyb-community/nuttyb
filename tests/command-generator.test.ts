@@ -4,7 +4,7 @@
 
 import { describe, expect, test } from 'bun:test';
 
-import { generateCommandSections } from '@/lib/command-generator/command-generator';
+import { generateCommands } from '@/lib/command-generator/command-generator';
 import { interpolateCommands } from '@/lib/command-generator/command-template';
 import {
     MAX_CHUNK_SIZE,
@@ -104,26 +104,20 @@ describe('Command generation', () => {
         if (!bundle) expect.unreachable('Bundle should exist');
 
         const luaFiles = bundle.files;
-        const generatedLobbySections = generateCommandSections(
-            config,
-            luaFiles
-        );
+        const result = generateCommands(config, luaFiles);
 
         // Validate slot usage statistics
-        expect(
-            generatedLobbySections.slotUsage.tweakdefs.used
-        ).toBeLessThanOrEqual(MAX_SLOTS_PER_TYPE);
-        expect(
-            generatedLobbySections.slotUsage.tweakunits.used
-        ).toBeLessThanOrEqual(MAX_SLOTS_PER_TYPE);
-        expect(generatedLobbySections.slotUsage.tweakdefs.total).toBe(
+        expect(result.slotUsage.tweakdefs).toBeLessThanOrEqual(
             MAX_SLOTS_PER_TYPE
         );
-        expect(generatedLobbySections.slotUsage.tweakunits.total).toBe(
+        expect(result.slotUsage.tweakunits).toBeLessThanOrEqual(
             MAX_SLOTS_PER_TYPE
         );
 
-        const sections = generatedLobbySections.sections;
+        // Derive sections from structured chunks
+        const sections = result.chunks.map((chunk) =>
+            chunk.commands.map((cmd) => cmd.command).join('\n')
+        );
 
         expect(sections.length).toBeGreaterThan(0);
         const generatedTweaks = [];
@@ -293,5 +287,41 @@ end`,
         // Tweakdefs should merge regardless of format
         expect(result.commands.length).toBe(1);
         expect(result.slotUsage.used).toBe(1);
+    });
+});
+
+describe('Command-centric structure (generateCommands)', () => {
+    test('generateCommands returns properly structured commands', () => {
+        const config = DEFAULT_CONFIGURATION;
+        const bundle = getBundle();
+        if (!bundle) expect.unreachable('Bundle should exist');
+
+        const result = generateCommands(config, bundle.files);
+        const allCommands = result.chunks.flatMap((c) => c.commands);
+
+        // Validate command structure contract
+        for (const cmd of allCommands) {
+            expect(['tweakdefs', 'tweakunits', 'command']).toContain(cmd.type);
+            expect(typeof cmd.command).toBe('string');
+            expect(cmd.command.length).toBeGreaterThan(0);
+
+            // Slot presence follows type rules
+            if (cmd.type === 'command') {
+                expect(cmd.slot).toBeUndefined();
+            } else {
+                expect(cmd.slot).toBeDefined();
+                expect(typeof cmd.slot!.index).toBe('number');
+                expect(Array.isArray(cmd.slot!.sources)).toBe(true);
+                expect(typeof cmd.slot!.content).toBe('string');
+            }
+        }
+
+        // Validate slot usage counts
+        const tweakdefsCmds = allCommands.filter((c) => c.type === 'tweakdefs');
+        const tweakunitsCmds = allCommands.filter(
+            (c) => c.type === 'tweakunits'
+        );
+        expect(result.slotUsage.tweakdefs).toBe(tweakdefsCmds.length);
+        expect(result.slotUsage.tweakunits).toBe(tweakunitsCmds.length);
     });
 });

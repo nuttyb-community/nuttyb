@@ -3,8 +3,11 @@
 import { useMemo } from 'react';
 
 import type { DroppedTweak } from '@/components/contexts/tweak-data-context';
-import type { EnabledCustomTweak } from '@/lib/command-generator/command-generator';
-import { generateCommandSections } from '@/lib/command-generator/command-generator';
+import {
+    type EnabledCustomTweak,
+    generateCommands,
+} from '@/lib/command-generator/command-generator';
+import { MAX_SLOTS_PER_TYPE } from '@/lib/command-generator/constants';
 import type { Configuration } from '@/lib/command-generator/data/configuration';
 import type { LuaFile } from '@/types/types';
 
@@ -29,22 +32,38 @@ export function useTweakData(
         }
 
         try {
-            const { sections, slotUsage, droppedCustomTweaks } =
-                generateCommandSections(
-                    configuration,
-                    luaFiles,
-                    enabledCustomTweaks
-                );
-
-            // Transform business type to display type
-            const droppedTweaks: DroppedTweak[] = droppedCustomTweaks.map(
-                (tweak) => ({
-                    description: tweak.description,
-                    type: tweak.type,
-                })
+            const result = generateCommands(
+                configuration,
+                luaFiles,
+                enabledCustomTweaks
             );
 
-            return { sections, slotUsage, droppedTweaks };
+            // Derive sections from structured chunks
+            const sections = result.chunks.map((chunk) =>
+                chunk.commands.map((cmd) => cmd.command).join('\n')
+            );
+
+            // Transform business type to display type
+            const droppedTweaks: DroppedTweak[] =
+                result.droppedCustomTweaks.map((tweak) => ({
+                    description: tweak.description,
+                    type: tweak.type,
+                }));
+
+            return {
+                sections,
+                slotUsage: {
+                    tweakdefs: {
+                        used: result.slotUsage.tweakdefs,
+                        total: MAX_SLOTS_PER_TYPE,
+                    },
+                    tweakunits: {
+                        used: result.slotUsage.tweakunits,
+                        total: MAX_SLOTS_PER_TYPE,
+                    },
+                },
+                droppedTweaks,
+            };
         } catch (error) {
             console.error('[useTweakData] Failed to build commands:', error);
             return {

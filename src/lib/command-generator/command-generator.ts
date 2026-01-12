@@ -4,12 +4,13 @@
  * Flow: Configuration -> Lua sources -> Packed slots -> Command sections
  */
 
-import type { LuaFile, LuaTweakType } from '@/types/types';
+import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
 // Re-export for convenience
 
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
+import { MAX_CHUNK_SIZE } from './constants';
 import type { Configuration } from './data/configuration';
 import {
     DEFAULT_LUA_PRIORITY,
@@ -17,7 +18,7 @@ import {
 } from './data/configuration-mapping';
 import { resolveLuaReference } from './interpolator';
 import type { LuaSource } from './packer';
-import { packCommandsIntoSections, packLuaSources } from './packer';
+import { packLuaSources } from './packer';
 import { formatSlotName } from './slot';
 import { decode } from '../encoders/base64';
 
@@ -79,14 +80,41 @@ export interface EnabledCustomTweak extends CustomTweak {
     enabled: boolean;
 }
 
-/** Result of building lobby command sections */
-export interface LobbySectionsResult {
-    sections: string[];
+/**
+ * Metadata for slot-based commands (tweakdefs/tweakunits only)
+ */
+export interface SlotInfo {
+    index: number; // 0-9, which slot this command uses
+    sources: string[]; // File paths included in this slot
+    content: string; // Reconstructed Lua code for editor display
+}
+
+/**
+ * A single command to be sent to game lobby
+ */
+export interface Command {
+    type: TweakType; // 'tweakdefs' | 'tweakunits' | 'command'
+    command: string; // The actual command string (e.g., "!bset tweakdefs0 [base64]")
+    slot?: SlotInfo; // Present only for tweakdefs/tweakunits (not plain commands)
+}
+
+/**
+ * A chunk/section of commands that fits within message size limit
+ */
+export interface Chunk {
+    commands: Command[];
+}
+
+/**
+ * Complete result of command generation
+ */
+export interface PackingResult {
+    chunks: Chunk[]; // Structured commands grouped by message size
     slotUsage: {
-        tweakdefs: { used: number; total: number };
-        tweakunits: { used: number; total: number };
+        tweakdefs: number; // Number of tweakdefs slots used
+        tweakunits: number; // Number of tweakunits slots used
     };
-    droppedCustomTweaks: EnabledCustomTweak[];
+    droppedCustomTweaks: EnabledCustomTweak[]; // Custom tweaks that didn't fit
 }
 
 /**
@@ -98,11 +126,19 @@ function getLuaPriority(path: string): number {
     return LUA_PRIORITIES[clean] ?? DEFAULT_LUA_PRIORITY;
 }
 
+/** A single custom tweak allocation */
+interface CustomTweakAllocation {
+    tweak: EnabledCustomTweak;
+    slotIndex: number;
+    command: string;
+}
+
 /** Result of allocating custom tweaks to slots */
 interface CustomTweakAllocationResult {
-    commands: string[];
+    commands: string[]; // For backwards compat (derive from allocations)
     dropped: EnabledCustomTweak[];
     allocated: { tweakdefs: number; tweakunits: number };
+    allocations: CustomTweakAllocation[]; // NEW: structured allocation data
 }
 
 /**
@@ -117,6 +153,7 @@ function allocateCustomTweaks(
             commands: [],
             dropped: [],
             allocated: { tweakdefs: 0, tweakunits: 0 },
+            allocations: [],
         };
     }
 
@@ -136,7 +173,7 @@ function allocateCustomTweaks(
         }
     }
 
-    const commands: string[] = [];
+    const allocations: CustomTweakAllocation[] = [];
     const dropped: EnabledCustomTweak[] = [];
     const allocated = { tweakdefs: 0, tweakunits: 0 };
 
@@ -158,10 +195,21 @@ function allocateCustomTweaks(
         usedSlots[tweak.type].add(slot);
         allocated[tweak.type]++;
         const slotName = formatSlotName(tweak.type, slot);
-        commands.push(`!bset ${slotName} ${tweak.code}`);
+        const command = `!bset ${slotName} ${tweak.code}`;
+
+        allocations.push({
+            tweak,
+            slotIndex: slot,
+            command,
+        });
     }
 
-    return { commands, dropped, allocated };
+    return {
+        commands: allocations.map((a) => a.command), // Derive from allocations
+        dropped,
+        allocated,
+        allocations,
+    };
 }
 
 /**
@@ -188,82 +236,136 @@ function sortLua(sources: LuaSource[]): LuaSource[] {
 }
 
 /**
- * Generates paste-ready lobby command sections.
+ * Groups commands into chunks that fit within MAX_CHUNK_SIZE
  *
+ * @param commands Array of commands to group
+ * @returns Array of command chunks
+ */
+function groupIntoChunks(commands: Command[]): Chunk[] {
+    const chunks: Chunk[] = [];
+    let currentChunk: Command[] = [];
+    let currentSize = 0;
+
+    for (const cmd of commands) {
+        const cmdSize = cmd.command.length + 1; // +1 for newline
+
+        if (currentSize + cmdSize > MAX_CHUNK_SIZE && currentChunk.length > 0) {
+            chunks.push({ commands: currentChunk });
+            currentChunk = [cmd];
+            currentSize = cmdSize;
+        } else {
+            currentChunk.push(cmd);
+            currentSize += cmdSize;
+        }
+    }
+
+    if (currentChunk.length > 0) {
+        chunks.push({ commands: currentChunk });
+    }
+
+    return chunks;
+}
+
+/**
+ * Generates structured commands from configuration
  * @param configuration User's selected configuration
  * @param luaFiles Available Lua files from bundle
  * @param customTweaks Optional enabled custom tweaks
- * @returns Sections and metadata
+ *
+ * @returns PackingResult with chunks, slot usage, and dropped tweaks
  */
-export function generateCommandSections(
+export function generateCommands(
     configuration: Configuration,
     luaFiles: LuaFile[],
     customTweaks?: EnabledCustomTweak[]
-): LobbySectionsResult {
+): PackingResult {
     const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
 
-    // Map configuration to commands and Lua paths (includes BASE_TWEAKS)
+    // 1. Map configuration to commands and Lua paths
     const {
         commands: rawCommands,
         tweakdefs: defsPaths,
         tweakunits: unitsPaths,
     } = getMappedData(configuration);
 
-    // Interpolate any command templates with configuration values
+    // 2. Interpolate command templates
     const interpolatedCommands = interpolateCommands(
         rawCommands,
         configuration
     );
 
-    // Resolve Lua sources with content and priority
+    // 3. Resolve and pack tweakdefs
     const tweakdefsSources = resolveLuaSources(luaFileMap, defsPaths);
-    const tweakunitsSources = resolveLuaSources(luaFileMap, unitsPaths);
-
-    // Sort by priority before packing (packer expects pre-sorted input)
     const sortedTweakdefs = sortLua(tweakdefsSources);
-    const sortedTweakunits = sortLua(tweakunitsSources);
-
-    // Pack Lua sources into slots
     const tweakdefsResult = packLuaSources(sortedTweakdefs, 'tweakdefs');
+
+    // 4. Resolve and pack tweakunits
+    const tweakunitsSources = resolveLuaSources(luaFileMap, unitsPaths);
+    const sortedTweakunits = sortLua(tweakunitsSources);
     const tweakunitsResult = packLuaSources(sortedTweakunits, 'tweakunits');
 
-    const bsetCommands = [
-        ...tweakdefsResult.commands,
-        ...tweakunitsResult.commands,
-    ];
-
-    // Allocate custom tweaks
-    const {
-        commands: customCommands,
-        dropped,
-        allocated,
-    } = allocateCustomTweaks(
-        bsetCommands,
+    // 5. Allocate custom tweaks
+    const tweakdefsCommands = tweakdefsResult.commands.map(
+        (cmd: Command) => cmd.command
+    );
+    const tweakunitsCommands = tweakunitsResult.commands.map(
+        (cmd: Command) => cmd.command
+    );
+    const existingBsetCommands = [...tweakdefsCommands, ...tweakunitsCommands];
+    const allocationResult = allocateCustomTweaks(
+        existingBsetCommands,
         customTweaks?.filter((t) => t.enabled)
     );
 
-    // Sort commands: !preset first
-    const sortedCommands = interpolatedCommands.toSorted((a, b) => {
-        if (a.startsWith('!preset') && !b.startsWith('!preset')) return -1;
-        if (!a.startsWith('!preset') && b.startsWith('!preset')) return 1;
-        return 0;
-    });
+    // 5b. Convert custom tweak allocations to Command objects
+    const customCommands: Command[] = allocationResult.allocations.map(
+        (allocation) => {
+            const decoded = decode(allocation.tweak.code);
+            return {
+                type: allocation.tweak.type,
+                command: allocation.command,
+                slot: {
+                    index: allocation.slotIndex,
+                    sources: [`custom:${allocation.tweak.description}`],
+                    content: `-- Custom Tweak: ${allocation.tweak.description}\n${decoded}`,
+                },
+            };
+        }
+    );
 
-    // Combine all commands in order
-    const allCommands = [...sortedCommands, ...bsetCommands, ...customCommands];
+    // 6. Build Command[] array
+    const allCommands: Command[] = [
+        // Plain commands (sorted: !preset first)
+        ...interpolatedCommands
+            .toSorted((a, b) => {
+                if (a.startsWith('!preset') && !b.startsWith('!preset'))
+                    return -1;
+                if (!a.startsWith('!preset') && b.startsWith('!preset'))
+                    return 1;
+                return 0;
+            })
+            .map((cmd) => ({
+                type: 'command' as TweakType,
+                command: cmd,
+                // No slot property for plain commands
+            })),
+        // Tweakdefs commands (already structured from packer)
+        ...tweakdefsResult.commands,
+        // Tweakunits commands (already structured from packer)
+        ...tweakunitsResult.commands,
+        // Custom tweak commands
+        ...customCommands,
+    ];
+
+    // 7. Group commands into chunks (respecting message size limit)
+    const chunks = groupIntoChunks(allCommands);
 
     return {
-        sections: packCommandsIntoSections(allCommands),
+        chunks,
         slotUsage: {
-            tweakdefs: {
-                used: tweakdefsResult.slotUsage.used + allocated.tweakdefs,
-                total: tweakdefsResult.slotUsage.total,
-            },
-            tweakunits: {
-                used: tweakunitsResult.slotUsage.used + allocated.tweakunits,
-                total: tweakunitsResult.slotUsage.total,
-            },
+            tweakdefs: tweakdefsResult.slotUsage.used,
+            tweakunits: tweakunitsResult.slotUsage.used,
         },
-        droppedCustomTweaks: dropped,
+        droppedCustomTweaks: allocationResult.dropped,
     };
 }

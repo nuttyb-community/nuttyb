@@ -11,7 +11,8 @@
 
 import { LuaTweakType } from '@/types/types';
 
-import { MAX_CHUNK_SIZE, MAX_SLOT_SIZE, MAX_SLOTS_PER_TYPE } from './constants';
+import type { Command } from './command-generator';
+import { MAX_SLOT_SIZE, MAX_SLOTS_PER_TYPE } from './constants';
 import { formatSlotName } from './slot';
 import { encode } from '../encoders/base64';
 import { minify } from '../lua-utils/minificator';
@@ -41,8 +42,8 @@ export interface LuaSource {
 
 /** Result of packing Lua sources into slots */
 export interface PackingResult {
-    /** Generated !bset commands */
-    commands: string[];
+    /** Generated commands with slot metadata */
+    commands: Command[];
     /** Slot usage statistics */
     slotUsage: { used: number; total: number };
 }
@@ -168,51 +169,27 @@ export function packLuaSources(
         );
     }
 
-    // Generate !bset commands with source manifests
-    const commands = slots.map((slot, i) => {
+    // Generate structured commands with slot metadata
+    const commands: Command[] = slots.map((slot, i) => {
         const minifiedContent = minify(slot.content);
         const sourceManifest = `-- Source: ${JSON.stringify(slot.sources)}`;
         const encoded = encode(`${sourceManifest}\n${minifiedContent}`);
         const slotName = formatSlotName(slotType, i);
-        return `!bset ${slotName} ${encoded}`;
+        const commandString = `!bset ${slotName} ${encoded}`;
+
+        return {
+            type: slotType, // 'tweakdefs' or 'tweakunits'
+            command: commandString,
+            slot: {
+                index: i,
+                sources: slot.sources,
+                content: `${sourceManifest}\n${slot.content}`, // Unminified with manifest
+            },
+        };
     });
 
     return {
         commands,
         slotUsage: { used: slots.length, total: MAX_SLOTS_PER_TYPE },
     };
-}
-
-/**
- * Packs commands into sections respecting MAX_CHUNK_SIZE.
- *
- * @param commands List of commands to pack
- * @returns List of packed command sections
- */
-export function packCommandsIntoSections(commands: string[]): string[] {
-    if (commands.length === 0) return [];
-
-    const sections: string[] = [];
-    let current = '';
-
-    for (const cmd of commands) {
-        if (!cmd) continue;
-
-        if (cmd.length > MAX_CHUNK_SIZE) {
-            throw new Error(
-                `Command exceeds maximum length: ${cmd.length} > ${MAX_CHUNK_SIZE}`
-            );
-        }
-
-        const separator = current ? '\n' : '';
-        if (current.length + separator.length + cmd.length <= MAX_CHUNK_SIZE) {
-            current += separator + cmd;
-        } else {
-            if (current) sections.push(current);
-            current = cmd;
-        }
-    }
-
-    if (current) sections.push(current);
-    return sections;
 }
