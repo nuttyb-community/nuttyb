@@ -307,10 +307,10 @@ export function generateCommands(
 
     // 5. Allocate custom tweaks
     const tweakdefsCommands = tweakdefsResult.commands.map(
-        (cmd: Command) => cmd.command
+        (cmd) => cmd.command
     );
     const tweakunitsCommands = tweakunitsResult.commands.map(
-        (cmd: Command) => cmd.command
+        (cmd) => cmd.command
     );
     const existingBsetCommands = [...tweakdefsCommands, ...tweakunitsCommands];
     const allocationResult = allocateCustomTweaks(
