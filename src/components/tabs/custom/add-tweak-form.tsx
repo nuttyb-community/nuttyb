@@ -8,7 +8,6 @@ import {
     Group,
     NativeSelect,
     Stack,
-    Text,
     Textarea,
     TextInput,
     Title,
@@ -149,9 +148,22 @@ export const AddTweakForm: React.FC = () => {
                 />
 
                 {preview && (
-                    <Text size='sm' c='dimmed'>
-                        Preview (first line): <code>{preview}</code>
-                    </Text>
+                    <Textarea
+                        label='Preview (decoded first line)'
+                        value={preview}
+                        readOnly
+                        disabled
+                        autosize
+                        minRows={2}
+                        maxRows={3}
+                        style={{ flex: 1 }}
+                        styles={{
+                            input: {
+                                fontFamily: 'monospace',
+                                fontSize: '12px',
+                            },
+                        }}
+                    />
                 )}
 
                 {error && (
