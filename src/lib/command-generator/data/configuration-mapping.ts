@@ -15,6 +15,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/main-defs.lua': 2,
     'lua/builders-t3.lua': 3,
     'lua/t1-buffs.lua': 3,
+    'lua/t2-buffs.lua': 3,
     'lua/t3-evolution.lua': 3,
     'lua/defences-t4.lua': 4,
     'lua/mini-bosses.lua': 5,
@@ -75,7 +76,6 @@ export const BASE_COMMANDS = [
     '!multiplier_shieldpower 2',
     '!multiplier_turnrate 1',
     '!multiplier_weapondamage 1',
-    '!experiencemult 3',
     '!multiplier_weaponrange 1',
     '!raptor_difficulty epic',
     '!raptor_spawntimemult 1',
@@ -113,6 +113,7 @@ export const BASE_TWEAKS = {
         '~lua/builders-t3.lua',
         '~lua/unit-launchers.lua',
         '~lua/t1-buffs.lua',
+        '~lua/t2-buffs.lua',
         '~lua/t3-evolution.lua',
     ],
     tweakunits: [
@@ -275,7 +276,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         values: {
             'No rush': {
                 command: [
-                    '!raptor_queentimemult 1.3',
+                    '!raptor_queentimemult 1.6',
                     '!raptor_spawncountmult 3',
                     '!raptor_firstwavesboost 4',
                     '!raptor_graceperiodmult 3',
@@ -283,7 +284,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
             'No rush solo': {
                 command: [
-                    '!raptor_queentimemult 1.3',
+                    '!raptor_queentimemult 1.6',
                     '!raptor_spawncountmult 3',
                     '!raptor_firstwavesboost 3',
                     '!raptor_graceperiodmult 2.7',
@@ -291,7 +292,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
             'Zero grace': {
                 command: [
-                    '!raptor_queentimemult 1.4',
+                    '!raptor_queentimemult 1.7',
                     '!raptor_spawncountmult 3',
                     '!raptor_firstwavesboost 3',
                     '!raptor_graceperiodmult 0.1',
@@ -299,7 +300,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
             Surrounded: {
                 command: [
-                    '!raptor_queentimemult 1.3',
+                    '!raptor_queentimemult 1.6',
                     '!raptor_spawncountmult 3',
                     '!raptor_firstwavesboost 6',
                     '!raptor_graceperiodmult 3',

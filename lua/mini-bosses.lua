@@ -29,7 +29,7 @@ do
         return math.max(1, math.ceil(base * totalSpawnScale))
     end
 
-    local mqAnger = { 70, 85, 90, 105, 110, 125 }
+    local mqAnger = { 90, 105, 115, 130, 140, 155 }
     local mqTimeMult =
         math.max(1, spring.GetModOptions().raptor_queentimemult or 1.3)
     local mqStart, mqLast = mqAnger[1], mqAnger[#mqAnger]
