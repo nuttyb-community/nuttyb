@@ -77,6 +77,17 @@ export const ExtrasSection: React.FC = () => {
                             )
                         }
                     />
+                    <Checkbox
+                        label='Units Priority'
+                        description='Costlier turrets, cheaper/faster mobile units, anti-turret raptor squads'
+                        checked={configuration.isUnitsPriority}
+                        onChange={(event) =>
+                            setProperty(
+                                'isUnitsPriority',
+                                event.currentTarget.checked
+                            )
+                        }
+                    />
                 </Stack>
             </SimpleGrid>
         </Stack>

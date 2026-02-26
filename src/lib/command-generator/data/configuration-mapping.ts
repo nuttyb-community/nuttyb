@@ -26,6 +26,8 @@ export const LUA_PRIORITIES: Record<string, number> = {
     '~lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
     'lua/unit-launchers.lua': 13,
+    '~lua/units-priority-stats.lua': 14,
+    '~lua/units-priority-defs.lua': 15,
 } as const;
 
 /**
@@ -332,6 +334,16 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'Mega Nuke',
         values: {
             true: { tweakunits: ['~lua/mega-nuke.lua'] },
+            false: undefined,
+        },
+    },
+    isUnitsPriority: {
+        description: 'Units Priority',
+        values: {
+            true: {
+                tweakunits: ['~lua/units-priority-stats.lua'],
+                tweakdefs: ['~lua/units-priority-defs.lua'],
+            },
             false: undefined,
         },
     },

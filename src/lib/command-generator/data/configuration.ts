@@ -41,6 +41,7 @@ export interface Configuration {
     isRFLRPCRebalance: boolean;
     isRFLRPCT4: boolean;
     isMegaNuke: boolean;
+    isUnitsPriority: boolean;
     // Numeric multipliers
     incomeMult: number;
     buildDistMult: number;
@@ -58,6 +59,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     isRFLRPCRebalance: true,
     isRFLRPCT4: true,
     isMegaNuke: false,
+    isUnitsPriority: false,
     // Numeric multipliers
     incomeMult: 1,
     buildDistMult: 1.5,
