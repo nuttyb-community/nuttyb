@@ -16,7 +16,6 @@ describe('isCommandTemplate', () => {
     test('detects template with $variable$ pattern', () => {
         expect(isCommandTemplate('Hello $name$!')).toBe(true);
         expect(isCommandTemplate('$a$ and $b$')).toBe(true);
-        expect(isCommandTemplate('!rename [$difficulty$]')).toBe(true);
     });
 
     test('returns false for non-template strings', () => {
@@ -142,40 +141,6 @@ describe('interpolateCommandTemplate', () => {
             );
         });
     });
-
-    describe('rename command template', () => {
-        const renameTemplate =
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$';
-
-        test('generates command with lobby name', () => {
-            expect(
-                interpolateCommandTemplate(renameTemplate, {
-                    presetDifficulty: 'Medium',
-                    lobbyName: 'My Game',
-                })
-            ).toBe('!rename Community NuttyB [Medium] [My Game]');
-        });
-
-        test('generates command without lobby name', () => {
-            expect(
-                interpolateCommandTemplate(renameTemplate, {
-                    presetDifficulty: 'Medium',
-                    lobbyName: '',
-                })
-            ).toBe('!rename Community NuttyB [Medium]');
-        });
-
-        test('works with all difficulty levels', () => {
-            for (const difficulty of ['Easy', 'Medium', 'Hard']) {
-                expect(
-                    interpolateCommandTemplate(renameTemplate, {
-                        presetDifficulty: difficulty,
-                        lobbyName: '',
-                    })
-                ).toBe(`!rename Community NuttyB [${difficulty}]`);
-            }
-        });
-    });
 });
 
 describe('buildTemplateContext', () => {
@@ -183,40 +148,14 @@ describe('buildTemplateContext', () => {
         const context = buildTemplateContext(DEFAULT_CONFIGURATION);
 
         expect(context.presetDifficulty).toBe('Medium');
-        expect(context.lobbyName).toBe('');
         expect(context.extras).toBe('None');
         expect(context.gameMap).toBe('Full Metal Plate (12P)');
-        expect(context.start).toBe('No rush');
+        expect(context.start).toBe('Zero grace');
         expect(context.isMegaNuke).toBe('false');
-    });
-
-    test('trims lobby name', () => {
-        const context = buildTemplateContext({
-            ...DEFAULT_CONFIGURATION,
-            lobbyName: '  My Game  ',
-        });
-
-        expect(context.lobbyName).toBe('My Game');
     });
 });
 
 describe('interpolateCommands', () => {
-    test('interpolates template commands', () => {
-        const commands = [
-            '!preset coop',
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
-            '!balance',
-        ];
-
-        const result = interpolateCommands(commands, DEFAULT_CONFIGURATION);
-
-        expect(result).toEqual([
-            '!preset coop',
-            '!rename Community NuttyB [Medium]',
-            '!balance',
-        ]);
-    });
-
     test('passes through non-template commands unchanged', () => {
         const commands = ['!preset coop', '!teamsize 12', '!balance'];
 
@@ -228,21 +167,15 @@ describe('interpolateCommands', () => {
     test('handles mixed template and non-template commands', () => {
         const commands = [
             '!preset coop',
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
+            'Setting $presetDifficulty$ mode',
             '!teamsize 12',
         ];
 
-        const config = {
-            ...DEFAULT_CONFIGURATION,
-            presetDifficulty: 'Hard' as const,
-            lobbyName: 'Epic Battle',
-        };
-
-        const result = interpolateCommands(commands, config);
+        const result = interpolateCommands(commands, DEFAULT_CONFIGURATION);
 
         expect(result).toEqual([
             '!preset coop',
-            '!rename Community NuttyB [Hard] [Epic Battle]',
+            'Setting Medium mode',
             '!teamsize 12',
         ]);
     });

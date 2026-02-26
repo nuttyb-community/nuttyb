@@ -34,33 +34,21 @@ export interface Configuration {
     challenges: Challenges;
     gameMap: GameMap;
     start: StartOption;
-    lobbyName: string;
     isEcoT4: boolean;
     isRFLRPCRebalance: boolean;
     isRFLRPCT4: boolean;
     isMegaNuke: boolean;
     isUnitsPriority: boolean;
-    // Numeric multipliers
-    incomeMult: number;
-    buildDistMult: number;
-    buildPowerMult: number;
-    queenCount: number;
 }
 
 export const DEFAULT_CONFIGURATION: Configuration = {
     presetDifficulty: 'Medium',
     challenges: 'None',
     gameMap: 'Full Metal Plate (12P)',
-    start: 'No rush',
-    lobbyName: '',
+    start: 'Zero grace',
     isEcoT4: true,
     isRFLRPCRebalance: true,
     isRFLRPCT4: true,
     isMegaNuke: false,
     isUnitsPriority: false,
-    // Numeric multipliers
-    incomeMult: 1,
-    buildDistMult: 1.5,
-    buildPowerMult: 1,
-    queenCount: 12,
 };

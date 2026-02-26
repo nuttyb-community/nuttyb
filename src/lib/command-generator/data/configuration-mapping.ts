@@ -59,8 +59,8 @@ export const BASE_COMMANDS = [
     '!experimentallegionfaction 1',
     '!experimentalshields bounceeverything',
     '!maxunits 10000',
-    '!bSet multiplier_builddistance $buildDistMult$',
-    '!bSet multiplier_buildpower $buildPowerMult$',
+    '!multiplier_builddistance 1.5',
+    '!multiplier_buildpower 1',
     '!multiplier_buildtimecost 1',
     '!multiplier_energyconversion 1',
     '!multiplier_energycost 1',
@@ -71,7 +71,7 @@ export const BASE_COMMANDS = [
     '!multiplier_metalcost 1',
     '!multiplier_metalextraction 1',
     '!multiplier_radarrange 1',
-    '!bSet multiplier_resourceincome $incomeMult$',
+    '!multiplier_resourceincome 1',
     '!multiplier_shieldpower 2',
     '!multiplier_turnrate 1',
     '!multiplier_weapondamage 1',
@@ -92,13 +92,12 @@ export const BASE_COMMANDS = [
     '!unit_restrictions_nonukes 0',
     '!draft_mode disabled',
     '!unit_restrictions_notacnukes 0',
-    '$welcome-message See https://nuttyb.org for mod info and setup instructions',
+    '$welcome-message Settings made with NuttyB Configurator https://rcorex.github.io/nuttyb-config/',
     '!unit_market 0',
     '!evocom 0',
     '!nowasting all',
     '!bSet unit_restrictions_nonukes 1',
-    '!bSet raptor_queen_count $queenCount$',
-    '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
+    '!bSet raptor_queen_count 8',
     '!balance',
 ] as const;
 
@@ -306,10 +305,6 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
         },
     },
-    lobbyName: {
-        description: 'Custom lobby name',
-        values: {},
-    },
     isEcoT4: {
         description: 'T4 Economy',
         values: {
@@ -347,22 +342,5 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             },
             false: undefined,
         },
-    },
-    // Numeric settings - handled via command templates, not value mapping
-    incomeMult: {
-        description: 'Resource income multiplier',
-        values: {},
-    },
-    buildDistMult: {
-        description: 'Build distance multiplier',
-        values: {},
-    },
-    buildPowerMult: {
-        description: 'Build power multiplier',
-        values: {},
-    },
-    queenCount: {
-        description: 'Raptor queen count',
-        values: {},
     },
 } as const;

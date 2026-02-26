@@ -9,13 +9,10 @@
  * - $?content?$ : Optional section, removed entirely if any $variable$ inside is empty
  *
  * @example
- * // Template: '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$'
+ * // Template: 'Setting $presetDifficulty$ mode'
  * //
- * // With { presetDifficulty: 'Medium', lobbyName: 'My Game' }
- * // -> '!rename Community NuttyB [Medium] [My Game]'
- * //
- * // With { presetDifficulty: 'Medium', lobbyName: '' }
- * // -> '!rename Community NuttyB [Medium]'
+ * // With { presetDifficulty: 'Medium' }
+ * // -> 'Setting Medium mode'
  */
 
 import type { Configuration } from './data/configuration';
@@ -119,10 +116,10 @@ function replaceRequiredVariables(
  *
  * @example
  * interpolateCommandTemplate(
- *     '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
- *     { presetDifficulty: 'Medium', lobbyName: '' }
+ *     'Setting $presetDifficulty$ mode',
+ *     { presetDifficulty: 'Medium' }
  * )
- * // Returns: '!rename Community NuttyB [Medium]'
+ * // Returns: 'Setting Medium mode'
  */
 export function interpolateCommandTemplate(
     template: string,
@@ -148,16 +145,10 @@ export function interpolateCommandTemplate(
 export function buildTemplateContext(config: Configuration): TemplateContext {
     return {
         presetDifficulty: config.presetDifficulty,
-        lobbyName: config.lobbyName?.trim() ?? '',
         extras: config.challenges,
         gameMap: config.gameMap,
         start: config.start,
         isMegaNuke: String(config.isMegaNuke),
-        // Numeric settings
-        incomeMult: String(config.incomeMult),
-        buildDistMult: String(config.buildDistMult),
-        buildPowerMult: String(config.buildPowerMult),
-        queenCount: String(config.queenCount),
     };
 }
 
