@@ -15,6 +15,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/main-defs.lua': 2,
     'lua/builders-t3.lua': 3,
     'lua/t1-buffs.lua': 3,
+    'lua/t3-evolution.lua': 3,
     'lua/defences-t4.lua': 4,
     'lua/mini-bosses.lua': 5,
     'lua/mega-nuke.lua': 5,
@@ -74,6 +75,7 @@ export const BASE_COMMANDS = [
     '!multiplier_shieldpower 2',
     '!multiplier_turnrate 1',
     '!multiplier_weapondamage 1',
+    '!experiencemult 3',
     '!multiplier_weaponrange 1',
     '!raptor_difficulty epic',
     '!raptor_spawntimemult 1',
@@ -111,6 +113,7 @@ export const BASE_TWEAKS = {
         '~lua/builders-t3.lua',
         '~lua/unit-launchers.lua',
         '~lua/t1-buffs.lua',
+        '~lua/t3-evolution.lua',
     ],
     tweakunits: [
         '~lua/main-units.lua',

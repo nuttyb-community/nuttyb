@@ -12,7 +12,7 @@ for unitName, unitDef in pairs(UnitDefs) do
                 if weaponDef.damage then
                     for dmgType, dmgVal in pairs(weaponDef.damage) do
                         if type(dmgVal) == 'number' then
-                            weaponDef.damage[dmgType] = math.floor(dmgVal * 2.5)
+                            weaponDef.damage[dmgType] = math.floor(dmgVal * 3.5)
                         end
                     end
                 end
