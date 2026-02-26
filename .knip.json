@@ -4,6 +4,7 @@
         "src/app/**/*.{ts,tsx}",
         "scripts/sync/sync.ts",
         "scripts/bundle-report/bundle-report.ts",
+        "scripts/encode/encode.ts",
         "tests/**/*.test.{ts,js}"
     ],
     "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{ts,tsx,js,jsx}"],

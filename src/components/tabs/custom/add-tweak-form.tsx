@@ -80,7 +80,7 @@ export const AddTweakForm: React.FC = () => {
         }
     };
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = (event: React.SyntheticEvent) => {
         event.preventDefault();
 
         // Validate description
