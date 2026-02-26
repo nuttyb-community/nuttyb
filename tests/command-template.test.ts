@@ -184,7 +184,7 @@ describe('buildTemplateContext', () => {
 
         expect(context.presetDifficulty).toBe('Medium');
         expect(context.lobbyName).toBe('');
-        expect(context.extras).toBe('Mini Bosses');
+        expect(context.extras).toBe('None');
         expect(context.gameMap).toBe('Full Metal Plate (12P)');
         expect(context.start).toBe('No rush');
         expect(context.isMegaNuke).toBe('false');

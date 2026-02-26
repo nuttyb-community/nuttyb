@@ -1,8 +1,6 @@
 export const PRESET_DIFFICULTIES = ['Easy', 'Medium', 'Hard'] as const;
 export const CHALLENGES = [
     'None',
-    'Mini Bosses',
-    'Mini Bosses Extended',
     'Experimental Wave Challenge',
 ] as const;
 export const MAPS = [
@@ -51,7 +49,7 @@ export interface Configuration {
 
 export const DEFAULT_CONFIGURATION: Configuration = {
     presetDifficulty: 'Medium',
-    challenges: 'Mini Bosses',
+    challenges: 'None',
     gameMap: 'Full Metal Plate (12P)',
     start: 'No rush',
     lobbyName: '',
