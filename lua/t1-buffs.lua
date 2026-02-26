@@ -2,7 +2,10 @@
 -- https://github.com/nuttyb-community/nuttyb
 
 for unitName, unitDef in pairs(UnitDefs) do
-    if unitDef.customparams and tonumber(unitDef.customparams.techlevel) == 1 then
+    local cp = unitDef.customparams
+    local isT1 = cp and (cp.techlevel == nil or cp.techlevel == 1)
+    local isPlayer = not unitName:match('^raptor_') and not unitName:match('_scav$')
+    if isT1 and isPlayer and unitDef.health then
         unitDef.health = math.ceil(unitDef.health * 1.5)
         if unitDef.weapondefs then
             for _, weaponDef in pairs(unitDef.weapondefs) do
