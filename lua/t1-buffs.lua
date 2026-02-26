@@ -2,7 +2,7 @@
 -- https://github.com/nuttyb-community/nuttyb
 
 for unitName, unitDef in pairs(UnitDefs) do
-    if unitDef.customparams and unitDef.customparams.techlevel == 1 then
+    if unitDef.customparams and tonumber(unitDef.customparams.techlevel) == 1 then
         unitDef.health = math.ceil(unitDef.health * 1.5)
         if unitDef.weapondefs then
             for _, weaponDef in pairs(unitDef.weapondefs) do
