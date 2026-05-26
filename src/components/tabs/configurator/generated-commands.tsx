@@ -14,7 +14,12 @@ import {
     Title,
 } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
-import { IconCheck, IconCopy } from '@tabler/icons-react';
+import {
+    IconCheck,
+    IconChevronDown,
+    IconChevronUp,
+    IconCopy,
+} from '@tabler/icons-react';
 
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
@@ -26,30 +31,48 @@ interface CopySectionProps {
 
 const CopySection: React.FC<CopySectionProps> = ({ content, label }) => {
     const clipboard = useClipboard({ timeout: 2000 });
+    const [isExpanded, setIsExpanded] = React.useState(false);
 
     return (
         <Group align='flex-start' gap='md'>
-            <Button
-                color={clipboard.copied ? 'teal' : 'blue'}
-                onClick={() => clipboard.copy(content)}
-                w={120}
-                style={{ flexShrink: 0 }}
-                leftSection={
-                    clipboard.copied ? (
-                        <IconCheck {...ICON_SIZE_MD} />
-                    ) : (
-                        <IconCopy {...ICON_SIZE_MD} />
-                    )
-                }
-            >
-                {clipboard.copied ? 'Copied!' : label}
-            </Button>
+            <Stack gap='xs' style={{ flexShrink: 0 }}>
+                <Button
+                    color={clipboard.copied ? 'teal' : 'blue'}
+                    onClick={() => clipboard.copy(content)}
+                    w={130}
+                    leftSection={
+                        clipboard.copied ? (
+                            <IconCheck {...ICON_SIZE_MD} />
+                        ) : (
+                            <IconCopy {...ICON_SIZE_MD} />
+                        )
+                    }
+                >
+                    {clipboard.copied ? 'Copied!' : label}
+                </Button>
+                <Button
+                    variant='light'
+                    color='gray'
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    w={130}
+                    size='xs'
+                    leftSection={
+                        isExpanded ? (
+                            <IconChevronUp {...ICON_SIZE_MD} />
+                        ) : (
+                            <IconChevronDown {...ICON_SIZE_MD} />
+                        )
+                    }
+                >
+                    {isExpanded ? 'Collapse' : 'Expand'}
+                </Button>
+            </Stack>
             <Textarea
                 value={content}
                 readOnly
                 autosize
-                minRows={2}
-                maxRows={3}
+                minRows={6}
+                maxRows={isExpanded ? undefined : 6}
                 style={{ flex: 1 }}
                 styles={{
                     input: {
@@ -111,7 +134,7 @@ export const GeneratedCommands: React.FC = () => {
                 </Alert>
             )}
             {sections.map((section, index) => (
-                <CopySection key={index} content={section} label='Copy' />
+                <CopySection key={index} content={section} label='Copy All' />
             ))}
         </Stack>
     );

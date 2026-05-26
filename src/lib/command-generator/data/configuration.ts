@@ -64,3 +64,44 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     buildPowerMult: 1,
     queenCount: 12,
 };
+
+/**
+ * Generates the default lobby name tag based on configuration settings.
+ */
+export function getDefaultLobbyNameTag(config: {
+    presetDifficulty: PresetDifficulty;
+    challenges: Challenges;
+}): string {
+    let diffTag = '1_5x';
+    switch (config.presetDifficulty) {
+        case 'Easy':
+            diffTag = '1_3x';
+            break;
+        case 'Hard':
+            diffTag = '3x';
+            break;
+        // No default
+    }
+
+    let challengeTag = '';
+    switch (config.challenges) {
+        case 'Mini Bosses':
+            challengeTag = ' [Mini Bosses]';
+
+            break;
+
+        case 'Mini Bosses Extended':
+            challengeTag = ' [Mini Bosses Ext]';
+
+            break;
+
+        case 'Experimental Wave Challenge':
+            challengeTag = ' [Expo Waves]';
+
+            break;
+
+        // No default
+    }
+
+    return `Raptors${challengeTag}[${diffTag} QHP ${diffTag} HP][No Mex]`;
+}

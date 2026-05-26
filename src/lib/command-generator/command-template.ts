@@ -18,7 +18,10 @@
  * // -> '!rename Community NuttyB [Medium]'
  */
 
-import type { Configuration } from './data/configuration';
+import {
+    type Configuration,
+    getDefaultLobbyNameTag,
+} from './data/configuration';
 
 export type TemplateContext = Record<string, string>;
 
@@ -146,9 +149,19 @@ export function interpolateCommandTemplate(
  * @returns Template context with all config values as strings
  */
 export function buildTemplateContext(config: Configuration): TemplateContext {
+    let lobbyNameValue = config.lobbyName?.trim() ?? '';
+    if (!lobbyNameValue) {
+        lobbyNameValue = getDefaultLobbyNameTag(config);
+    }
+
+    // Strip outer brackets because the template wraps it in brackets: $?[$lobbyName$]?$
+    if (lobbyNameValue.startsWith('[') && lobbyNameValue.endsWith(']')) {
+        lobbyNameValue = lobbyNameValue.slice(1, -1);
+    }
+
     return {
         presetDifficulty: config.presetDifficulty,
-        lobbyName: config.lobbyName?.trim() ?? '',
+        lobbyName: lobbyNameValue,
         extras: config.challenges,
         gameMap: config.gameMap,
         start: config.start,

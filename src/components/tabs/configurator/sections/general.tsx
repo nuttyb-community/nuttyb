@@ -14,6 +14,7 @@ import {
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import {
     GameMap,
+    getDefaultLobbyNameTag,
     MAPS,
     START_OPTIONS,
     StartOption,
@@ -28,10 +29,12 @@ export const GeneralSection: React.FC = () => {
             <SimpleGrid spacing='xl' cols={2}>
                 <Stack gap='sm'>
                     <TextInput
-                        label='Lobby name tag'
-                        description='It will be added to auto-generated lobby name'
-                        placeholder='Custom name tag (optional)'
-                        value={configuration.lobbyName}
+                        label='Lobby name tag (added to auto-generated lobby name)'
+                        placeholder={getDefaultLobbyNameTag(configuration)}
+                        value={
+                            configuration.lobbyName ||
+                            getDefaultLobbyNameTag(configuration)
+                        }
                         onChange={(event) =>
                             setProperty('lobbyName', event.currentTarget.value)
                         }
@@ -59,8 +62,7 @@ export const GeneralSection: React.FC = () => {
                         }
                     />
                     <NumberInput
-                        label='Raptor queen count'
-                        description='Number of raptor queens (1 - 100)'
+                        label='Raptor queen count (1 - 100)'
                         value={configuration.queenCount}
                         onChange={(value) =>
                             setProperty('queenCount', Number(value) || 8)
@@ -74,8 +76,7 @@ export const GeneralSection: React.FC = () => {
                 </Stack>
                 <Stack gap='sm'>
                     <NumberInput
-                        label='Resource income multiplier'
-                        description='Affects both energy and metal production (0.1 - 10)'
+                        label='Resource income multiplier (0.1 - 10)'
                         value={configuration.incomeMult}
                         onChange={(value) =>
                             setProperty('incomeMult', Number(value) || 1)
@@ -88,8 +89,7 @@ export const GeneralSection: React.FC = () => {
                         required
                     />
                     <NumberInput
-                        label='Build power multiplier'
-                        description='Affects the build power (0.1 - 10). Might want to make it the same as resource income multiplier for balance.'
+                        label='Build power multiplier (0.1 - 10)'
                         value={configuration.buildPowerMult}
                         onChange={(value) =>
                             setProperty('buildPowerMult', Number(value) || 1)
@@ -102,8 +102,7 @@ export const GeneralSection: React.FC = () => {
                         required
                     />
                     <NumberInput
-                        label='Build distance multiplier'
-                        description='Defines how far you can build, compared to vanilla BAR (0.5 - 10)'
+                        label='Build distance multiplier (0.5 - 10)'
                         value={configuration.buildDistMult}
                         onChange={(value) =>
                             setProperty('buildDistMult', Number(value) || 1.5)
