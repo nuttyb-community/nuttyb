@@ -107,14 +107,14 @@ export const BASE_TWEAKS = {
         '~lua/eco-t3.lua',
         '~lua/builders-t3.lua',
         '~lua/unit-launchers.lua',
+        '~lua/lrpc-rebalance.lua',
+        '~lua/air-rework-t4.lua',
     ],
     tweakunits: [
         '~lua/main-units.lua',
         '~lua/evocom-leg.lua',
         '~lua/evocom-arm.lua',
         '~lua/evocom-cor.lua',
-        '~lua/lrpc-rebalance.lua',
-        '~lua/air-rework-t4.lua',
     ],
 } as const;
 

@@ -49,6 +49,50 @@ export interface PackingResult {
 }
 
 /**
+ * Helper to build the encoded/formatted content for a slot.
+ * If the content starts with a comment line, it preserves that comment line
+ * as the first line, puts the `-- Source: ...` manifest on the second line,
+ * and the remaining content (optionally minified) below.
+ */
+function getEncodedContent(
+    sources: string[],
+    content: string,
+    minifyContent: boolean
+): string {
+    const lines = content.split('\n');
+    let firstCommentIndex = -1;
+    for (const [i, rawLine] of lines.entries()) {
+        const line = rawLine.trim();
+        if (line === '') {
+            continue;
+        }
+        if (line.startsWith('--')) {
+            firstCommentIndex = i;
+        }
+        break;
+    }
+
+    let firstComment = '';
+    let remaining = content;
+    if (firstCommentIndex !== -1) {
+        firstComment = lines[firstCommentIndex];
+        const remainingLines = [
+            ...lines.slice(0, firstCommentIndex),
+            ...lines.slice(firstCommentIndex + 1),
+        ];
+        remaining = remainingLines.join('\n');
+    }
+
+    const preparedContent = minifyContent ? minify(remaining) : remaining;
+    const sourceManifest = `-- Source: ${JSON.stringify(sources)}`;
+
+    if (firstComment) {
+        return `${firstComment}\n${sourceManifest}\n${preparedContent}`;
+    }
+    return `${sourceManifest}\n${preparedContent}`;
+}
+
+/**
  * Checks if adding new content to existing slot would exceed the size limit.
  *
  * @param existingSources Current source paths in the slot
@@ -68,9 +112,12 @@ function canFitInSlot(
         ? existingContent + '\n\n' + newContent
         : newContent;
 
-    const manifest = `-- Source: ${JSON.stringify(combinedSources)}`;
-    const minifiedContent = minify(combinedContent);
-    const encoded = encode(`${manifest}\n${minifiedContent}`);
+    const finalContent = getEncodedContent(
+        combinedSources,
+        combinedContent,
+        true
+    );
+    const encoded = encode(finalContent);
 
     return encoded.length <= MAX_SLOT_SIZE;
 }
@@ -171,11 +218,20 @@ export function packLuaSources(
 
     // Generate structured commands with slot metadata
     const commands: Command[] = slots.map((slot, i) => {
-        const minifiedContent = minify(slot.content);
-        const sourceManifest = `-- Source: ${JSON.stringify(slot.sources)}`;
-        const encoded = encode(`${sourceManifest}\n${minifiedContent}`);
+        const finalMinifiedContent = getEncodedContent(
+            slot.sources,
+            slot.content,
+            true
+        );
+        const encoded = encode(finalMinifiedContent);
         const slotName = formatSlotName(slotType, i);
         const commandString = `!bset ${slotName} ${encoded}`;
+
+        const finalUnminifiedContent = getEncodedContent(
+            slot.sources,
+            slot.content,
+            false
+        );
 
         return {
             type: slotType, // 'tweakdefs' or 'tweakunits'
@@ -183,7 +239,7 @@ export function packLuaSources(
             slot: {
                 index: i,
                 sources: slot.sources,
-                content: `${sourceManifest}\n${slot.content}`, // Unminified with manifest
+                content: finalUnminifiedContent,
             },
         };
     });

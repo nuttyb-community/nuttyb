@@ -290,6 +290,52 @@ end`,
     });
 });
 
+describe('Slot comment preservation', () => {
+    test('Preserves the first comment line and inserts source manifest right after it', () => {
+        const source: LuaSource = {
+            path: 'lua/raptor-hp-template.lua',
+            content:
+                '\n\n-- Raptor HP multiplier\n-- Authors: Name\ndo\n    local hp = 1.5\nend',
+            priority: 1,
+        };
+
+        const result = packLuaSources([source], 'tweakdefs');
+        expect(result.commands.length).toBe(1);
+
+        const base64 = result.commands[0].command.replace(
+            /^!bset tweakdefs\d* /,
+            ''
+        );
+        const decoded = decode(base64);
+
+        const lines = decoded.split('\n');
+        expect(lines[0]).toBe('-- Raptor HP multiplier');
+        expect(lines[1]).toBe('-- Source: ["lua/raptor-hp-template.lua"]');
+        expect(lines[2]).toContain('local'); // Should contain minified remaining code
+    });
+
+    test('Works correctly when there is no comment line at the top', () => {
+        const source: LuaSource = {
+            path: 'lua/main-defs.lua',
+            content: 'do\n    local x = 1\nend',
+            priority: 1,
+        };
+
+        const result = packLuaSources([source], 'tweakdefs');
+        expect(result.commands.length).toBe(1);
+
+        const base64 = result.commands[0].command.replace(
+            /^!bset tweakdefs\d* /,
+            ''
+        );
+        const decoded = decode(base64);
+
+        const lines = decoded.split('\n');
+        expect(lines[0]).toBe('-- Source: ["lua/main-defs.lua"]');
+        expect(lines[1]).toContain('local');
+    });
+});
+
 describe('Command-centric structure (generateCommands)', () => {
     test('generateCommands returns properly structured commands', () => {
         const config = DEFAULT_CONFIGURATION;
