@@ -10,7 +10,6 @@ import {
 } from '@/lib/command-generator/command-generator';
 import { interpolateCommands } from '@/lib/command-generator/command-template';
 import {
-    MAX_CHUNK_SIZE,
     MAX_SLOT_SIZE,
     MAX_SLOTS_PER_TYPE,
 } from '@/lib/command-generator/constants';
@@ -123,12 +122,8 @@ describe('Command generation', () => {
             chunk.commands.map((cmd) => cmd.command).join('\n')
         );
 
-        expect(sections.length).toBeGreaterThan(0);
-        const generatedTweaks = [];
-        for (const section of sections) {
-            expect(section.length).toBeLessThanOrEqual(MAX_CHUNK_SIZE);
-            generatedTweaks.push(...section.split('\n'));
-        }
+        expect(sections.length).toBe(1);
+        const generatedTweaks = sections[0].split('\n');
 
         // Decode generated tweaks to extract source references
         const tweaks = [];
@@ -152,9 +147,10 @@ describe('Command generation', () => {
                 ''
             );
 
-            // Each command must fit within MAX_CHUNK_SIZE - that's the absolute limit
-            // MAX_SLOT_SIZE is a target limit, not a real constraint
-            expect(generatedTweak.length).toBeLessThanOrEqual(MAX_CHUNK_SIZE);
+            // Each command must fit within MAX_SLOT_SIZE plus the command prefix
+            expect(generatedTweak.length).toBeLessThanOrEqual(
+                MAX_SLOT_SIZE + 50
+            );
 
             const decoded = decode(base64);
             const manifest = extractSourceManifest(decoded);
@@ -346,6 +342,7 @@ describe('Command size validation', () => {
                 description: 'Oversized Tweak',
                 type: 'tweakdefs',
                 code: oversizedCode,
+                priority: 0,
                 enabled: true,
             },
         ];
@@ -361,7 +358,9 @@ describe('Command size validation', () => {
         // All chunks should still be valid
         for (const chunk of result.chunks) {
             for (const cmd of chunk.commands) {
-                expect(cmd.command.length).toBeLessThanOrEqual(MAX_CHUNK_SIZE);
+                expect(cmd.command.length).toBeLessThanOrEqual(
+                    MAX_SLOT_SIZE + 50
+                );
             }
         }
     });
@@ -381,6 +380,7 @@ describe('Command size validation', () => {
                 description: 'Valid',
                 type: 'tweakdefs',
                 code: validCode,
+                priority: 0,
                 enabled: true,
             },
             {
@@ -388,6 +388,7 @@ describe('Command size validation', () => {
                 description: 'Oversized',
                 type: 'tweakdefs',
                 code: oversizedCode,
+                priority: 0,
                 enabled: true,
             },
             {
@@ -395,6 +396,7 @@ describe('Command size validation', () => {
                 description: 'Also Valid',
                 type: 'tweakunits',
                 code: validCode,
+                priority: 0,
                 enabled: true,
             },
         ];

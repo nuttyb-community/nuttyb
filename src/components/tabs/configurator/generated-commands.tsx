@@ -70,8 +70,6 @@ export const GeneratedCommands: React.FC = () => {
         return null;
     }
 
-    const hasMultipleSections = sections.length > 1;
-
     return (
         <Stack gap='md'>
             <Flex gap='md' align='baseline'>
@@ -112,21 +110,8 @@ export const GeneratedCommands: React.FC = () => {
                     </Text>
                 </Alert>
             )}
-
-            {hasMultipleSections && (
-                <Text size='sm' c='dimmed'>
-                    Copy and paste all parts separately to the lobby
-                </Text>
-            )}
-
             {sections.map((section, index) => (
-                <CopySection
-                    key={index}
-                    content={section}
-                    label={
-                        hasMultipleSections ? `Copy Part ${index + 1}` : 'Copy'
-                    }
-                />
+                <CopySection key={index} content={section} label='Copy' />
             ))}
         </Stack>
     );

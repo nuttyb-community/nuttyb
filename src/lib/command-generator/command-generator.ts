@@ -10,7 +10,7 @@ import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
-import { MAX_CHUNK_SIZE, MAX_SLOT_SIZE } from './constants';
+import { MAX_SLOT_SIZE } from './constants';
 import type { Configuration } from './data/configuration';
 import {
     DEFAULT_LUA_PRIORITY,
@@ -247,16 +247,12 @@ function sortLua(sources: LuaSource[]): LuaSource[] {
 }
 
 /**
- * Groups commands into chunks that fit within MAX_CHUNK_SIZE
+ * Wraps commands in a single chunk.
  *
- * @param commands Array of commands to group
- * @returns Array of command chunks
+ * @param commands Array of commands
+ * @returns Array of command chunks (always contains exactly one chunk)
  */
 function groupIntoChunks(commands: Command[]): Chunk[] {
-    const chunks: Chunk[] = [];
-    let currentChunk: Command[] = [];
-    let currentSize = 0;
-
     for (const cmd of commands) {
         // Validate that individual command doesn't exceed MAX_SLOT_SIZE
         if (cmd.command.length > MAX_SLOT_SIZE) {
@@ -265,25 +261,9 @@ function groupIntoChunks(commands: Command[]): Chunk[] {
                     'This indicates a bug in command generation.'
             );
         }
-
-        const separatorLength = currentChunk.length > 0 ? 1 : 0;
-        const cmdSize = cmd.command.length + separatorLength;
-
-        if (currentSize + cmdSize > MAX_CHUNK_SIZE && currentChunk.length > 0) {
-            chunks.push({ commands: currentChunk });
-            currentChunk = [cmd];
-            currentSize = cmd.command.length;
-        } else {
-            currentChunk.push(cmd);
-            currentSize += cmdSize;
-        }
     }
 
-    if (currentChunk.length > 0) {
-        chunks.push({ commands: currentChunk });
-    }
-
-    return chunks;
+    return [{ commands }];
 }
 
 /**
