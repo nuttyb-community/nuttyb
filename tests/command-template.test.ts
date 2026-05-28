@@ -183,7 +183,9 @@ describe('buildTemplateContext', () => {
         const context = buildTemplateContext(DEFAULT_CONFIGURATION);
 
         expect(context.presetDifficulty).toBe('Medium');
-        expect(context.lobbyName).toBe('');
+        expect(context.lobbyName).toBe(
+            'Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]'
+        );
         expect(context.extras).toBe('Mini Bosses');
         expect(context.gameMap).toBe('Full Metal Plate (12P)');
         expect(context.start).toBe('No rush');
@@ -212,7 +214,7 @@ describe('interpolateCommands', () => {
 
         expect(result).toEqual([
             '!preset coop',
-            '!rename Community NuttyB [Medium]',
+            '!rename Community NuttyB [Medium] [Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]]',
             '!balance',
         ]);
     });

@@ -1,3 +1,4 @@
+-- MiniBossesExt
 -- Mini Bosses Extended Version
 -- Authors: RCore, Altwaal
 -- docs.google.com/spreadsheets/d/1QSVsuAAMhBrhiZdTihVfSCwPzbbZWDLCtXWP23CU0ko

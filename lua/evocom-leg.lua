@@ -1,4 +1,4 @@
--- NuttyB v1.52c Legion Com
+-- LegionCom
 -- Authors: ChrispyNut, BackBash
 -- https://github.com/nuttyb-community/nuttyb
 

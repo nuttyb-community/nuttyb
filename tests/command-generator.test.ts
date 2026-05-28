@@ -290,6 +290,83 @@ end`,
     });
 });
 
+describe('Slot comment preservation', () => {
+    test('Preserves the first comment line and inserts source manifest right after it', () => {
+        const source: LuaSource = {
+            path: 'lua/raptor-hp-template.lua',
+            content:
+                '\n\n-- Raptor HP multiplier\n-- Authors: Name\ndo\n    local hp = 1.5\nend',
+            priority: 1,
+        };
+
+        const result = packLuaSources([source], 'tweakdefs');
+        expect(result.commands.length).toBe(1);
+
+        const base64 = result.commands[0].command.replace(
+            /^!bset tweakdefs\d* /,
+            ''
+        );
+        const decoded = decode(base64);
+
+        const lines = decoded.split('\n');
+        expect(lines[0]).toBe('-- Raptor HP multiplier');
+        expect(lines[1]).toBe('-- Source: ["lua/raptor-hp-template.lua"]');
+        expect(lines[2]).toContain('local'); // Should contain minified remaining code
+    });
+
+    test('Works correctly when there is no comment line at the top', () => {
+        const source: LuaSource = {
+            path: 'lua/main-defs.lua',
+            content: 'do\n    local x = 1\nend',
+            priority: 1,
+        };
+
+        const result = packLuaSources([source], 'tweakdefs');
+        expect(result.commands.length).toBe(1);
+
+        const base64 = result.commands[0].command.replace(
+            /^!bset tweakdefs\d* /,
+            ''
+        );
+        const decoded = decode(base64);
+
+        const lines = decoded.split('\n');
+        expect(lines[0]).toBe('-- Source: ["lua/main-defs.lua"]');
+        expect(lines[1]).toContain('local');
+    });
+
+    test('Merges first comment lines of multiple tweaks into a single comment line', () => {
+        const source1: LuaSource = {
+            path: 'lua/air-rework-t4.lua',
+            content:
+                '-- Air Rework T4\n-- Authors: BackBash\ndo\n    local speed = 100\nend',
+            priority: 1,
+        };
+
+        const source2: LuaSource = {
+            path: 'lua/lrpc-rebalance.lua',
+            content: '\n\n-- LRPC Rebalance\ndo\n    local hp = 100\nend',
+            priority: 2,
+        };
+
+        const result = packLuaSources([source1, source2], 'tweakdefs');
+        expect(result.commands.length).toBe(1);
+
+        const base64 = result.commands[0].command.replace(
+            /^!bset tweakdefs\d* /,
+            ''
+        );
+        const decoded = decode(base64);
+
+        const lines = decoded.split('\n');
+        expect(lines[0]).toBe('-- Air Rework T4-LRPC Rebalance');
+        expect(lines[1]).toBe(
+            '-- Source: ["lua/air-rework-t4.lua","lua/lrpc-rebalance.lua"]'
+        );
+        expect(lines[2]).toContain('local');
+    });
+});
+
 describe('Command-centric structure (generateCommands)', () => {
     test('generateCommands returns properly structured commands', () => {
         const config = DEFAULT_CONFIGURATION;

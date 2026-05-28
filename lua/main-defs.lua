@@ -1,3 +1,4 @@
+-- MainDefs
 -- NuttyB v1.52b Def Main
 -- Authors: ChrispyNut, BackBash
 -- https://github.com/nuttyb-community/nuttyb

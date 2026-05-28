@@ -1,3 +1,4 @@
+-- $HP_MULTIPLIER$X.QHP
 -- NuttyB v1.52 $HP_MULTIPLIER$X QHP
 -- https://github.com/nuttyb-community/nuttyb
 

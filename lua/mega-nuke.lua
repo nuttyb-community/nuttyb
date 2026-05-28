@@ -1,3 +1,4 @@
+-- MegaNuke
 -- NuttyB v1.52 Mega Nuke
 -- https://github.com/nuttyb-community/nuttyb
 

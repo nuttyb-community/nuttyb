@@ -1,3 +1,4 @@
+-- CrossTax70%
 -- Cross Faction Tax 70%
 -- Authors: TetrisCo
 -- https://github.com/nuttyb-community/nuttyb

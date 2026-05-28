@@ -1,3 +1,4 @@
+-- MiniBosses
 -- Mini Bosses v2g
 -- Authors: RCore
 -- https://github.com/nuttyb-community/nuttyb
