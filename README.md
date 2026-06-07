@@ -14,7 +14,7 @@ This is a monorepo that contains:
 ## 🎮 Quick Start for Players
 
 ### Getting the Mod
-Use the [Community NuttyB Configurator](https://configurator.nuttyb.org) to generate your custom configuration with the tweaks you want.
+Use the [Community NuttyB Configurator](https://nuttyb-community.github.io/nuttyb/) to generate your custom configuration with the tweaks you want.
 
 ## 🛠️ Development
 
