@@ -145,7 +145,7 @@ describe('interpolateCommandTemplate', () => {
 
     describe('rename command template', () => {
         const renameTemplate =
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$';
+            '!rename Community NuttyB $?[$lobbyName$]?$';
 
         test('generates command with lobby name', () => {
             expect(
@@ -153,7 +153,7 @@ describe('interpolateCommandTemplate', () => {
                     presetDifficulty: 'Medium',
                     lobbyName: 'My Game',
                 })
-            ).toBe('!rename Community NuttyB [Medium] [My Game]');
+            ).toBe('!rename Community NuttyB [My Game]');
         });
 
         test('generates command without lobby name', () => {
@@ -162,18 +162,7 @@ describe('interpolateCommandTemplate', () => {
                     presetDifficulty: 'Medium',
                     lobbyName: '',
                 })
-            ).toBe('!rename Community NuttyB [Medium]');
-        });
-
-        test('works with all difficulty levels', () => {
-            for (const difficulty of ['Easy', 'Medium', 'Hard']) {
-                expect(
-                    interpolateCommandTemplate(renameTemplate, {
-                        presetDifficulty: difficulty,
-                        lobbyName: '',
-                    })
-                ).toBe(`!rename Community NuttyB [${difficulty}]`);
-            }
+            ).toBe('!rename Community NuttyB');
         });
     });
 });
@@ -206,7 +195,7 @@ describe('interpolateCommands', () => {
     test('interpolates template commands', () => {
         const commands = [
             '!preset coop',
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
+            '!rename Community NuttyB $?[$lobbyName$]?$',
             '!balance',
         ];
 
@@ -214,7 +203,7 @@ describe('interpolateCommands', () => {
 
         expect(result).toEqual([
             '!preset coop',
-            '!rename Community NuttyB [Medium] [Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]]',
+            '!rename Community NuttyB [Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]]',
             '!balance',
         ]);
     });
@@ -230,7 +219,7 @@ describe('interpolateCommands', () => {
     test('handles mixed template and non-template commands', () => {
         const commands = [
             '!preset coop',
-            '!rename Community NuttyB [$presetDifficulty$] $?[$lobbyName$]?$',
+            '!rename Community NuttyB $?[$lobbyName$]?$',
             '!teamsize 12',
         ];
 
@@ -244,7 +233,7 @@ describe('interpolateCommands', () => {
 
         expect(result).toEqual([
             '!preset coop',
-            '!rename Community NuttyB [Hard] [Epic Battle]',
+            '!rename Community NuttyB [Epic Battle]',
             '!teamsize 12',
         ]);
     });

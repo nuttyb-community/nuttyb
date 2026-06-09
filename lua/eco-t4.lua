@@ -30,6 +30,13 @@ do
         leg = 'Legion ',
     }
 
+    local function scaled(value, multiplier)
+        if value then
+            return math.ceil(value * multiplier)
+        end
+        return nil
+    end
+
     local function cloneUnit(sourceUnit, targetUnit, overrides)
         if unitDefs[sourceUnit] and not unitDefs[targetUnit] then
             unitDefs[targetUnit] = tableMerge(unitDefs[sourceUnit], overrides)
@@ -53,14 +60,13 @@ do
         if metalMakerDef then
             local t4Multiplier = 2.0
             cloneUnit(templateConverterName, newConverterName, {
-                metalcost = math.ceil(metalMakerDef.metalcost * t4Multiplier),
-                energycost = math.ceil(metalMakerDef.energycost * t4Multiplier),
-                buildtime = math.ceil(metalMakerDef.buildtime * t4Multiplier),
-                health = math.ceil(metalMakerDef.health * t4Multiplier * 6),
+                description = 'Legendary Energy Converter',
+                metalcost = scaled(metalMakerDef.metalcost, t4Multiplier),
+                energycost = scaled(metalMakerDef.energycost, t4Multiplier),
+                buildtime = scaled(metalMakerDef.buildtime, t4Multiplier),
+                health = scaled(metalMakerDef.health, t4Multiplier * 6),
                 customparams = {
-                    energyconv_capacity = math.ceil(
-                        metalMakerDef.customparams.energyconv_capacity * 2
-                    ),
+                    energyconv_capacity = scaled(metalMakerDef.customparams.energyconv_capacity, 2),
                     energyconv_efficiency = 0.022,
                     buildinggrounddecaldecayspeed = metalMakerDef.customparams.buildinggrounddecaldecayspeed,
                     buildinggrounddecalsizex = metalMakerDef.customparams.buildinggrounddecalsizex,
@@ -111,13 +117,14 @@ do
         -- Legendary Fusion Reactor (200% version)
         if fusionDef then
             cloneUnit(templateFusionName, newFusionName, {
-                buildtime = math.ceil(fusionDef.buildtime * 1.8),
+                buildtime = scaled(fusionDef.buildtime, 1.8),
                 name = 'Legendary Fusion Reactor',
-                metalcost = math.ceil(fusionDef.metalcost * 2.0),
-                energycost = math.ceil(fusionDef.energycost * 2.0),
-                energymake = math.ceil(fusionDef.energymake * 2.4),
-                energystorage = math.ceil(fusionDef.energystorage * 6.0),
-                health = math.ceil(fusionDef.health * 2.0 * 3),
+                description = 'Legendary Fusion Reactor',
+                metalcost = scaled(fusionDef.metalcost, 2.0),
+                energycost = scaled(fusionDef.energycost, 2.0),
+                energymake = scaled(fusionDef.energymake, 2.4),
+                energystorage = scaled(fusionDef.energystorage, 6.0),
+                health = scaled(fusionDef.health, 2.0 * 3),
                 buildpic = fusionDef.buildpic,
                 collisionvolumeoffsets = fusionDef.collisionvolumeoffsets,
                 collisionvolumescales = fusionDef.collisionvolumescales,
@@ -134,7 +141,7 @@ do
                 selfdestructas = 'largeBuildingExplosionGenericSelfd',
                 sightdistance = fusionDef.sightdistance,
                 seismicsignature = fusionDef.seismicsignature,
-                idleautoheal = math.ceil(fusionDef.idleautoheal * 6),
+                idleautoheal = scaled(fusionDef.idleautoheal, 6),
                 idletime = fusionDef.idletime,
                 maxslope = fusionDef.maxslope,
                 maxwaterdepth = fusionDef.maxwaterdepth,
