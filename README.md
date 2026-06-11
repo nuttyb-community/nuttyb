@@ -11,6 +11,10 @@ This is a monorepo that contains:
 
 Go to the [Community NuttyB Configurator](https://nuttyb-community.github.io/nuttyb/) page, pick your desired tweaks and copy the commands generated. Next, host a new lobby and paste the commands into its chat. All set!
 
+## 📚 Documentation
+
+- **[Changelog](CHANGELOG.md)** - What's new in the configurator and tweaks. Also visible on the configurator's About page.
+
 ## 👥 Contributors
 
 This project has been made possible by the contributions of:
