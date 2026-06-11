@@ -1,67 +1,15 @@
 # 🦖 Community NuttyB
 
-Community NuttyB is a mod for BAR Raptors and Scavengers on steroids!
+Community NuttyB is a mod for Beyond All Reason RTS, which pushes Raptors PvE gameplay to its limits. It's the hard work of many people that developed various tweaks to make the game more challenging. There are lots of new buildings and weapons to discover, and the mod is constantly evolving with new content and improvements.
 
 This is a monorepo that contains:
+
 - The source code for various tweaks for the NuttyB mod (`lua` directory).
 - The source code for Configurator web application.
 
-## 📚 Documentation
+## 🎮 How to play
 
-- **[Wiki](https://wiki.nuttyb.org)** - Complete guides and documentation
-- **[Changelog](https://wiki.nuttyb.org/changelog)** - Detailed version history with author attributions
-
-## 🎮 Quick Start for Players
-
-### Getting the Mod
-Use the [Community NuttyB Configurator](https://nuttyb-community.github.io/nuttyb/) to generate your custom configuration with the tweaks you want.
-
-## 🛠️ Development
-
-### Prerequisites
-- Install Bun.
-- Clone this repository.
-- Install dependencies.
-
-```bash
-bun install
-```
-
-### Run locally (live reload)
-
-Use a Next web server with live reload for development.
-
-```bash
-bun dev
-```
-
-The app will be available at http://localhost:3000
-
-### Sync Lua data
-
-Whenever you make changes to the tweak source files, you need to generate the Lua bundle that Configurator will use. You can do this by running:
-
-```bash
-bun run sync -p .
-```
-
-Sync script supports pulling latest Lua files from either a local path or a GitHub repository. For more details, see the script's command-line help:
-
-```bash
-bun sync --help
-```
-
-### Verify Lua bundle
-
-To run the tests, execute the following command:
-
-```bash
-bun test
-```
-
-### Deployment (GitHub Pages)
-
-Deployment is automated using GitHub Actions. Pushes to the `main` branch will trigger a build and deploy the site to GitHub Pages. By default, it uses the repository name to define the base path for the web application. If you want to use a custom base path, you can set the `BASE_PATH` repository variable in your repository settings. Note that you should not include a leading slash in the `BASE_PATH` value.
+Go to the [Community NuttyB Configurator](https://nuttyb-community.github.io/nuttyb/) page, pick your desired tweaks and copy the commands generated. Next, host a new lobby and paste the commands into its chat. All set!
 
 ## 👥 Contributors
 
