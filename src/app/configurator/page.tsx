@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Divider, Stack, Text, Title } from '@mantine/core';
+import { Divider, Stack } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
@@ -41,17 +41,6 @@ export default function Page() {
             droppedTweaks={droppedTweaks}
         >
             <Stack gap='xl'>
-                <Stack gap='sm'>
-                    <Title order={2}>Intro</Title>
-                    <Text size='sm'>
-                        Community NuttyB pushes Raptors PvE gameplay to its
-                        limits. It&apos;s the hard work of many people that
-                        developed various tweaks to make the game more
-                        challenging. Pick your desired tweaks and copy the
-                        commands generated. Next, host a new lobby and paste the
-                        commands into its chat.
-                    </Text>
-                </Stack>
                 <Configurator />
                 <Divider />
                 <GeneratedCommands />
