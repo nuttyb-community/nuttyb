@@ -24,4 +24,8 @@ export const LINKS: { [key: string]: Link } = {
         href: '/editor',
         title: 'Editor',
     },
+    about: {
+        href: '/about',
+        title: 'About',
+    },
 } as const;
