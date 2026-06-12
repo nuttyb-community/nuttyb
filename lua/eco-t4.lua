@@ -1,5 +1,5 @@
 -- T4Eco
--- T4 Eco (Legendary Fusion & Metal Converters)
+-- T4 Eco (Fusion Reactors & Energy Converters)
 -- Authors: jackie188, Insider
 -- https://github.com/nuttyb-community/nuttyb
 
@@ -43,7 +43,7 @@ do
 
     local newUnitNames = {}
 
-    -- Create Legendary metal converters and fusion reactors for each faction
+    -- Create T4 energy converters and fusion reactors for each faction
     for _, faction in ipairs(factions) do
         local isLegion = (faction == 'leg')
 
@@ -54,7 +54,7 @@ do
         local newConverterName = baseConverterName .. 't4'
         local metalMakerDef = unitDefs[templateConverterName]
 
-        -- T4 Legendary Energy Converter
+        -- T4 Energy Converter
         if metalMakerDef then
             local t4Multiplier = 2.0
             local capacity = scaled(
@@ -63,8 +63,8 @@ do
             )
             local efficiency = 0.022
             cloneUnit(templateConverterName, newConverterName, {
-                name = 'Legendary Energy Converter',
-                description = 'Legendary Energy Converter',
+                name = 'T4 Energy Converter',
+                description = 'T4 Energy Converter',
                 metalcost = scaled(metalMakerDef.metalcost, t4Multiplier),
                 energycost = scaled(metalMakerDef.energycost, t4Multiplier),
                 buildtime = scaled(metalMakerDef.buildtime, t4Multiplier),
@@ -78,7 +78,7 @@ do
                 customparams = {
                     energyconv_capacity = capacity,
                     energyconv_efficiency = efficiency,
-                    i18n_en_humanname = 'Legendary Energy Converter',
+                    i18n_en_humanname = 'T4 Energy Converter',
                     i18n_en_tooltip = ('Converts %d energy into %d metal per sec (non-explosive)'):format(
                         capacity,
                         round(capacity * efficiency)
@@ -95,12 +95,12 @@ do
         local newFusionName = baseFusionName .. 't4'
         local fusionDef = unitDefs[templateFusionName]
 
-        -- Legendary Fusion Reactor (200% version)
+        -- T4 Fusion Reactor
         if fusionDef then
             local energyMake = scaled(fusionDef.energymake, 2.4) or 0
             cloneUnit(templateFusionName, newFusionName, {
-                name = 'Legendary Fusion Reactor',
-                description = 'Legendary Fusion Reactor',
+                name = 'T4 Fusion Reactor',
+                description = 'T4 Fusion Reactor',
                 buildtime = scaled(fusionDef.buildtime, 1.8),
                 metalcost = scaled(fusionDef.metalcost, 2.0),
                 energycost = scaled(fusionDef.energycost, 2.0),
@@ -124,7 +124,7 @@ do
                     techlevel = 3,
                     unitgroup = 'energy',
                     usebuildinggrounddecal = true,
-                    i18n_en_humanname = 'Legendary Fusion Reactor',
+                    i18n_en_humanname = 'T4 Fusion Reactor',
                     i18n_en_tooltip = ('Produces %d Energy (non-explosive)'):format(
                         energyMake
                     ),

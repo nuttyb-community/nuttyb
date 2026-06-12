@@ -211,7 +211,7 @@ local function cloneUnit(sourceUnit, targetUnit, overrides)
 end
 
 cloneUnit('armfus', 'armfust4', {
-    name = 'Legendary Fusion Reactor',
+    name = 'T4 Fusion Reactor',
     metalcost = 50000,
     energymake = 72000,
 })
@@ -281,7 +281,7 @@ do
 
     -- Create a new unit
     unitDefs['armannit4'] = table.merge(unitDefs['armannit3'], {
-        name = 'Legendary Pulsar',
+        name = 'T4 Pulsar',
         metalcost = 43840,
         energycost = 1096000,
     })
@@ -379,7 +379,7 @@ Always include human-readable names and tooltips:
 
 ```lua
 customparams = {
-    i18n_en_humanname = 'Legendary Fusion Reactor',
+    i18n_en_humanname = 'T4 Fusion Reactor',
     i18n_en_tooltip = 'Produces 72000 Energy (non-explosive)',
     techlevel = 4,
 },
@@ -406,7 +406,27 @@ if unitDefs.cormandot4 then
 end
 ```
 
-### 6. Test Locally Before Submitting
+### 6. Use Tier Prefixes in Structure Names
+
+Name new structures with an explicit tier prefix (`T3 ...`, `T4 ...`) instead
+of vague qualifiers like "Epic" or "Legendary" — tier numbers make it
+immediately clear which building outranks another, matching the game's own
+T1/T2 progression:
+
+```lua
+-- Good
+i18n_en_humanname = 'T4 Pulsar'
+i18n_en_humanname = 'T3 Construction Turret'
+
+-- Avoid: which one is better?
+i18n_en_humanname = 'Epic Pulsar'
+i18n_en_humanname = 'Legendary Pulsar'
+```
+
+Keep flavor words for weapon names and for units whose base-game identity
+uses them (e.g. "Experimental" gantry units, "Epic Tumbleweed").
+
+### 7. Test Locally Before Submitting
 
 Use the configurator's local sync feature to test your changes:
 

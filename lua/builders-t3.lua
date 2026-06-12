@@ -182,7 +182,7 @@ do
             t3AideBuildoptions[#t3AideBuildoptions + 1] = option
         end
 
-        -- Epic Ground Constructor Aide
+        -- T3 Ground Constructor Aide
         local newUnit = faction .. 't3aide'
         addNewMergedUnitDef(faction .. 'decom', newUnit, {
             blocking = true,
@@ -202,12 +202,12 @@ do
             workertime = 6000,
             reclaimable = true,
             candgun = false,
-            name = factionPrefix[faction] .. 'Epic Aide',
+            name = factionPrefix[faction] .. 'T3 Aide',
             customparams = {
                 subfolder = 'ArmBots/T3',
                 techlevel = 3,
                 unitgroup = 'buildert3',
-                i18n_en_humanname = 'Epic Ground Construction Aide',
+                i18n_en_humanname = 'T3 Ground Construction Aide',
                 i18n_en_tooltip = 'Your Aide that helps you construct buildings',
             },
             buildoptions = t3AideBuildoptions,
@@ -215,7 +215,7 @@ do
         unitDefs[newUnit].weapondefs = {}
         unitDefs[newUnit].weapons = {}
 
-        -- Epic Air Constructor Aide
+        -- T3 Air Constructor Aide
         newUnit = faction .. 't3airaide'
         addNewMergedUnitDef('armfify', newUnit, {
             blocking = false,
@@ -238,13 +238,13 @@ do
             turnrate = 1240,
             workertime = 1600,
             buildpic = 'ARMFIFY.DDS',
-            name = factionPrefix[faction] .. 'Epic Aide',
+            name = factionPrefix[faction] .. 'T3 Aide',
             customparams = {
                 is_builder = true,
                 subfolder = 'ArmBots/T3',
                 techlevel = 3,
                 unitgroup = 'buildert3',
-                i18n_en_humanname = 'Epic Air Construction Aide',
+                i18n_en_humanname = 'T3 Air Construction Aide',
                 i18n_en_tooltip = 'Your Aide that helps you construct buildings',
             },
             buildoptions = t3AideBuildoptions,

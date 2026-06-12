@@ -29,7 +29,7 @@ do
     local EPIC_STARFALL = 'epic_starfall'
 
     unitDefs[EPIC_RAGNAROK] = tableMerge(unitDefs['armvulc'], {
-        name = 'Epic Ragnarok',
+        name = 'T4 Ragnarok',
         description = 'Advanced Armada artillery engineering. Unleashes powerful plasma barrages across the battlefield.',
         buildtime = 900000,
         health = 140000,
@@ -37,7 +37,7 @@ do
         energycost = 2600000,
         icontype = 'armvulc',
         customparams = {
-            i18n_en_humanname = 'Epic Ragnarok',
+            i18n_en_humanname = 'T4 Ragnarok',
             i18n_en_tooltip = 'Powerful burst-fire plasma artillery. Destroys everything in range.',
             techlevel = 4,
         },
@@ -96,7 +96,7 @@ do
     })
 
     unitDefs[EPIC_CALAMITY] = tableMerge(unitDefs['corbuzz'], {
-        name = 'Epic Calamity',
+        name = 'T4 Calamity',
         description = 'Advanced Cortex siege technology. Fires large plasma shells that devastate formations with each impact.',
         buildtime = 920000,
         health = 145000,
@@ -104,7 +104,7 @@ do
         energycost = 2700000,
         icontype = 'corbuzz',
         customparams = {
-            i18n_en_humanname = 'Epic Calamity',
+            i18n_en_humanname = 'T4 Calamity',
             i18n_en_tooltip = 'Large single-shot plasma artillery. Each shell causes major destruction.',
             techlevel = 4,
         },
@@ -161,7 +161,7 @@ do
     })
 
     unitDefs[EPIC_STARFALL] = tableMerge(unitDefs['legstarfall'], {
-        name = 'Epic Starfall',
+        name = 'T4 Starfall',
         description = 'Advanced Legion siege technology. Unleashes devastating rocket barrages that obliterate everything in range.',
         buildtime = 180000,
         health = 145000,
@@ -174,7 +174,7 @@ do
         yardmap = 'oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo',
         icontype = 'legstarfall',
         customparams = {
-            i18n_en_humanname = 'Epic Starfall',
+            i18n_en_humanname = 'T4 Starfall',
             i18n_en_tooltip = 'Massive rocket artillery. Fires devastating direct-fire rocket barrages.',
             techlevel = 4,
             modelradius = 150,

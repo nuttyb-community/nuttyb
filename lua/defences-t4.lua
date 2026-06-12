@@ -23,10 +23,10 @@ do
         builder.buildoptions[#builder.buildoptions + 1] = optionName
     end
 
-    -- Legendary Pulsar
-    local legPulsarName = 'armannit4'
-    unitDefs[legPulsarName] = tableMerge(unitDefs['armannit3'], {
-        name = 'Legendary Pulsar',
+    -- T4 Pulsar
+    local t4PulsarName = 'armannit4'
+    unitDefs[t4PulsarName] = tableMerge(unitDefs['armannit3'], {
+        name = 'T4 Pulsar',
         description = 'A pinnacle of Armada engineering that fires devastating, rapid-fire tachyon bolts.',
         buildtime = 300000,
         health = 30000,
@@ -34,7 +34,7 @@ do
         energycost = 1096000,
         icontype = 'armannit3',
         customparams = {
-            i18n_en_humanname = 'Legendary Pulsar',
+            i18n_en_humanname = 'T4 Pulsar',
             i18n_en_tooltip = 'Fires devastating, rapid-fire tachyon bolts.',
             techlevel = 4,
         },
@@ -96,13 +96,13 @@ do
         builders_arm[#builders_arm + 1] = 'armcomlvl' .. i
     end
     for _, builder_name in pairs(builders_arm) do
-        ensureBuildOption(builder_name, legPulsarName)
+        ensureBuildOption(builder_name, t4PulsarName)
     end
 
-    -- Legendary Bastion
-    local legBastionName = 'legbastiont4'
-    unitDefs[legBastionName] = tableMerge(unitDefs['legbastion'], {
-        name = 'Legendary Bastion',
+    -- T4 Bastion
+    local t4BastionName = 'legbastiont4'
+    unitDefs[t4BastionName] = tableMerge(unitDefs['legbastion'], {
+        name = 'T4 Bastion',
         description = 'The ultimate defensive emplacement. Projects a devastating, pulsating heatray.',
         health = 22000,
         metalcost = 65760,
@@ -116,7 +116,7 @@ do
         buildpic = 'scavengers/SCAVBEACON.DDS',
         damagemodifier = 0.20,
         customparams = {
-            i18n_en_humanname = 'Legendary Bastion',
+            i18n_en_humanname = 'T4 Bastion',
             i18n_en_tooltip = 'Projects a devastating, pulsating purple heatray.',
             maxrange = 1450,
             techlevel = 4,
@@ -188,14 +188,14 @@ do
         builders_leg[#builders_leg + 1] = 'legcomlvl' .. i
     end
     for _, builder_name in pairs(builders_leg) do
-        ensureBuildOption(builder_name, legBastionName)
+        ensureBuildOption(builder_name, t4BastionName)
     end
 
-    -- Legendary Bulwark
-    local legBulwarkName = 'cordoomt4'
-    unitDefs[legBulwarkName] = tableMerge(unitDefs['cordoomt3'], {
-        name = 'Legendary Bulwark',
-        description = 'A pinnacle of defensive technology, the Legendary Bulwark annihilates all who approach.',
+    -- T4 Bulwark
+    local t4BulwarkName = 'cordoomt4'
+    unitDefs[t4BulwarkName] = tableMerge(unitDefs['cordoomt3'], {
+        name = 'T4 Bulwark',
+        description = 'A pinnacle of defensive technology, the T4 Bulwark annihilates all who approach.',
         buildtime = 250000,
         health = 42000,
         metalcost = 61650,
@@ -206,7 +206,7 @@ do
         sightdistance = 1100,
         icontype = 'cordoomt3',
         customparams = {
-            i18n_en_humanname = 'Legendary Bulwark',
+            i18n_en_humanname = 'T4 Bulwark',
             i18n_en_tooltip = 'The ultimate defensive structure.',
             paralyzemultiplier = 0.2,
             techlevel = 4,
@@ -353,6 +353,6 @@ do
         builders_cor[#builders_cor + 1] = 'corcomlvl' .. i
     end
     for _, builder_name in pairs(builders_cor) do
-        ensureBuildOption(builder_name, legBulwarkName)
+        ensureBuildOption(builder_name, t4BulwarkName)
     end
 end
