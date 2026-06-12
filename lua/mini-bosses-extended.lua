@@ -13,11 +13,9 @@ do
         'customfusionexplo',
         Spring
 
-    local nbQhpMult, nbHpMult = 1.3, 1.3
-
     -- Calculate health multipliers from existing unit definitions
-    nbHpMult = unitDefs[RAPTOR_MATRIARCH_BASIC].health / 60000
-    nbQhpMult = unitDefs['raptor_queen_epic'].health / 1250000
+    local nbHpMult = unitDefs[RAPTOR_MATRIARCH_BASIC].health / 60000
+    local nbQhpMult = unitDefs['raptor_queen_epic'].health / 1250000
 
     -- Calculate player count multiplier
     local playerCountScale = 1
@@ -48,8 +46,7 @@ do
 
     -- Calculate queen-related values for Doombringer spawning
     local mqNumQueens = spring.GetModOptions().raptor_queen_count or 1
-    local mqDoomAngerScale = 1
-    mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
+    local mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
 
     -- Extra anger % required before Doombringers spawn. 0 = vanilla timing.
     local DOOMBRINGER_SPAWN_DELAY = 40
@@ -384,7 +381,7 @@ do
                     badtargetcategory = 'VTOL OBJECT',
                 },
                 [2] = {
-                    def = 'armcomsealaserboss ',
+                    def = 'armcomsealaserboss',
                     maindir = '0 0 1',
                     maxangledif = 180,
                     badtargetcategory = 'VTOL OBJECT',

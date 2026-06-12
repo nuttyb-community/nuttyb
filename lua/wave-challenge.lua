@@ -4,152 +4,72 @@
 -- https://github.com/nuttyb-community/nuttyb
 
 do
-    local unitDefs = UnitDefs or {}
-    local merge = table.mergeInPlace or table.merge
+    local unitDefs, tableMerge = UnitDefs or {}, table.merge
+    local merge = table.mergeInPlace or tableMerge
+
+    local function pveSquad(
+        minAnger,
+        maxAnger,
+        behavior,
+        rarity,
+        amount,
+        weight,
+        distance
+    )
+        return {
+            raptorcustomsquad = true,
+            raptorsquadunitsamount = amount or 1,
+            raptorsquadminanger = minAnger,
+            raptorsquadmaxanger = maxAnger,
+            raptorsquadweight = weight or 5,
+            raptorsquadrarity = rarity or 'basic',
+            raptorsquadbehavior = behavior,
+            raptorsquadbehaviordistance = distance or 500,
+            raptorsquadbehaviorchance = 0.75,
+        }
+    end
 
     merge(unitDefs, {
         raptor_air_scout_basic_t2_v1 = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 25,
-                raptorsquadminanger = 20,
-                raptorsquadmaxanger = 26,
-                raptorsquadweight = 10,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'raider',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(20, 26, 'raider', 'basic', 25, 10),
         },
         raptor_hive_assault_basic = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 25,
-                raptorsquadminanger = 0,
-                raptorsquadmaxanger = 40,
-                raptorsquadweight = 1,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'raider',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(0, 40, 'raider', 'basic', 25, 1),
         },
         raptor_land_swarmer_basic_t3_v1 = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 25,
-                raptorsquadminanger = 0,
-                raptorsquadmaxanger = 40,
-                raptorsquadweight = 2,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'raider',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(0, 40, 'raider', 'basic', 25, 2),
         },
         raptor_evolved_motort4 = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 12,
-                raptorsquadminanger = 50,
-                raptorsquadmaxanger = 300,
-                raptorsquadweight = 3,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'artillery',
-                raptorsquadbehaviordistance = 2500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(
+                50,
+                300,
+                'artillery',
+                'special',
+                12,
+                3,
+                2500
+            ),
         },
         raptor_hive_assault_heavy = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 25,
-                raptorsquadminanger = 55,
-                raptorsquadmaxanger = 70,
-                raptorsquadweight = 1,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(55, 70, 'berserk', 'basic', 25, 1),
         },
         raptor_hive_assault_superheavy = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 25,
-                raptorsquadminanger = 80,
-                raptorsquadmaxanger = 85,
-                raptorsquadweight = 1,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(80, 85, 'berserk', 'basic', 25, 1),
         },
         raptor_air_kamikaze_basic_t2_v1 = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 55,
-                raptorsquadminanger = 100,
-                raptorsquadmaxanger = 105,
-                raptorsquadweight = 2,
-                raptorsquadrarity = 'basic',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(100, 105, 'berserk', 'basic', 55, 2),
         },
         raptor_matriarch_fire = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 30,
-                raptorsquadminanger = 105,
-                raptorsquadmaxanger = 135,
-                raptorsquadweight = 3,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(105, 135, 'berserk', 'special', 30, 3),
         },
         raptor_matriarch_basic = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 30,
-                raptorsquadminanger = 105,
-                raptorsquadmaxanger = 135,
-                raptorsquadweight = 3,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(105, 135, 'berserk', 'special', 30, 3),
         },
         raptor_matriarch_acid = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 30,
-                raptorsquadminanger = 105,
-                raptorsquadmaxanger = 135,
-                raptorsquadweight = 3,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(105, 135, 'berserk', 'special', 30, 3),
         },
         raptor_matriarch_electric = {
-            customparams = {
-                raptorcustomsquad = true,
-                raptorsquadunitsamount = 30,
-                raptorsquadminanger = 105,
-                raptorsquadmaxanger = 135,
-                raptorsquadweight = 3,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = pveSquad(105, 135, 'berserk', 'special', 30, 3),
             weapons = {
                 [5] = {
                     def = '',
@@ -160,19 +80,13 @@ do
             selfdestructas = 'customfusionexplo',
             explodeas = 'customfusionexplo',
             maxthisunit = 3,
-            customparams = {
-                raptorcustomsquad = true,
-                i18n_en_humanname = 'Queen Degenerative',
-                i18n_en_tooltip = 'SHES A BIG ONE',
-                raptorsquadunitsamount = 2,
-                raptorsquadminanger = 70,
-                raptorsquadmaxanger = 150,
-                raptorsquadweight = 2,
-                raptorsquadrarity = 'special',
-                raptorsquadbehavior = 'berserk',
-                raptorsquadbehaviordistance = 500,
-                raptorsquadbehaviorchance = 0.75,
-            },
+            customparams = tableMerge(
+                pveSquad(70, 150, 'berserk', 'special', 2, 2),
+                {
+                    i18n_en_humanname = 'Queen Degenerative',
+                    i18n_en_tooltip = 'SHES A BIG ONE',
+                }
+            ),
             weapondefs = {
                 melee = {
                     damage = {

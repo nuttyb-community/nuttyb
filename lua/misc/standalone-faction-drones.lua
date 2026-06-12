@@ -19,22 +19,22 @@ unitDefs[corsat].cruisealtitude = 3300
 unitDefs[corsat].energyupkeep = 1250
 
 local builderNames = {
-	'armapt3',
-	'corapt3',
-	'legapt3',
-	'armshltx',
-	'corgant',
-	'leggant',
-	'armshltxuw',
-	'corgantuw',
-	'leggantuw'
+    'armapt3',
+    'corapt3',
+    'legapt3',
+    'armshltx',
+    'corgant',
+    'leggant',
+    'armshltxuw',
+    'corgantuw',
+    'leggantuw',
 }
 
 for i = 1, #builderNames do
-	local builderName = builderNames[i]
-	local nBuildOptions = #unitDefs[builderName].buildoptions
-	unitDefs[builderName].buildoptions[nBuildOptions + 1] = armassistdrone
-	unitDefs[builderName].buildoptions[nBuildOptions + 2] = corassistdrone
-	unitDefs[builderName].buildoptions[nBuildOptions + 3] = legassistdrone
-	unitDefs[builderName].buildoptions[nBuildOptions + 4] = corsat
+    local builderName = builderNames[i]
+    local nBuildOptions = #unitDefs[builderName].buildoptions
+    unitDefs[builderName].buildoptions[nBuildOptions + 1] = armassistdrone
+    unitDefs[builderName].buildoptions[nBuildOptions + 2] = corassistdrone
+    unitDefs[builderName].buildoptions[nBuildOptions + 3] = legassistdrone
+    unitDefs[builderName].buildoptions[nBuildOptions + 4] = corsat
 end

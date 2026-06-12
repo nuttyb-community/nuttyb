@@ -20,7 +20,6 @@ for unitName, unitDef in pairs(UnitDefs) do
     then
         unitDef.health = unitDef.health * $HP_MULTIPLIER$
         unitDef.sfxtypes = {}
-        unitDef.explodas = unitDef.explodas
     end
 end
 

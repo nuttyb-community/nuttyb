@@ -110,28 +110,23 @@ do
             },
         })
 
-        local t3AideBuildoptions, commonBuildoptions =
-            {}, {
-                faction .. 'afust3',
-                faction .. 'nanotct2',
-                faction .. 'nanotct3',
-                faction .. 'alab',
-                faction .. 'avp',
-                faction .. 'aap',
-                faction .. 'gatet3',
-                faction .. 'flak',
-                -- Legion vs others conditional options
-                isLeg and 'legadveconvt3' or faction .. 'mmkrt3',
-                isLeg and 'legamstort3' or faction .. 'uwadvmst3',
-                isLeg and 'legadvestoret3' or faction .. 'advestoret3',
-                isLeg and 'legdeflector' or faction .. 'gate',
-                isLeg and 'legforti' or faction .. 'fort',
-                isArm and 'armshltx' or faction .. 'gant',
-            }
-
-        for _, option in ipairs(commonBuildoptions) do
-            t3AideBuildoptions[#t3AideBuildoptions + 1] = option
-        end
+        local t3AideBuildoptions = {
+            faction .. 'afust3',
+            faction .. 'nanotct2',
+            faction .. 'nanotct3',
+            faction .. 'alab',
+            faction .. 'avp',
+            faction .. 'aap',
+            faction .. 'gatet3',
+            faction .. 'flak',
+            -- Legion vs others conditional options
+            isLeg and 'legadveconvt3' or faction .. 'mmkrt3',
+            isLeg and 'legamstort3' or faction .. 'uwadvmst3',
+            isLeg and 'legadvestoret3' or faction .. 'advestoret3',
+            isLeg and 'legdeflector' or faction .. 'gate',
+            isLeg and 'legforti' or faction .. 'fort',
+            isArm and 'armshltx' or faction .. 'gant',
+        }
 
         -- Add taxed gantries (only for other factions)
         local taxedMap = {
@@ -258,9 +253,7 @@ do
         unitDefs[newUnit].weapons = {}
 
         -- Buildoptions for T3 Gantrys (Ground)
-        local factoryName = isArm and 'armshltx'
-            or isCor and 'corgant'
-            or 'leggant'
+        local factoryName = baseFactory
 
         -- Limit Bot Gantrys to 1
         unitDefs[factoryName].maxthisunit = 1

@@ -4,7 +4,7 @@
 -- https://github.com/nuttyb-community/nuttyb
 
 do
-    local unitDefs, tableMerge, tableCopy, raptor_matriarch_basic, customfusionexplo, spring =
+    local unitDefs, tableMerge, tableCopy, RAPTOR_MATRIARCH_BASIC, CUSTOM_FUSION_EXPLO, spring =
         UnitDefs or {},
         table.merge,
         table.copy,
@@ -12,10 +12,9 @@ do
         'customfusionexplo',
         Spring
 
-    local nbQhpMult, nbHpMult = 1.3, 1.3
-
-    nbHpMult = unitDefs[raptor_matriarch_basic].health / 60000
-    nbQhpMult = unitDefs['raptor_queen_epic'].health / 1250000
+    -- Health multipliers derived from existing unit definitions
+    local nbHpMult = unitDefs[RAPTOR_MATRIARCH_BASIC].health / 60000
+    local nbQhpMult = unitDefs['raptor_queen_epic'].health / 1250000
 
     local playerCountScale = 1
     local isRaptors = spring.Utilities.Gametype.IsRaptors()
@@ -45,8 +44,7 @@ do
 
     -- Calculate queen-related values for Doombringer spawning
     local mqNumQueens = spring.GetModOptions().raptor_queen_count or 1
-    local mqDoomAngerScale = 1
-    mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
+    local mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
 
     -- Extra anger % required before Doombringers spawn. 0 = vanilla timing.
     local DOOMBRINGER_SPAWN_DELAY = 40
@@ -55,9 +53,10 @@ do
     local queenThreshold = 20
     local exponentialPart = 10
         * (1.06 ^ math.max(0, math.min(mqNumQueens, queenThreshold) - 8))
-    local x = math.max(0, mqNumQueens - queenThreshold)
-    local linearPart = (x <= 80) and (0.6 * x - x * x / 270)
-        or (24.3 + (x - 80) * 0.15)
+    local extraQueens = math.max(0, mqNumQueens - queenThreshold)
+    local linearPart = (extraQueens <= 80)
+            and (0.6 * extraQueens - extraQueens * extraQueens / 270)
+        or (24.3 + (extraQueens - 80) * 0.15)
     local baseQueenAnger = exponentialPart + linearPart
 
     local mqDoomAnger = math.ceil(mqDoomAngerScale * baseQueenAnger)
@@ -65,19 +64,20 @@ do
     local maxDoombringers =
         math.max(3, scaledMax(math.floor((21 * mqNumQueens + 36) / 19)))
 
-    local function newUnit(old, new, data)
-        if unitDefs[old] and not unitDefs[new] then
-            unitDefs[new] = tableMerge(unitDefs[old], data or {})
+    local function newUnit(sourceUnit, targetUnit, overrides)
+        if unitDefs[sourceUnit] and not unitDefs[targetUnit] then
+            unitDefs[targetUnit] =
+                tableMerge(unitDefs[sourceUnit], overrides or {})
         end
     end
 
-    local raptor_matriarch_basic_health =
-        unitDefs[raptor_matriarch_basic].health
+    -- Base health value from matriarch
+    local baseHealth = unitDefs[RAPTOR_MATRIARCH_BASIC].health
 
     newUnit('raptor_queen_veryeasy', 'raptor_miniq_a', {
         name = 'Queenling Prima',
         icontype = 'raptor_queen_veryeasy',
-        health = raptor_matriarch_basic_health * 5,
+        health = baseHealth * 5,
         customparams = {
             i18n_en_humanname = 'Queenling Prima',
             i18n_en_tooltip = 'Majestic and bold, ruler of the hunt.',
@@ -87,7 +87,7 @@ do
     newUnit('raptor_queen_easy', 'raptor_miniq_b', {
         name = 'Queenling Secunda',
         icontype = 'raptor_queen_easy',
-        health = raptor_matriarch_basic_health * 6,
+        health = baseHealth * 6,
         customparams = {
             i18n_en_humanname = 'Queenling Secunda',
             i18n_en_tooltip = 'Swift and sharp, a noble among raptors.',
@@ -97,7 +97,7 @@ do
     newUnit('raptor_queen_normal', 'raptor_miniq_c', {
         name = 'Queenling Tertia',
         icontype = 'raptor_queen_normal',
-        health = raptor_matriarch_basic_health * 7,
+        health = baseHealth * 7,
         customparams = {
             i18n_en_humanname = 'Queenling Tertia',
             i18n_en_tooltip = 'Refined tastes. Likes her prey rare.',
@@ -109,7 +109,7 @@ do
     unitDefs.raptor_miniq_c.weapondefs.empgoo =
         tableCopy(unitDefs['raptor_matriarch_electric'].weapondefs.goo)
 
-    for _, l in ipairs {
+    for _, matronaData in ipairs {
         {
             'raptor_matriarch_basic',
             'raptor_mama_ba',
@@ -135,13 +135,13 @@ do
             'Acid-fueled, melting everything in sight.',
         },
     } do
-        newUnit(l[1], l[2], {
-            name = l[3],
-            icontype = l[1],
-            health = raptor_matriarch_basic_health * 1.5,
+        newUnit(matronaData[1], matronaData[2], {
+            name = matronaData[3],
+            icontype = matronaData[1],
+            health = baseHealth * 1.5,
             customparams = {
-                i18n_en_humanname = l[3],
-                i18n_en_tooltip = l[4],
+                i18n_en_humanname = matronaData[3],
+                i18n_en_tooltip = matronaData[4],
             },
         })
     end
@@ -149,7 +149,7 @@ do
     newUnit('critter_penguinking', 'raptor_consort', {
         name = 'Raptor Consort',
         icontype = 'corkorg',
-        health = raptor_matriarch_basic_health * 4,
+        health = baseHealth * 4,
         mass = 100000,
         nochasecategory = 'MOBILE VTOL OBJECT',
         sonarstealth = false,
@@ -167,7 +167,7 @@ do
     newUnit('raptor_consort', 'raptor_doombringer', {
         name = 'Doombringer',
         icontype = 'armafust3',
-        health = raptor_matriarch_basic_health * 12,
+        health = baseHealth * 12,
         speed = 50,
         customparams = {
             i18n_en_humanname = 'Doombringer',
@@ -175,30 +175,37 @@ do
         },
     })
 
-    local function pveSquad(p, q, e, r, s, t)
-        local mode_prefix = isRaptors and 'raptor' or 'scav'
+    local function pveSquad(
+        minAnger,
+        maxAnger,
+        behavior,
+        rarity,
+        amount,
+        weight
+    )
+        local modePrefix = isRaptors and 'raptor' or 'scav'
         return {
-            [mode_prefix .. 'customsquad'] = true,
-            [mode_prefix .. 'squadunitsamount'] = s or 1,
-            [mode_prefix .. 'squadminanger'] = p,
-            [mode_prefix .. 'squadmaxanger'] = q,
-            [mode_prefix .. 'squadweight'] = t or 5,
-            [mode_prefix .. 'squadrarity'] = r or 'basic',
-            [mode_prefix .. 'squadbehavior'] = e,
-            [mode_prefix .. 'squadbehaviordistance'] = 500,
-            [mode_prefix .. 'squadbehaviorchance'] = 0.75,
+            [modePrefix .. 'customsquad'] = true,
+            [modePrefix .. 'squadunitsamount'] = amount or 1,
+            [modePrefix .. 'squadminanger'] = minAnger,
+            [modePrefix .. 'squadmaxanger'] = maxAnger,
+            [modePrefix .. 'squadweight'] = weight or 5,
+            [modePrefix .. 'squadrarity'] = rarity or 'basic',
+            [modePrefix .. 'squadbehavior'] = behavior,
+            [modePrefix .. 'squadbehaviordistance'] = 500,
+            [modePrefix .. 'squadbehaviorchance'] = 0.75,
         }
     end
 
     local miniQueenCommon = {
-        selfdestructas = customfusionexplo,
-        explodeas = customfusionexplo,
+        selfdestructas = CUSTOM_FUSION_EXPLO,
+        explodeas = CUSTOM_FUSION_EXPLO,
         weapondefs = {
             yellow_missile = { damage = { default = 1, vtol = 1000 } },
         },
     }
 
-    for f, u in pairs {
+    for unitName, unitConfig in pairs {
         raptor_miniq_a = tableMerge(miniQueenCommon, {
             maxthisunit = scaledMax(2),
             customparams = pveSquad(mqAnger[1], mqAnger[2], 'berserk'),
@@ -399,8 +406,8 @@ do
             customparams = pveSquad(51, 64, 'raider', 'basic', 2),
         },
     } do
-        unitDefs[f] = unitDefs[f] or {}
-        table.mergeInPlace(unitDefs[f], u, true)
+        unitDefs[unitName] = unitDefs[unitName] or {}
+        table.mergeInPlace(unitDefs[unitName], unitConfig, true)
     end
 
     local newCosts = {
@@ -412,11 +419,11 @@ do
         raptor_doombringer = 90000,
     }
 
-    local H = UnitDef_Post
+    local oldUnitDef_Post = UnitDef_Post
 
-    function UnitDef_Post(p, I)
-        if H then
-            H(p, I)
+    function UnitDef_Post(unitID, unitDef)
+        if oldUnitDef_Post then
+            oldUnitDef_Post(unitID, unitDef)
         end
 
         local nbHpScale = 1

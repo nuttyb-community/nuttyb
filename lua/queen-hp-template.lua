@@ -2,13 +2,13 @@
 -- NuttyB v1.52 $HP_MULTIPLIER$X QHP
 -- https://github.com/nuttyb-community/nuttyb
 
-for b, c in pairs(UnitDefs) do
-    if b:match('^raptor_queen_.*') then
-        c.repairable = 0
-        c.canbehealed = 0
-        c.buildtime = 9999999
-        c.autoheal = 2
-        c.canSelfRepair = 0
-        c.health = c.health * $HP_MULTIPLIER$
+for unitName, unitDef in pairs(UnitDefs) do
+    if unitName:match('^raptor_queen_.*') then
+        unitDef.repairable = 0
+        unitDef.canbehealed = 0
+        unitDef.buildtime = 9999999
+        unitDef.autoheal = 2
+        unitDef.canSelfRepair = 0
+        unitDef.health = unitDef.health * $HP_MULTIPLIER$
     end
 end
