@@ -30,6 +30,7 @@ do
         return math.max(1, math.ceil(base * totalSpawnScale))
     end
 
+    -- Anger thresholds for mini-queen spawning
     local mqAnger = { 70, 85, 90, 105, 110, 125 }
     local mqTimeMult =
         math.max(1, spring.GetModOptions().raptor_queentimemult or 1.3)
@@ -37,13 +38,18 @@ do
     local mqTargetLast = mqTimeMult * mqAnger[#mqAnger] / 1.3
     local mqFactor = (mqTargetLast - mqStart) / (mqLast - mqStart)
 
+    -- Scale anger thresholds based on queen time multiplier
     for i = 2, #mqAnger do
         mqAnger[i] = math.floor(mqStart + (mqAnger[i] - mqStart) * mqFactor)
     end
 
+    -- Calculate queen-related values for Doombringer spawning
     local mqNumQueens = spring.GetModOptions().raptor_queen_count or 1
     local mqDoomAngerScale = 1
     mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
+
+    -- Extra anger % required before Doombringers spawn. 0 = vanilla timing.
+    local DOOMBRINGER_SPAWN_DELAY = 40
 
     -- Compact logic for hybrid exponential/linear growth
     local queenThreshold = 20
@@ -55,7 +61,7 @@ do
     local baseQueenAnger = exponentialPart + linearPart
 
     local mqDoomAnger = math.ceil(mqDoomAngerScale * baseQueenAnger)
-    local mqAngerBoss = mqTimeMult * 100 + mqDoomAnger
+    local mqAngerBoss = mqTimeMult * 100 + mqDoomAnger + DOOMBRINGER_SPAWN_DELAY
     local maxDoombringers =
         math.max(3, scaledMax(math.floor((21 * mqNumQueens + 36) / 19)))
 

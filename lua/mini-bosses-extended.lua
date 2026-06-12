@@ -51,13 +51,17 @@ do
     local mqDoomAngerScale = 1
     mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
 
+    -- Extra anger % required before Doombringers spawn. 0 = vanilla timing.
+    local DOOMBRINGER_SPAWN_DELAY = 40
+
+    -- Compact logic for hybrid exponential/linear growth
     local queenThreshold = 20
     local exponentialPart = 10
         * (1.06 ^ math.max(0, math.min(mqNumQueens, queenThreshold) - 8))
     local linearPart = math.max(0, mqNumQueens - queenThreshold)
     local baseQueenAnger = exponentialPart + linearPart
     local mqDoomAnger = math.ceil(mqDoomAngerScale * baseQueenAnger)
-    local mqAngerBoss = mqTimeMult * 100 + mqDoomAnger
+    local mqAngerBoss = mqTimeMult * 100 + mqDoomAnger + DOOMBRINGER_SPAWN_DELAY
     local maxDoombringers =
         math.max(3, scaledMax(math.floor((21 * mqNumQueens + 36) / 19)))
 

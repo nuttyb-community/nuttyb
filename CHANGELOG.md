@@ -4,6 +4,10 @@ Notable changes to the Community NuttyB configurator and tweaks, grouped by date
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-06-12
+
+- Added extra delay before Doombringers spawn (+40% anger).
+
 ## 2026-06-11
 
 - About page with a project overview, how-to-play guide, recommended widgets,
