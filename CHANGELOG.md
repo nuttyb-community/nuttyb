@@ -7,6 +7,8 @@ visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`
 ## 2026-06-12
 
 - Added extra delay before Doombringers spawn (+40% anger).
+- Improved tooltips for T3 and T4 economy buildings.
+- Made tiering system clearer: Epic -> T3, Legendary -> T4.
 
 ## 2026-06-11
 
