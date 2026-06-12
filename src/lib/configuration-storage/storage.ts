@@ -47,11 +47,19 @@ export function validateStoredConfiguration(
         return null;
     }
 
-    // Merge stored config with defaults to ensure all fields exist
-    // (handles cases where new fields were added in updates)
+    // Only keep keys that exist in DEFAULT_CONFIGURATION — drops renamed/removed keys from stale localStorage
+    const validKeys = Object.keys(
+        DEFAULT_CONFIGURATION
+    ) as (keyof Configuration)[];
+    const sanitized = Object.fromEntries(
+        validKeys
+            .filter((k) => k in stored.configuration)
+            .map((k) => [k, stored.configuration[k]])
+    ) as Partial<Configuration>;
+
     const mergedConfiguration: Configuration = {
         ...DEFAULT_CONFIGURATION,
-        ...stored.configuration,
+        ...sanitized,
     };
 
     return {

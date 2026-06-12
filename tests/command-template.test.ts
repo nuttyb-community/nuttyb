@@ -144,8 +144,7 @@ describe('interpolateCommandTemplate', () => {
     });
 
     describe('rename command template', () => {
-        const renameTemplate =
-            '!rename Community NuttyB $?[$lobbyName$]?$';
+        const renameTemplate = '!rename Community NuttyB $?[$lobbyName$]?$';
 
         test('generates command with lobby name', () => {
             expect(
