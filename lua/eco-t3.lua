@@ -16,9 +16,12 @@ do
             'legacv',
         }
 
-    for _, factionMM in pairs({ 'armmmkrt3', 'cormmkrt3', 'legadveconvt3' }) do
+    local converters = { 'armmmkrt3', 'cormmkrt3', 'legadveconvt3' }
+    local fusions = { 'armafust3', 'corafust3', 'legafust3' }
+
+    for _, converterName in pairs(converters) do
         table.mergeInPlace(
-            unitDefs[factionMM],
+            unitDefs[converterName],
             { footprintx = 6, footprintz = 6 }
         )
     end
@@ -44,5 +47,34 @@ do
             unitDefs[unitName],
             { footprintx = 4, footprintz = 4 }
         )
+    end
+
+    -- Recompute production tooltips from the actually assigned values so the
+    -- text never goes stale when the numbers change.
+    local function round(value)
+        return math.floor(value + 0.5)
+    end
+
+    for _, fusionName in pairs(fusions) do
+        local def = unitDefs[fusionName]
+        if def and def.energymake then
+            def.customparams = def.customparams or {}
+            def.customparams.i18n_en_tooltip = ('Produces %d Energy (extremely explosive)'):format(
+                round(def.energymake)
+            )
+        end
+    end
+
+    for _, converterName in pairs(converters) do
+        local def = unitDefs[converterName]
+        local params = def and def.customparams
+        local capacity = params and tonumber(params.energyconv_capacity)
+        local efficiency = params and tonumber(params.energyconv_efficiency)
+        if capacity and efficiency then
+            params.i18n_en_tooltip = ('Converts %d energy into %d metal per sec (extremely explosive)'):format(
+                round(capacity),
+                round(capacity * efficiency)
+            )
+        end
     end
 end

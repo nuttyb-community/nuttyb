@@ -29,6 +29,10 @@ do
         return value and math.ceil(value * multiplier) or nil
     end
 
+    local function round(value)
+        return math.floor(value + 0.5)
+    end
+
     -- cloneUnit deep-merges, so any field not overridden is inherited from
     -- the source unit.
     local function cloneUnit(sourceUnit, targetUnit, overrides)
@@ -53,6 +57,11 @@ do
         -- T4 Legendary Energy Converter
         if metalMakerDef then
             local t4Multiplier = 2.0
+            local capacity = scaled(
+                tonumber(metalMakerDef.customparams.energyconv_capacity) or 0,
+                2
+            )
+            local efficiency = 0.022
             cloneUnit(templateConverterName, newConverterName, {
                 name = 'Legendary Energy Converter',
                 description = 'Legendary Energy Converter',
@@ -67,13 +76,13 @@ do
                 explodeas = 'largeBuildingexplosiongeneric',
                 selfdestructas = 'largeBuildingExplosionGenericSelfd',
                 customparams = {
-                    energyconv_capacity = scaled(
-                        metalMakerDef.customparams.energyconv_capacity,
-                        2
-                    ),
-                    energyconv_efficiency = 0.022,
+                    energyconv_capacity = capacity,
+                    energyconv_efficiency = efficiency,
                     i18n_en_humanname = 'Legendary Energy Converter',
-                    i18n_en_tooltip = 'Converts 12000 energy into 264 metal per sec (non-explosive)',
+                    i18n_en_tooltip = ('Converts %d energy into %d metal per sec (non-explosive)'):format(
+                        capacity,
+                        round(capacity * efficiency)
+                    ),
                 },
             })
 
@@ -88,13 +97,14 @@ do
 
         -- Legendary Fusion Reactor (200% version)
         if fusionDef then
+            local energyMake = scaled(fusionDef.energymake, 2.4) or 0
             cloneUnit(templateFusionName, newFusionName, {
                 name = 'Legendary Fusion Reactor',
                 description = 'Legendary Fusion Reactor',
                 buildtime = scaled(fusionDef.buildtime, 1.8),
                 metalcost = scaled(fusionDef.metalcost, 2.0),
                 energycost = scaled(fusionDef.energycost, 2.0),
-                energymake = scaled(fusionDef.energymake, 2.4),
+                energymake = energyMake,
                 energystorage = scaled(fusionDef.energystorage, 6.0),
                 health = scaled(fusionDef.health, 2.0 * 3),
                 idleautoheal = scaled(fusionDef.idleautoheal, 6),
@@ -115,7 +125,9 @@ do
                     unitgroup = 'energy',
                     usebuildinggrounddecal = true,
                     i18n_en_humanname = 'Legendary Fusion Reactor',
-                    i18n_en_tooltip = 'Produces 72000 Energy (non-explosive)',
+                    i18n_en_tooltip = ('Produces %d Energy (non-explosive)'):format(
+                        energyMake
+                    ),
                 },
                 sfxtypes = {
                     pieceexplosiongenerators = {
