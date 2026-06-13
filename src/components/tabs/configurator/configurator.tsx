@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 
-import { Button, Flex, Stack, Text, Title } from '@mantine/core';
+import { Button, Divider, Flex, Stack, Text, Title } from '@mantine/core';
 import { IconArrowBackUp, IconCheck } from '@tabler/icons-react';
 
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
@@ -59,7 +59,8 @@ export const Configurator: React.FC = () => {
                 tweaks and copy the commands generated. Next, host a new lobby
                 and paste the commands into its chat.
             </Text>
-
+            <PresetShowcase />
+            <Divider />
             <GeneralSection />
             <DifficultySection />
             <ExtrasSection />

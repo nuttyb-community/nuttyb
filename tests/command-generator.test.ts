@@ -5,6 +5,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
+    cleanLuaPath,
     type EnabledCustomTweak,
     generateCommands,
 } from '@/lib/command-generator/command-generator';
@@ -98,9 +99,8 @@ function validatePriorityOrder(sources: string[]): void {
     let maxPriority = -1;
 
     for (const sourceRef of sources) {
-        // Clean path for lookup (strip ~ prefix and template variables)
-        const cleanPath = sourceRef.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
-        const priority = LUA_PRIORITIES[cleanPath] ?? DEFAULT_LUA_PRIORITY;
+        const cleanedPath = cleanLuaPath(sourceRef);
+        const priority = LUA_PRIORITIES[cleanedPath] ?? DEFAULT_LUA_PRIORITY;
 
         // Priority should never decrease (monotonic non-decreasing)
         expect(priority).toBeGreaterThanOrEqual(maxPriority);
@@ -484,7 +484,7 @@ describe('Preset replacement tweaks', () => {
     test('dynamically filters out replaced built-in files based on active configuration', () => {
         // 1. Get active paths for DEFAULT_CONFIGURATION
         const activePaths = mapSettingsToConfig(DEFAULT_CONFIGURATION)
-            .map((p) => p.replace(/^~/, '').replace(/\{[^}]*\}$/, ''))
+            .map((p) => cleanLuaPath(p))
             .filter((p) => p.endsWith('.lua'));
 
         expect(activePaths.length).toBeGreaterThanOrEqual(2);
@@ -527,7 +527,7 @@ describe('Preset replacement tweaks', () => {
         const sources = allCommands.flatMap((c) => c.slot?.sources || []);
 
         // Assert single target is filtered out and replacement is included
-        expect(sources.some((s) => s.replace(/^~/, '') === singleTarget)).toBe(
+        expect(sources.some((s) => cleanLuaPath(s) === singleTarget)).toBe(
             false
         );
         expect(sources.includes('preset:Dynamic Single Replacement')).toBe(
@@ -535,10 +535,10 @@ describe('Preset replacement tweaks', () => {
         );
 
         // Assert multi targets are filtered out and replacement is included
-        expect(sources.some((s) => s.replace(/^~/, '') === multiTarget1)).toBe(
+        expect(sources.some((s) => cleanLuaPath(s) === multiTarget1)).toBe(
             false
         );
-        expect(sources.some((s) => s.replace(/^~/, '') === multiTarget2)).toBe(
+        expect(sources.some((s) => cleanLuaPath(s) === multiTarget2)).toBe(
             false
         );
         expect(sources.includes('preset:Dynamic Multi Replacement')).toBe(true);
@@ -552,7 +552,7 @@ describe('Preset replacement tweaks', () => {
         // Get the active paths under DEFAULT_CONFIGURATION
         const activePaths = new Set(
             mapSettingsToConfig(DEFAULT_CONFIGURATION).map((p) =>
-                p.replace(/^~/, '').replace(/\{[^}]*\}$/, '')
+                cleanLuaPath(p)
             )
         );
 
@@ -560,10 +560,7 @@ describe('Preset replacement tweaks', () => {
             const parsed = JSON.parse(config.data) as Preset;
             const mockRemoteFiles: Record<string, string> = {};
             for (const tweak of parsed.presetTweaks || []) {
-                if (
-                    tweak.path.startsWith('http://') ||
-                    tweak.path.startsWith('https://')
-                ) {
+                if (tweak.path.startsWith('https://')) {
                     mockRemoteFiles[tweak.path] = '-- Mock remote code';
                 }
             }
@@ -588,9 +585,7 @@ describe('Preset replacement tweaks', () => {
                     const targets = Array.isArray(tweak.replaces)
                         ? tweak.replaces
                         : [tweak.replaces];
-                    const cleanTargets = targets.map((t) =>
-                        t.replace(/^~/, '').replace(/\{[^}]*\}$/, '')
-                    );
+                    const cleanTargets = targets.map((t) => cleanLuaPath(t));
                     const allTargetsActive = cleanTargets.every((t) =>
                         activePaths.has(t)
                     );
@@ -604,12 +599,9 @@ describe('Preset replacement tweaks', () => {
 
                         // The replaced files should be filtered out
                         for (const target of cleanTargets) {
-                            const hasOriginal = sources.some((s) => {
-                                const cleanSource = s
-                                    .replace(/^~/, '')
-                                    .replace(/\{[^}]*\}$/, '');
-                                return cleanSource === target;
-                            });
+                            const hasOriginal = sources.some(
+                                (s) => cleanLuaPath(s) === target
+                            );
                             expect(hasOriginal).toBe(false);
                         }
                     } else {

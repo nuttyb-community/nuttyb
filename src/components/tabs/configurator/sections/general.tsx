@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Group,
@@ -23,6 +23,8 @@ import {
     START_OPTIONS,
     StartOption,
 } from '@/lib/command-generator/data/configuration';
+
+import styles from './general.module.css';
 
 interface LabelWithTooltipProps {
     label: string;
@@ -53,23 +55,7 @@ const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
             radius='md'
             p='xs'
         >
-            <span
-                style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    color: 'var(--mantine-color-dimmed)',
-                    cursor: 'help',
-                    verticalAlign: 'middle',
-                    transition: 'color 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.color =
-                        'var(--mantine-primary-color-filled)';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--mantine-color-dimmed)';
-                }}
-            >
+            <span className={styles.infoIcon}>
                 <IconInfoCircle size={14} />
             </span>
         </Tooltip>
@@ -81,12 +67,11 @@ export const GeneralSection: React.FC = () => {
     const displayLobbyName =
         configuration.lobbyName || getDefaultLobbyNameTag(configuration);
     const [localLobbyName, setLocalLobbyName] = useState(displayLobbyName);
-    const [prevLobbyName, setPrevLobbyName] = useState(displayLobbyName);
 
-    if (displayLobbyName !== prevLobbyName) {
+    // Sync local state when external configuration changes (e.g. preset switch)
+    useEffect(() => {
         setLocalLobbyName(displayLobbyName);
-        setPrevLobbyName(displayLobbyName);
-    }
+    }, [displayLobbyName]);
 
     const debouncedSetProperty = useDebouncedCallback((val: string) => {
         setProperty('lobbyName', val);

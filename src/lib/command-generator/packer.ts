@@ -53,12 +53,6 @@ export interface PackingResult {
 }
 
 /**
- * Helper to build the encoded/formatted content for a slot.
- * If the content starts with a comment line, it preserves that comment line
- * as the first line, puts the `-- Source: ...` manifest on the second line,
- * and the remaining content (optionally minified) below.
- */
-/**
  * Separates the first comment line of a Lua file from the remaining content.
  *
  * @param content The Lua file content

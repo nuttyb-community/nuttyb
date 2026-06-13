@@ -8,13 +8,6 @@ export interface PresetTweak {
     replaces?: string | string[];
 }
 
-export interface PresetTweakCode {
-    description: string;
-    type: LuaTweakType;
-    code: string;
-    replaces?: string | string[];
-}
-
 export interface Preset {
     id: string;
     name: string;
@@ -22,6 +15,5 @@ export interface Preset {
     icon: string;
     configuration: Configuration;
     presetTweaks?: PresetTweak[];
-    presetTweakCodes?: PresetTweakCode[];
     isBuiltIn?: boolean;
 }

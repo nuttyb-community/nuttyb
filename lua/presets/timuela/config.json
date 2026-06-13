@@ -1,11 +1,21 @@
 {
-    "id": "pyrem-showcase",
-    "name": "Pyrem",
-    "description": "",
-    "icon": "IconBolt",
+    "version": 1,
+    "name": "Timuela",
+    "description": "EvoEco + Pyrem",
+    "icon": "IconUser",
     "configuration": {
-        "presetDifficulty": "Medium",
+        "presetDifficulty": "Easy",
         "challenges": "Mini Bosses",
+        "gameMap": "Full Metal Plate (12P)",
+        "start": "No rush",
+        "lobbyName": "Raptors [Mini Bosses][1_3x QHP 1_3x HP][EvoEco]",
+        "isEcoT4": false,
+        "isRFLRPCRebalance": true,
+        "isRFLRPCT4": true,
+        "isMegaNuke": false,
+        "incomeMult": 1,
+        "buildDistMult": 2,
+        "buildPowerMult": 1,
         "queenCount": 12
     },
     "presetTweaks": [
@@ -115,6 +125,11 @@
             "type": "tweakunits",
             "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_NuttyB_Evolving_Commanders_Legion.lua",
             "replaces": "lua/evocom-leg.lua"
+        },
+        {
+            "description": "Evolve Eco",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/timuela/BAR-widgets/refs/heads/main/tweaks/evo_eco-yardmaps.lua"
         }
     ]
 }

@@ -11,11 +11,13 @@ import React, {
 } from 'react';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
-import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { EnabledCustomTweak } from '@/lib/command-generator/command-generator';
-import { DEFAULT_CONFIGURATION } from '@/lib/command-generator/data/configuration';
+import {
+    type Configuration,
+    DEFAULT_CONFIGURATION,
+} from '@/lib/command-generator/data/configuration';
 import {
     ACTIVE_PRESET_ID_STORAGE_KEY,
     LOCAL_PRESETS_STORAGE_KEY,
@@ -57,7 +59,6 @@ export function usePresetsContext() {
 
 export function PresetsProvider({ children }: { children: React.ReactNode }) {
     const { configuration, setProperty } = useConfiguratorContext();
-    const { getEnabledTweaks } = useCustomTweaksContext();
     const { luaFiles } = useLuaBundleContext();
 
     const [activePresetId, setActivePresetId] = useLocalStorage<string | null>(
@@ -92,7 +93,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                                 ...parsed.configuration,
                             },
                             presetTweaks: parsed.presetTweaks || [],
-                            presetTweakCodes: parsed.presetTweakCodes || [],
                             isBuiltIn: true,
                         });
                     }
@@ -118,15 +118,33 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         return dynamicPresets;
     }, [luaFiles]);
 
+    /** Finds a preset by ID across both built-in and local presets. */
+    const findPresetById = useCallback(
+        (id: string): Preset | null =>
+            builtInPresets.find((p) => p.id === id) ||
+            localPresets.find((p) => p.id === id) ||
+            null,
+        [builtInPresets, localPresets]
+    );
+
     // Get the active preset details
     const activePreset = useMemo<Preset | null>(() => {
         if (!activePresetId) return null;
-        return (
-            builtInPresets.find((p) => p.id === activePresetId) ||
-            localPresets.find((p) => p.id === activePresetId) ||
-            null
-        );
-    }, [activePresetId, builtInPresets, localPresets]);
+        return findPresetById(activePresetId);
+    }, [activePresetId, findPresetById]);
+
+    /** Applies all properties from a Configuration object to the current context. */
+    const applyConfiguration = useCallback(
+        (config: Configuration) => {
+            const configKeys = Object.keys(config) as Array<
+                keyof typeof config
+            >;
+            for (const key of configKeys) {
+                setProperty(key, config[key]);
+            }
+        },
+        [setProperty]
+    );
 
     const [remoteFiles, setRemoteFiles] = useState<Record<string, string>>({});
     const fetchedUrlsRef = useRef<Set<string>>(new Set());
@@ -137,10 +155,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         const tweaks = activePreset.presetTweaks || [];
         const remoteUrls = tweaks
             .map((t) => t.path)
-            .filter(
-                (path) =>
-                    path.startsWith('http://') || path.startsWith('https://')
-            );
+            .filter((path) => path.startsWith('https://'));
 
         for (const url of remoteUrls) {
             if (fetchedUrlsRef.current.has(url)) continue;
@@ -195,18 +210,12 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             const currentLocal = prev.find((p) => p.id === activePresetId);
             if (!currentLocal) return prev;
 
-            let changed = false;
-            const configKeys = Object.keys(configuration) as Array<
-                keyof typeof configuration
-            >;
-            for (const key of configKeys) {
-                if (currentLocal.configuration[key] !== configuration[key]) {
-                    changed = true;
-                    break;
-                }
-            }
-
-            if (!changed) return prev;
+            // Configuration only has primitive values — stringify is safe
+            if (
+                JSON.stringify(currentLocal.configuration) ===
+                JSON.stringify(configuration)
+            )
+                return prev;
 
             return prev.map((p) =>
                 p.id === activePresetId
@@ -227,103 +236,59 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
 
     const selectPreset = useCallback(
         (id: string) => {
-            const preset =
-                builtInPresets.find((p) => p.id === id) ||
-                localPresets.find((p) => p.id === id);
-
+            const preset = findPresetById(id);
             if (!preset) return;
 
-            // Set all configuration values in a type-safe manner
-            const configKeys = Object.keys(preset.configuration) as Array<
-                keyof typeof preset.configuration
-            >;
-            for (const key of configKeys) {
-                const value = preset.configuration[key];
-                setProperty(key, value);
-            }
-
+            applyConfiguration(preset.configuration);
             setActivePresetId(id);
         },
-        [builtInPresets, localPresets, setProperty, setActivePresetId]
+        [findPresetById, applyConfiguration, setActivePresetId]
     );
 
     const savePreset = useCallback(
         (presetData: Omit<Preset, 'id' | 'isBuiltIn'>, id?: string) => {
+            const presetFields = {
+                name: presetData.name.trim(),
+                description: presetData.description || '',
+                icon: presetData.icon || 'IconSparkles',
+                configuration: { ...presetData.configuration },
+                presetTweaks: presetData.presetTweaks || [],
+            };
+
             if (id) {
                 setLocalPresets((prev) =>
                     prev.map((p) =>
-                        p.id === id
-                            ? {
-                                  ...p,
-                                  name: presetData.name.trim(),
-                                  description: presetData.description || '',
-                                  icon: presetData.icon || 'IconSparkles',
-                                  configuration: {
-                                      ...presetData.configuration,
-                                  },
-                                  presetTweaks: presetData.presetTweaks || [],
-                                  presetTweakCodes:
-                                      presetData.presetTweakCodes || [],
-                              }
-                            : p
+                        p.id === id ? { ...p, ...presetFields } : p
                     )
                 );
-
-                // Apply configuration settings to current context
-                const configKeys = Object.keys(
-                    presetData.configuration
-                ) as Array<keyof typeof presetData.configuration>;
-                for (const key of configKeys) {
-                    const value = presetData.configuration[key];
-                    setProperty(key, value);
-                }
             } else {
                 const newPreset: Preset = {
                     id: `local-${Date.now()}`,
-                    name: presetData.name.trim(),
-                    description: presetData.description || '',
-                    icon: presetData.icon || 'IconSparkles',
-                    configuration: { ...presetData.configuration },
-                    presetTweaks: presetData.presetTweaks || [],
-                    presetTweakCodes: presetData.presetTweakCodes || [],
+                    ...presetFields,
                 };
 
                 setLocalPresets((prev) => [...prev, newPreset]);
                 setActivePresetId(newPreset.id);
-
-                // Apply configuration settings to current context
-                const configKeys = Object.keys(
-                    newPreset.configuration
-                ) as Array<keyof typeof newPreset.configuration>;
-                for (const key of configKeys) {
-                    const value = newPreset.configuration[key];
-                    setProperty(key, value);
-                }
             }
+
+            applyConfiguration(presetData.configuration);
         },
-        [setProperty, setLocalPresets, setActivePresetId]
+        [applyConfiguration, setLocalPresets, setActivePresetId]
     );
 
     const saveCurrentAsPreset = useCallback(
         (name: string, icon = 'IconUser') => {
-            const enabledUserTweaks = getEnabledTweaks().filter(
-                (t) => t.id > 0
-            );
-            const presetTweakCodes = enabledUserTweaks.map((t) => ({
-                description: t.description,
-                type: t.type,
-                code: t.code,
-            }));
+            const currentPresetTweaks = activePreset?.presetTweaks || [];
 
             savePreset({
                 name,
                 description: 'Custom user-saved preset.',
                 icon,
                 configuration: { ...configuration },
-                presetTweakCodes,
+                presetTweaks: currentPresetTweaks,
             });
         },
-        [configuration, getEnabledTweaks, savePreset]
+        [configuration, activePreset, savePreset]
     );
 
     const deleteLocalPreset = useCallback(
@@ -356,8 +321,9 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                     };
                 }
 
-                // Clean/Merge with default configuration to ensure all fields are valid
-                const cleanConfig = {
+                // Merge with defaults to ensure all fields are present
+                const cleanConfig: Configuration = {
+                    ...DEFAULT_CONFIGURATION,
                     ...parsed.configuration,
                 };
 
@@ -369,20 +335,11 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                     icon: parsed.icon || 'IconDownload',
                     configuration: cleanConfig,
                     presetTweaks: parsed.presetTweaks || [],
-                    presetTweakCodes: parsed.presetTweakCodes || [],
                 };
 
                 setLocalPresets((prev) => [...prev, newPreset]);
                 setActivePresetId(newPreset.id);
-
-                // Apply configuration settings
-                const configKeys = Object.keys(cleanConfig) as Array<
-                    keyof typeof cleanConfig
-                >;
-                for (const key of configKeys) {
-                    const value = cleanConfig[key];
-                    setProperty(key, value);
-                }
+                applyConfiguration(cleanConfig);
 
                 return { success: true };
             } catch (error) {
@@ -395,18 +352,15 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 };
             }
         },
-        [setLocalPresets, setProperty, setActivePresetId]
+        [setLocalPresets, applyConfiguration, setActivePresetId]
     );
 
     const exportPreset = useCallback(
         (id: string) => {
-            const preset =
-                builtInPresets.find((p) => p.id === id) ||
-                localPresets.find((p) => p.id === id);
-
+            const preset = findPresetById(id);
             if (!preset) return;
 
-            // Prepare export data including both presetTweaks and presetTweakCodes
+            // Prepare export data including presetTweaks
             const exportData = {
                 version: 1,
                 name: preset.name,
@@ -414,7 +368,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 icon: preset.icon,
                 configuration: preset.configuration,
                 presetTweaks: preset.presetTweaks || [],
-                presetTweakCodes: preset.presetTweakCodes || [],
             };
 
             const dataStr =
@@ -430,7 +383,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             downloadAnchor.click();
             downloadAnchor.remove();
         },
-        [builtInPresets, localPresets]
+        [findPresetById]
     );
 
     const clearActivePreset = useCallback(() => {
