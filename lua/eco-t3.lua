@@ -58,7 +58,9 @@ do
     for _, fusionName in pairs(fusions) do
         local def = unitDefs[fusionName]
         if def and def.energymake then
+            def.name = 'T3 Fusion Reactor'
             def.customparams = def.customparams or {}
+            def.customparams.i18n_en_humanname = 'T3 Fusion Reactor'
             def.customparams.i18n_en_tooltip = ('Produces %d Energy (extremely explosive)'):format(
                 round(def.energymake)
             )
@@ -71,6 +73,8 @@ do
         local capacity = params and tonumber(params.energyconv_capacity)
         local efficiency = params and tonumber(params.energyconv_efficiency)
         if capacity and efficiency then
+            def.name = 'T3 Energy Converter'
+            params.i18n_en_humanname = 'T3 Energy Converter'
             params.i18n_en_tooltip = ('Converts %d energy into %d metal per sec (extremely explosive)'):format(
                 round(capacity),
                 round(capacity * efficiency)

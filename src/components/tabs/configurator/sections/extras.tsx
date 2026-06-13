@@ -37,7 +37,7 @@ export const ExtrasSection: React.FC = () => {
                     />
                     <Checkbox
                         label='T4 Economy'
-                        description='Legendary fusion reactors and energy converters'
+                        description='T4 fusion reactors and energy converters'
                         checked={configuration.isEcoT4}
                         onChange={(event) =>
                             setProperty('isEcoT4', event.currentTarget.checked)
@@ -57,8 +57,8 @@ export const ExtrasSection: React.FC = () => {
                         }
                     />
                     <Checkbox
-                        label='Epic RFLRPC'
-                        description='Epic Ragnarok, Calamity and Starfall'
+                        label='T4 RFLRPC'
+                        description='More powerful, T4 versions of Ragnarok, Calamity and Starfall'
                         checked={configuration.isRFLRPCT4}
                         onChange={(event) =>
                             setProperty(
