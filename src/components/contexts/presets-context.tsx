@@ -295,10 +295,10 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         (id: string) => {
             setLocalPresets((prev) => prev.filter((p) => p.id !== id));
             if (activePresetId === id) {
-                setActivePresetId('default');
+                selectPreset('default');
             }
         },
-        [activePresetId, setLocalPresets, setActivePresetId]
+        [activePresetId, setLocalPresets, selectPreset]
     );
 
     const importPreset = useCallback(
