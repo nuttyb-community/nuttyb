@@ -77,6 +77,16 @@ export const ExtrasSection: React.FC = () => {
                             )
                         }
                     />
+					<Checkbox
+						label="T3 Geo + Walls"
+						checked={configuration.isT3GeoWalls}
+						onChange={(event) =>
+							setProperty(
+								'isT3GeoWalls',
+								event.currentTarget.checked
+							)
+						}
+					/>
                 </Stack>
             </SimpleGrid>
         </Stack>

@@ -58,6 +58,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     isRFLRPCRebalance: true,
     isRFLRPCT4: true,
     isMegaNuke: false,
+	isT3GeoWalls: false,
     // Numeric multipliers
     incomeMult: 1,
     buildDistMult: 1.5,
