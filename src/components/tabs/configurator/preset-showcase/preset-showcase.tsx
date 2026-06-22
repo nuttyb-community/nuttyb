@@ -12,7 +12,6 @@ import type { Preset } from '@/lib/presets/registry';
 
 import { PresetCardList } from './preset-card-list';
 import { PresetModal } from './preset-modal';
-import styles from './preset-showcase.module.css';
 
 export const PresetShowcase: React.FC = () => {
     const {
@@ -54,12 +53,7 @@ export const PresetShowcase: React.FC = () => {
         <Stack gap='sm'>
             <Flex justify='space-between' align='center' wrap='wrap' gap='sm'>
                 <Stack gap={0}>
-                    <Text
-                        size='sm'
-                        fw={600}
-                        c='dimmed'
-                        className={styles.sectionLabel}
-                    >
+                    <Text size='sm' fw={600} c='dimmed' tt='uppercase'>
                         Preset Showcase
                     </Text>
                     <Text size='xs' c='dimmed'>

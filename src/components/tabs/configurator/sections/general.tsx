@@ -75,7 +75,7 @@ export const GeneralSection: React.FC = () => {
 
     const debouncedSetProperty = useDebouncedCallback((val: string) => {
         setProperty('lobbyName', val);
-    }, 1000);
+    }, 500);
 
     const handleLobbyNameChange = (
         event: React.ChangeEvent<HTMLInputElement>
@@ -100,6 +100,8 @@ export const GeneralSection: React.FC = () => {
                         placeholder={getDefaultLobbyNameTag(configuration)}
                         value={localLobbyName}
                         onChange={handleLobbyNameChange}
+                        onBlur={() => debouncedSetProperty.flush()}
+                        onMouseLeave={() => debouncedSetProperty.flush()}
                     />
                     <NativeSelect
                         label='Map'

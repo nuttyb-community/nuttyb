@@ -28,7 +28,7 @@ function getLuaFilesRecursively(dir: string, basePath: string): string[] {
             const isLuaFile = entry.name.endsWith('.lua');
             const normalizedRelative = relativePath.replaceAll('\\', '/');
             const isPresetConfigJson =
-                (normalizedRelative.startsWith('lua/presets/') ||
+                (normalizedRelative.startsWith('public/presets/') ||
                     normalizedRelative.startsWith('presets/')) &&
                 entry.name === 'config.json';
 

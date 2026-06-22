@@ -32,7 +32,9 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
 
     // Extract files from lua/ folder
     const luaFolderFiles = useMemo(() => {
-        return luaFiles.filter((file) => file.path.startsWith('lua/'));
+        return luaFiles.filter(
+            (file) => file.path.startsWith('lua/') && file.path.endsWith('.lua')
+        );
     }, [luaFiles]);
 
     // Combine user custom tweaks and active preset tweaks

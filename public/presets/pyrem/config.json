@@ -1,7 +1,7 @@
 {
     "id": "pyrem-showcase",
     "name": "Pyrem",
-    "description": "",
+    "description": "Community configuration by Relicus",
     "icon": "IconBolt",
     "configuration": {
         "presetDifficulty": "Medium",

@@ -89,9 +89,8 @@ async function fetchLuaFileTree(
         .filter(
             (item) =>
                 item.type === 'blob' &&
-                item.path.startsWith('lua/') &&
-                (item.path.endsWith('.lua') ||
-                    (item.path.startsWith('lua/presets/') &&
+                ((item.path.startsWith('lua/') && item.path.endsWith('.lua')) ||
+                    (item.path.startsWith('public/presets/') &&
                         item.path.endsWith('/config.json')))
         )
         .map((item) => item.path);

@@ -19,7 +19,14 @@ import {
     TextInput,
     Tooltip,
 } from '@mantine/core';
-import { IconFileImport, IconPlus, IconTrash } from '@tabler/icons-react';
+import {
+    IconAlertTriangle,
+    IconCircleCheck,
+    IconCircleX,
+    IconFileImport,
+    IconPlus,
+    IconTrash,
+} from '@tabler/icons-react';
 
 import {
     Configuration,
@@ -27,7 +34,6 @@ import {
 } from '@/lib/command-generator/data/configuration';
 import type { Preset } from '@/lib/presets/registry';
 
-import styles from './preset-showcase.module.css';
 import {
     computeConfigDiff,
     getPresetIcon,
@@ -52,6 +58,24 @@ interface PresetModalProps {
     isEditPresetActive?: boolean;
 }
 
+function isValidTweakUrl(url: string): boolean {
+    if (!url.startsWith('https://')) {
+        // If it starts with http://, it's invalid
+        if (url.startsWith('http://')) return false;
+        // Local paths are valid
+        return true;
+    }
+    try {
+        const parsedUrl = new URL(url);
+        return (
+            parsedUrl.hostname === 'raw.githubusercontent.com' ||
+            parsedUrl.hostname === 'gist.githubusercontent.com'
+        );
+    } catch {
+        return false; // Invalid URL string
+    }
+}
+
 export const PresetModal: React.FC<PresetModalProps> = ({
     opened,
     onClose,
@@ -67,6 +91,9 @@ export const PresetModal: React.FC<PresetModalProps> = ({
         useState<Configuration | null>(null);
     const [presetTweaks, setPresetTweaks] = useState<TweakFormRow[]>([]);
     const [importError, setImportError] = useState<string | null>(null);
+    const [saveError, setSaveError] = useState<string | null>(null);
+    const [importSuccess, setImportSuccess] = useState(false);
+    const [hasRemoteTweaks, setHasRemoteTweaks] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,14 +113,24 @@ export const PresetModal: React.FC<PresetModalProps> = ({
             setPresetTweaks(
                 mapPresetTweaksToFormRows(editPreset.presetTweaks || [])
             );
+            const hasRemote = (editPreset.presetTweaks || []).some(
+                (t) =>
+                    t.path &&
+                    (t.path.startsWith('http://') ||
+                        t.path.startsWith('https://'))
+            );
+            setHasRemoteTweaks(hasRemote);
         } else {
             setPresetName('');
             setPresetDescription('');
             setSelectedIcon('IconSparkles');
             setPresetConfiguration({ ...configuration });
             setPresetTweaks([]);
+            setHasRemoteTweaks(false);
         }
         setImportError(null);
+        setSaveError(null);
+        setImportSuccess(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [opened]);
 
@@ -104,6 +141,19 @@ export const PresetModal: React.FC<PresetModalProps> = ({
 
     const handleSave = () => {
         if (!presetName.trim()) return;
+
+        const hasInvalidUrl = presetTweaks.some(
+            (t) => t.path.trim() && !isValidTweakUrl(t.path.trim())
+        );
+
+        if (hasInvalidUrl) {
+            setSaveError(
+                'One or more tweaks contain an unsupported remote URL. Only GitHub URLs (raw/gist) are allowed.'
+            );
+            return;
+        }
+
+        setSaveError(null);
 
         const formattedPresetTweaks = presetTweaks
             .filter((t) => t.path.trim())
@@ -156,6 +206,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                         setImportError(
                             'Invalid preset: Missing or invalid preset name.'
                         );
+                        setImportSuccess(false);
                         return;
                     }
 
@@ -175,15 +226,36 @@ export const PresetModal: React.FC<PresetModalProps> = ({
 
                     const tweaks = parsed.presetTweaks || [];
                     if (Array.isArray(tweaks)) {
+                        const hasInvalidUrl = tweaks.some(
+                            (t) => t.path && !isValidTweakUrl(t.path)
+                        );
+                        if (hasInvalidUrl) {
+                            setImportError(
+                                'Preset contains unsupported remote URLs. Only GitHub URLs (raw/gist) are allowed.'
+                            );
+                            setImportSuccess(false);
+                            return;
+                        }
                         setPresetTweaks(mapPresetTweaksToFormRows(tweaks));
+                        const hasRemote = tweaks.some(
+                            (t) =>
+                                t.path &&
+                                (t.path.startsWith('http://') ||
+                                    t.path.startsWith('https://'))
+                        );
+                        setHasRemoteTweaks(hasRemote);
                     }
                     setImportError(null);
+                    setSaveError(null);
+                    setImportSuccess(true);
                 } catch {
                     setImportError('Failed to parse JSON file.');
+                    setImportSuccess(false);
                 }
             })
             .catch(() => {
                 setImportError('Failed to read file content.');
+                setImportSuccess(false);
             });
 
         event.target.value = '';
@@ -254,9 +326,56 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                 </Button>
 
                 {importError && (
-                    <Text size='xs' c='red' fw={500}>
-                        Import Error: {importError}
-                    </Text>
+                    <Group gap={6} wrap='nowrap' align='flex-start'>
+                        <IconCircleX
+                            size={14}
+                            color='var(--mantine-color-red-5)'
+                            style={{ flexShrink: 0, marginTop: '2px' }}
+                        />
+                        <Text size='xs' c='red' fw={500}>
+                            Import Error: {importError}
+                        </Text>
+                    </Group>
+                )}
+
+                {importSuccess && !importError && (
+                    <Group gap={6} wrap='nowrap' align='flex-start'>
+                        <IconCircleCheck
+                            size={14}
+                            color='var(--mantine-color-green-5)'
+                            style={{ flexShrink: 0, marginTop: '2px' }}
+                        />
+                        <Text size='xs' c='green.5' fw={500}>
+                            Preset imported successfully!
+                        </Text>
+                    </Group>
+                )}
+
+                {saveError && (
+                    <Group gap={6} wrap='nowrap' align='flex-start'>
+                        <IconCircleX
+                            size={14}
+                            color='var(--mantine-color-red-5)'
+                            style={{ flexShrink: 0, marginTop: '2px' }}
+                        />
+                        <Text size='xs' c='red' fw={500}>
+                            Save Error: {saveError}
+                        </Text>
+                    </Group>
+                )}
+
+                {hasRemoteTweaks && (
+                    <Group gap={6} wrap='nowrap' align='flex-start'>
+                        <IconAlertTriangle
+                            size={14}
+                            color='var(--mantine-color-yellow-5)'
+                            style={{ flexShrink: 0, marginTop: '2px' }}
+                        />
+                        <Text size='xs' c='yellow.5' fw={500}>
+                            Warning: This preset loads external scripts hosted
+                            on GitHub, make sure to trust the author.
+                        </Text>
+                    </Group>
                 )}
 
                 <Divider
@@ -329,7 +448,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                                     px='8px'
                                     radius='sm'
                                     bg='dark.6'
-                                    className={styles.configDiffChip}
+                                    bd='1px solid var(--mantine-color-dark-4)'
                                 >
                                     <Text size='xs' span fw={600} c='yellow.4'>
                                         {diff.label}:{' '}
@@ -348,9 +467,9 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                     labelPosition='center'
                 />
 
-                <Text size='xs' c='dimmed' className={styles.tweakHelperText}>
-                    Add custom Lua scripts to load from a path or URL when this
-                    preset is active.
+                <Text size='xs' c='dimmed' mt={-5}>
+                    Add custom Lua scripts to load from a path or GitHub URL
+                    when this preset is active.
                 </Text>
 
                 {presetTweaks.length > 0 && (
@@ -366,7 +485,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                                     p='xs'
                                     radius='sm'
                                     bg='dark.7'
-                                    className={styles.tweakCard}
+                                    bd='1px solid var(--mantine-color-dark-5)'
                                 >
                                     <Grid gutter='xs' align='flex-end'>
                                         <Grid.Col span={{ base: 12, sm: 6 }}>
@@ -408,25 +527,31 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                                                 size='xs'
                                             />
                                         </Grid.Col>
-                                        <Grid.Col
-                                            span={{ base: 2, sm: 1 }}
-                                            className={styles.tweakDeleteCol}
-                                        >
-                                            <ActionIcon
-                                                color='red'
-                                                variant='subtle'
-                                                onClick={() =>
-                                                    handleRemoveTweak(tweak.id)
-                                                }
-                                                size='md'
+                                        <Grid.Col span={{ base: 2, sm: 1 }}>
+                                            <Flex
+                                                justify='center'
+                                                align='flex-end'
+                                                pb={4}
+                                                h='100%'
                                             >
-                                                <IconTrash size={16} />
-                                            </ActionIcon>
+                                                <ActionIcon
+                                                    color='red'
+                                                    variant='subtle'
+                                                    onClick={() =>
+                                                        handleRemoveTweak(
+                                                            tweak.id
+                                                        )
+                                                    }
+                                                    size='md'
+                                                >
+                                                    <IconTrash size={16} />
+                                                </ActionIcon>
+                                            </Flex>
                                         </Grid.Col>
                                         <Grid.Col span={{ base: 12, sm: 7 }}>
                                             <TextInput
-                                                label='Path or Web URL'
-                                                placeholder='e.g. https://.../tweak.lua'
+                                                label='Path or GitHub URL'
+                                                placeholder='e.g. https://raw.githubusercontent.com/.../tweak.lua'
                                                 value={tweak.path}
                                                 onChange={(e) =>
                                                     handleTweakChange(

@@ -48,12 +48,7 @@ const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
                 <>
                     <Divider size='xs' color='dark.4' />
                     <Stack gap={4}>
-                        <Text
-                            size='10px'
-                            fw={600}
-                            c='dimmed'
-                            className={styles.sectionLabel}
-                        >
+                        <Text size='10px' fw={600} c='dimmed' tt='uppercase'>
                             Settings:
                         </Text>
                         {overrides.map((o) => (
@@ -66,7 +61,7 @@ const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
                                     <Text
                                         size='xs'
                                         fw={600}
-                                        className={styles.noWrap}
+                                        style={{ whiteSpace: 'nowrap' }}
                                     >
                                         {o.label}
                                     </Text>
@@ -74,11 +69,7 @@ const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
                                         {o.value}
                                     </Text>
                                 </Group>
-                                <Text
-                                    size='10px'
-                                    c='dimmed'
-                                    className={styles.tooltipDescription}
-                                >
+                                <Text size='10px' c='dimmed' lh={1.2}>
                                     {o.tooltip}
                                 </Text>
                             </div>
@@ -90,12 +81,7 @@ const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
                 <>
                     <Divider size='xs' color='dark.4' />
                     <Stack gap={2}>
-                        <Text
-                            size='10px'
-                            fw={600}
-                            c='dimmed'
-                            className={styles.sectionLabel}
-                        >
+                        <Text size='10px' fw={600} c='dimmed' tt='uppercase'>
                             Custom Tweaks:
                         </Text>
                         {preset.presetTweaks.map((t, idx) => (
@@ -215,15 +201,16 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                     direction='column'
                                     align='center'
                                     justify='center'
-                                    className={styles.cardBody}
+                                    flex={1}
+                                    mt={-2}
                                     gap='xs'
                                 >
                                     <div
-                                        className={
-                                            isActive
-                                                ? styles.cardIconActive
-                                                : styles.cardIcon
-                                        }
+                                        style={{
+                                            color: isActive
+                                                ? 'var(--mantine-color-yellow-4)'
+                                                : 'var(--mantine-color-dark-2)',
+                                        }}
                                     >
                                         {getPresetIcon(preset.icon, 24)}
                                     </div>
@@ -232,7 +219,8 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                         fw={isActive ? 700 : 500}
                                         ta='center'
                                         c={isActive ? 'yellow.4' : 'white'}
-                                        className={styles.truncateText}
+                                        truncate='end'
+                                        w='100%'
                                     >
                                         {preset.name}
                                         {showModified && ' *'}
@@ -243,7 +231,8 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                             size='10px'
                                             c='dimmed'
                                             ta='center'
-                                            className={styles.truncateText}
+                                            truncate='end'
+                                            w='100%'
                                         >
                                             {preset.description}
                                         </Text>

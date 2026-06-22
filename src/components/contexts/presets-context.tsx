@@ -75,9 +75,9 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         const dynamicPresets: Preset[] = [];
         for (const file of luaFiles) {
             // Check if file is a config.json inside a preset folder
-            // e.g. lua/presets/example/config.json
+            // e.g. public/presets/example/config.json
             const match = file.path.match(
-                /^lua\/presets\/([^/]+)\/config\.json$/
+                /^public\/presets\/([^/]+)\/config\.json$/
             );
             if (match) {
                 try {
@@ -106,7 +106,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             }
         }
         // Sort dynamic presets so 'default' is always first, then casual, hardcore, etc.
-        const order = ['default', 'casual', 'hardcore'];
+        const order = ['default', 'casual'];
         dynamicPresets.sort((a, b) => {
             const indexA = order.indexOf(a.id);
             const indexB = order.indexOf(b.id);
@@ -263,7 +263,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 );
             } else {
                 const newPreset: Preset = {
-                    id: `local-${Date.now()}`,
+                    id: crypto.randomUUID(),
                     ...presetFields,
                 };
 
@@ -328,7 +328,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 };
 
                 const newPreset: Preset = {
-                    id: `local-${Date.now()}`,
+                    id: crypto.randomUUID(),
                     name: parsed.name.trim(),
                     description:
                         parsed.description || 'Imported custom preset.',
