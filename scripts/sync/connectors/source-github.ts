@@ -84,7 +84,7 @@ async function fetchLuaFileTree(
 
     const data = (await response.json()) as GitHubTreeResponse;
 
-    // Filter for lua/**/*.lua files and lua/presets/**/config.json files
+    // Filter for lua/**/*.lua files and public/presets/**/config.json files
     const luaFiles = data.tree
         .filter(
             (item) =>
