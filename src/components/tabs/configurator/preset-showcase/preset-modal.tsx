@@ -33,6 +33,7 @@ import {
     DEFAULT_CONFIGURATION,
 } from '@/lib/command-generator/data/configuration';
 import type { Preset } from '@/lib/presets/registry';
+import { isValidTweakUrl } from '@/lib/presets/tweak-url';
 
 import {
     computeConfigDiff,
@@ -56,24 +57,6 @@ interface PresetModalProps {
     editPreset?: Preset | null;
     /** Whether the edit preset is the currently active one. */
     isEditPresetActive?: boolean;
-}
-
-function isValidTweakUrl(url: string): boolean {
-    if (!url.startsWith('https://')) {
-        // If it starts with http://, it's invalid
-        if (url.startsWith('http://')) return false;
-        // Local paths are valid
-        return true;
-    }
-    try {
-        const parsedUrl = new URL(url);
-        return (
-            parsedUrl.hostname === 'raw.githubusercontent.com' ||
-            parsedUrl.hostname === 'gist.githubusercontent.com'
-        );
-    } catch {
-        return false; // Invalid URL string
-    }
 }
 
 export const PresetModal: React.FC<PresetModalProps> = ({
