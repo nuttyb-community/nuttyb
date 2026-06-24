@@ -24,6 +24,7 @@ import {
 } from '@/lib/configuration-storage/keys';
 import { Preset } from '@/lib/presets/registry';
 import { resolvePresetTweaks } from '@/lib/presets/resolver';
+import { isAllowedRemoteTweakUrl } from '@/lib/presets/tweak-url';
 
 interface PresetsContextValue {
     activePresetId: string | null;
@@ -38,7 +39,6 @@ interface PresetsContextValue {
         id?: string
     ) => void;
     deleteLocalPreset: (id: string) => void;
-    importPreset: (jsonContent: string) => { success: boolean; error?: string };
     exportPreset: (id: string) => void;
     clearActivePreset: () => void;
 }
@@ -160,6 +160,16 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         for (const url of remoteUrls) {
             if (fetchedUrlsRef.current.has(url)) continue;
             fetchedUrlsRef.current.add(url);
+
+            // Enforce the host whitelist at the fetch boundary, not just in the
+            // import UI — this is the actual network/trust boundary.
+            if (!isAllowedRemoteTweakUrl(url)) {
+                // eslint-disable-next-line no-console
+                console.warn(
+                    `Skipped remote preset tweak from untrusted host: ${url}`
+                );
+                continue;
+            }
 
             void fetch(url)
                 .then((res) => {
@@ -301,60 +311,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         [activePresetId, setLocalPresets, selectPreset]
     );
 
-    const importPreset = useCallback(
-        (jsonContent: string) => {
-            try {
-                const parsed = JSON.parse(jsonContent) as Partial<Preset>;
-                if (!parsed.name || typeof parsed.name !== 'string') {
-                    return {
-                        success: false,
-                        error: 'Missing or invalid preset name.',
-                    };
-                }
-                if (
-                    !parsed.configuration ||
-                    typeof parsed.configuration !== 'object'
-                ) {
-                    return {
-                        success: false,
-                        error: 'Missing or invalid configuration.',
-                    };
-                }
-
-                // Merge with defaults to ensure all fields are present
-                const cleanConfig: Configuration = {
-                    ...DEFAULT_CONFIGURATION,
-                    ...parsed.configuration,
-                };
-
-                const newPreset: Preset = {
-                    id: crypto.randomUUID(),
-                    name: parsed.name.trim(),
-                    description:
-                        parsed.description || 'Imported custom preset.',
-                    icon: parsed.icon || 'IconDownload',
-                    configuration: cleanConfig,
-                    presetTweaks: parsed.presetTweaks || [],
-                };
-
-                setLocalPresets((prev) => [...prev, newPreset]);
-                setActivePresetId(newPreset.id);
-                applyConfiguration(cleanConfig);
-
-                return { success: true };
-            } catch (error) {
-                return {
-                    success: false,
-                    error:
-                        error instanceof Error
-                            ? error.message
-                            : 'Invalid JSON format.',
-                };
-            }
-        },
-        [setLocalPresets, applyConfiguration, setActivePresetId]
-    );
-
     const exportPreset = useCallback(
         (id: string) => {
             const preset = findPresetById(id);
@@ -400,7 +356,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             selectPreset,
             saveCurrentAsPreset,
             deleteLocalPreset,
-            importPreset,
             exportPreset,
             clearActivePreset,
             savePreset,
@@ -414,7 +369,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             selectPreset,
             saveCurrentAsPreset,
             deleteLocalPreset,
-            importPreset,
             exportPreset,
             clearActivePreset,
             savePreset,
