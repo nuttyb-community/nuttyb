@@ -5,6 +5,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Flex } from '@mantine/core';
 
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
+import { usePresetsContext } from '@/components/contexts/presets-context';
 import { EditorPanel } from '@/components/tabs/editor/editor-panel';
 import { EditorSidebar } from '@/components/tabs/editor/editor-sidebar';
 import { calculateEncodedSize } from '@/components/tabs/editor/editor-utils';
@@ -27,14 +28,20 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
 }) => {
     const [viewMode, setViewMode] = useState<ViewMode>('slots');
     const { getEnabledTweaks } = useCustomTweaksContext();
+    const { activePresetTweaks } = usePresetsContext();
 
     // Extract files from lua/ folder
     const luaFolderFiles = useMemo(() => {
-        return luaFiles.filter((file) => file.path.startsWith('lua/'));
+        return luaFiles.filter(
+            (file) => file.path.startsWith('lua/') && file.path.endsWith('.lua')
+        );
     }, [luaFiles]);
 
-    // Get enabled custom tweaks
-    const enabledTweaks = getEnabledTweaks();
+    // Combine user custom tweaks and active preset tweaks
+    const enabledTweaks = useMemo(
+        () => [...getEnabledTweaks(), ...activePresetTweaks],
+        [getEnabledTweaks, activePresetTweaks]
+    );
 
     // Compute slot contents
     const slotContents = useSlotContent(luaFiles, configuration, enabledTweaks);

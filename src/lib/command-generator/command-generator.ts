@@ -6,8 +6,6 @@
 
 import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
-// Re-export for convenience
-
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
 import { MAX_SLOT_SIZE } from './constants';
@@ -18,7 +16,7 @@ import {
 } from './data/configuration-mapping';
 import { resolveLuaReference } from './interpolator';
 import type { LuaSource } from './packer';
-import { packLuaSources } from './packer';
+import { extractFirstCommentAndRemaining, packLuaSources } from './packer';
 import { formatSlotName } from './slot';
 import { decode } from '../encoders/base64';
 
@@ -75,6 +73,8 @@ export interface CustomTweak {
     code: string;
     /** Priority for ordering (lower loads first) */
     priority: number;
+    /** Built-in file path(s) to replace, e.g. 'lua/eco-t3.lua' */
+    replaces?: string | string[];
 }
 
 /** Custom tweak with enabled state */
@@ -120,12 +120,39 @@ export interface PackingResult {
 }
 
 /**
+ * Strips the ~ prefix and template variable suffix from a Lua file path.
+ * Used for normalising paths before comparison or priority lookup.
+ *
+ * @example cleanLuaPath('~lua/eco-t3.lua{Medium}') → 'lua/eco-t3.lua'
+ */
+export function cleanLuaPath(path: string): string {
+    return path.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
+}
+
+/**
+ * Normalises a `replaces` value (which may be a single string or an array)
+ * into a guaranteed array.
+ */
+function normalizeReplaces(replaces?: string | string[]): string[] {
+    if (!replaces) return [];
+    return Array.isArray(replaces) ? replaces : [replaces];
+}
+
+/**
  * Gets priority for a Lua file path.
  * Strips ~ prefix and template variables before lookup.
  */
 function getLuaPriority(path: string): number {
-    const clean = path.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
-    return LUA_PRIORITIES[clean] ?? DEFAULT_LUA_PRIORITY;
+    return LUA_PRIORITIES[cleanLuaPath(path)] ?? DEFAULT_LUA_PRIORITY;
+}
+
+/**
+ * Gets priority for a preset tweak based on its replaced target(s).
+ */
+function getPresetPriority(replaces?: string | string[]): number {
+    if (!replaces) return DEFAULT_LUA_PRIORITY;
+    const targets = normalizeReplaces(replaces);
+    return getLuaPriority(targets[0]);
 }
 
 /** A single custom tweak allocation */
@@ -137,10 +164,9 @@ interface CustomTweakAllocation {
 
 /** Result of allocating custom tweaks to slots */
 interface CustomTweakAllocationResult {
-    commands: string[]; // For backwards compat (derive from allocations)
     dropped: EnabledCustomTweak[];
     allocated: { tweakdefs: number; tweakunits: number };
-    allocations: CustomTweakAllocation[]; // NEW: structured allocation data
+    allocations: CustomTweakAllocation[];
 }
 
 /**
@@ -152,7 +178,6 @@ function allocateCustomTweaks(
 ): CustomTweakAllocationResult {
     if (!customTweaks || customTweaks.length === 0) {
         return {
-            commands: [],
             dropped: [],
             allocated: { tweakdefs: 0, tweakunits: 0 },
             allocations: [],
@@ -216,7 +241,6 @@ function allocateCustomTweaks(
     }
 
     return {
-        commands: allocations.map((a) => a.command), // Derive from allocations
         dropped,
         allocated,
         allocations,
@@ -244,6 +268,53 @@ function resolveLuaSources(
 function sortLua(sources: LuaSource[]): LuaSource[] {
     // Sort by priority (ascending: 0 loads first)
     return sources.toSorted((a, b) => a.priority - b.priority);
+}
+
+// ── Preset helpers ────────────────────────────────────────
+
+/**
+ * Filters preset tweaks (negative IDs) to only those whose replaced targets
+ * are all active in the current configuration.
+ */
+function filterActivePresetTweaks(
+    enabledTweaks: EnabledCustomTweak[],
+    activePaths: Set<string>
+): EnabledCustomTweak[] {
+    return enabledTweaks.filter((t) => {
+        if (t.id >= 0) return false;
+        if (!t.replaces) return true; // Standalone preset tweaks always apply
+        const targets = normalizeReplaces(t.replaces);
+        return targets.every((target) => activePaths.has(cleanLuaPath(target)));
+    });
+}
+
+/**
+ * Collects all Lua paths that are being replaced by the given preset tweaks.
+ */
+function collectReplacedPaths(presetTweaks: EnabledCustomTweak[]): Set<string> {
+    const replaced = new Set<string>();
+    for (const t of presetTweaks) {
+        for (const target of normalizeReplaces(t.replaces)) {
+            replaced.add(cleanLuaPath(target));
+        }
+    }
+    return replaced;
+}
+
+/**
+ * Converts preset tweaks of a specific type into LuaSources for packing.
+ */
+function resolvePresetSources(
+    presetTweaks: EnabledCustomTweak[],
+    tweakType: LuaTweakType
+): LuaSource[] {
+    return presetTweaks
+        .filter((t) => t.type === tweakType)
+        .map((t) => ({
+            path: `preset:${t.description}`,
+            content: decode(t.code).trim(),
+            priority: getPresetPriority(t.replaces),
+        }));
 }
 
 /**
@@ -288,23 +359,50 @@ export function generateCommands(
         tweakunits: unitsPaths,
     } = getMappedData(configuration);
 
+    // Build the set of active paths in the configuration
+    const activePaths = new Set(
+        [...defsPaths, ...unitsPaths].map((p) => cleanLuaPath(p))
+    );
+
+    // Separate preset tweaks (negative IDs) from user custom tweaks (positive IDs)
+    const enabledTweaks = customTweaks?.filter((t) => t.enabled) || [];
+    const userCustomTweaks = enabledTweaks.filter((t) => t.id > 0);
+
+    // Filter preset tweaks to only those whose replaced targets are active
+    const presetTweaks = filterActivePresetTweaks(enabledTweaks, activePaths);
+
+    // Remove built-in paths that are replaced by preset tweaks
+    const replacedPaths = collectReplacedPaths(presetTweaks);
+    const filteredDefsPaths = defsPaths.filter(
+        (path) => !replacedPaths.has(cleanLuaPath(path))
+    );
+    const filteredUnitsPaths = unitsPaths.filter(
+        (path) => !replacedPaths.has(cleanLuaPath(path))
+    );
+
     // 2. Interpolate command templates
     const interpolatedCommands = interpolateCommands(
         rawCommands,
         configuration
     );
 
-    // 3. Resolve and pack tweakdefs
-    const tweakdefsSources = resolveLuaSources(luaFileMap, defsPaths);
-    const sortedTweakdefs = sortLua(tweakdefsSources);
+    // 3. Resolve and pack tweakdefs (including preset tweaks merged into main pack)
+    const tweakdefsSources = resolveLuaSources(luaFileMap, filteredDefsPaths);
+    const sortedTweakdefs = sortLua([
+        ...tweakdefsSources,
+        ...resolvePresetSources(presetTweaks, 'tweakdefs'),
+    ]);
     const tweakdefsResult = packLuaSources(sortedTweakdefs, 'tweakdefs');
 
-    // 4. Resolve and pack tweakunits
-    const tweakunitsSources = resolveLuaSources(luaFileMap, unitsPaths);
-    const sortedTweakunits = sortLua(tweakunitsSources);
+    // 4. Resolve and pack tweakunits (including preset tweaks merged into main pack)
+    const tweakunitsSources = resolveLuaSources(luaFileMap, filteredUnitsPaths);
+    const sortedTweakunits = sortLua([
+        ...tweakunitsSources,
+        ...resolvePresetSources(presetTweaks, 'tweakunits'),
+    ]);
     const tweakunitsResult = packLuaSources(sortedTweakunits, 'tweakunits');
 
-    // 5. Allocate custom tweaks (sorted by priority first)
+    // 5. Allocate user custom tweaks to separate slots (sorted by priority first)
     const tweakdefsCommands = tweakdefsResult.commands.map(
         (cmd) => cmd.command
     );
@@ -314,9 +412,9 @@ export function generateCommands(
     const existingBsetCommands = [...tweakdefsCommands, ...tweakunitsCommands];
 
     // Sort custom tweaks by priority before allocation (lower priority loads first)
-    const sortedCustomTweaks = customTweaks
-        ?.filter((t) => t.enabled)
-        .toSorted((a, b) => a.priority - b.priority);
+    const sortedCustomTweaks = userCustomTweaks.toSorted(
+        (a, b) => a.priority - b.priority
+    );
 
     const allocationResult = allocateCustomTweaks(
         existingBsetCommands,
@@ -327,13 +425,21 @@ export function generateCommands(
     const customCommands: Command[] = allocationResult.allocations.map(
         (allocation) => {
             const decoded = decode(allocation.tweak.code);
+            const { firstComment, remaining } =
+                extractFirstCommentAndRemaining(decoded);
+
+            const manifestComment = `-- Custom Tweak: ${allocation.tweak.description}`;
+            const finalContent = firstComment
+                ? `-- ${firstComment}\n${manifestComment}\n${remaining}`
+                : `${manifestComment}\n${remaining}`;
+
             return {
                 type: allocation.tweak.type,
                 command: allocation.command,
                 slot: {
                     index: allocation.slotIndex,
                     sources: [`custom:${allocation.tweak.description}`],
-                    content: `-- Custom Tweak: ${allocation.tweak.description}\n${decoded}`,
+                    content: finalContent,
                 },
             };
         }

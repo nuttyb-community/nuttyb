@@ -1,0 +1,15 @@
+{
+  "id": "casual",
+  "name": "Casual Start",
+  "description": "Easy start options for a relaxed gameplay experience.",
+  "icon": "IconMoodSmile",
+  "configuration": {
+    "presetDifficulty": "Easy",
+    "challenges": "None",
+    "start": "No rush",
+    "incomeMult": 2,
+    "buildPowerMult": 1.5,
+    "buildDistMult": 2,
+    "queenCount": 6
+  }
+}

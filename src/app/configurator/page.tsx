@@ -7,6 +7,7 @@ import { Divider, Stack } from '@mantine/core';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
+import { usePresetsContext } from '@/components/contexts/presets-context';
 import { TweakDataProvider } from '@/components/contexts/tweak-data-context';
 import { PageLoader } from '@/components/page-loader';
 import { Configurator } from '@/components/tabs/configurator/configurator';
@@ -19,8 +20,9 @@ export default function Page() {
     const { luaFiles, isLoading: isLuaLoading, error } = useLuaBundleContext();
     const { getEnabledTweaks, isLoading: isTweaksLoading } =
         useCustomTweaksContext();
+    const { activePresetTweaks } = usePresetsContext();
 
-    const enabledCustomTweaks = getEnabledTweaks();
+    const enabledCustomTweaks = [...getEnabledTweaks(), ...activePresetTweaks];
     const {
         sections,
         slotUsage,

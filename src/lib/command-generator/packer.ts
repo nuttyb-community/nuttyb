@@ -12,7 +12,11 @@
 import { LuaTweakType } from '@/types/types';
 
 import type { Command } from './command-generator';
-import { MAX_SLOT_SIZE, MAX_SLOTS_PER_TYPE } from './constants';
+import {
+    COMMAND_PREFIX_RESERVE,
+    MAX_SLOT_SIZE,
+    MAX_SLOTS_PER_TYPE,
+} from './constants';
 import { formatSlotName } from './slot';
 import { encode } from '../encoders/base64';
 import { minify } from '../lua-utils/minificator';
@@ -49,18 +53,12 @@ export interface PackingResult {
 }
 
 /**
- * Helper to build the encoded/formatted content for a slot.
- * If the content starts with a comment line, it preserves that comment line
- * as the first line, puts the `-- Source: ...` manifest on the second line,
- * and the remaining content (optionally minified) below.
- */
-/**
  * Separates the first comment line of a Lua file from the remaining content.
  *
  * @param content The Lua file content
  * @returns Cleaned first comment and remaining content
  */
-function extractFirstCommentAndRemaining(content: string): {
+export function extractFirstCommentAndRemaining(content: string): {
     firstComment: string;
     remaining: string;
 } {
@@ -102,19 +100,15 @@ function extractFirstCommentAndRemaining(content: string): {
 function buildFinalContent(
     sources: string[],
     firstComments: string[],
-    remainingContent: string,
-    minifyContent: boolean
+    content: string
 ): string {
-    const preparedContent = minifyContent
-        ? minify(remainingContent)
-        : remainingContent;
     const sourceManifest = `-- Source: ${JSON.stringify(sources)}`;
 
     if (firstComments.length > 0) {
         const mergedComment = `-- ${firstComments.join('-')}`;
-        return `${mergedComment}\n${sourceManifest}\n${preparedContent}`;
+        return `${mergedComment}\n${sourceManifest}\n${content}`;
     }
-    return `${sourceManifest}\n${preparedContent}`;
+    return `${sourceManifest}\n${content}`;
 }
 
 /**
@@ -122,37 +116,38 @@ function buildFinalContent(
  *
  * @param existingSources Current source paths in the slot
  * @param existingComments Current slot comments
- * @param existingRemainingContent Current slot remaining content
+ * @param existingMinifiedContent Current slot minified content
  * @param newSourcePath Path of the new source to add
  * @param newComment Comment of the new source to add
- * @param newRemainingContent Remaining content of the new source to add
+ * @param newMinifiedContent Minified content of the new source to add
  * @returns true if addition fits, false otherwise
  */
 function canFitInSlot(
     existingSources: string[],
     existingComments: string[],
-    existingRemainingContent: string,
+    existingMinifiedContent: string,
     newSourcePath: string,
     newComment: string,
-    newRemainingContent: string
+    newMinifiedContent: string
 ): boolean {
     const combinedSources = [...existingSources, newSourcePath];
     const combinedComments = newComment
         ? [...existingComments, newComment]
         : existingComments;
-    const combinedContent = existingRemainingContent
-        ? existingRemainingContent + '\n\n' + newRemainingContent
-        : newRemainingContent;
+    const combinedContent = existingMinifiedContent
+        ? existingMinifiedContent + '\n' + newMinifiedContent
+        : newMinifiedContent;
 
     const finalContent = buildFinalContent(
         combinedSources,
         combinedComments,
-        combinedContent,
-        true
+        combinedContent
     );
     const encoded = encode(finalContent);
 
-    return encoded.length <= MAX_SLOT_SIZE;
+    // Reserve space for the command prefix ('!bset tweakdefsN ')
+    const maxPayloadSize = MAX_SLOT_SIZE - COMMAND_PREFIX_RESERVE;
+    return encoded.length <= maxPayloadSize;
 }
 
 /** A slot being built, tracking sources and content separately */
@@ -160,6 +155,7 @@ interface SlotBuilder {
     sources: string[];
     firstComments: string[];
     remainingContent: string;
+    minifiedContent: string;
     /** If true, this slot contains a plain table and cannot accept more sources */
     isPlainTable: boolean;
 }
@@ -168,6 +164,7 @@ interface ProcessedLuaSource {
     path: string;
     firstComment: string;
     remainingContent: string;
+    minifiedRemaining: string;
     priority: number;
 }
 
@@ -200,6 +197,7 @@ export function packLuaSources(
             path: source.path,
             firstComment,
             remainingContent: remaining,
+            minifiedRemaining: minify(remaining),
             priority: source.priority,
         };
     });
@@ -209,11 +207,13 @@ export function packLuaSources(
         sources: [],
         firstComments: [],
         remainingContent: '',
+        minifiedContent: '',
         isPlainTable: false,
     };
 
     for (const source of processedSources) {
         const remainingContent = source.remainingContent;
+        const minifiedRemaining = source.minifiedRemaining;
         const sourceIsPlainTable =
             slotType === 'tweakunits' && isPlainTableFormat(remainingContent);
 
@@ -229,18 +229,20 @@ export function packLuaSources(
             canFitInSlot(
                 currentSlot.sources,
                 currentSlot.firstComments,
-                currentSlot.remainingContent,
+                currentSlot.minifiedContent,
                 source.path,
                 source.firstComment,
-                remainingContent
+                minifiedRemaining
             );
 
         if (fitsInCurrentSlot) {
             // Source fits in current slot
             if (currentSlot.remainingContent) {
                 currentSlot.remainingContent += '\n\n' + remainingContent;
+                currentSlot.minifiedContent += '\n' + minifiedRemaining;
             } else {
                 currentSlot.remainingContent = remainingContent;
+                currentSlot.minifiedContent = minifiedRemaining;
             }
             currentSlot.sources.push(source.path);
             if (source.firstComment) {
@@ -259,6 +261,7 @@ export function packLuaSources(
                 sources: [source.path],
                 firstComments: source.firstComment ? [source.firstComment] : [],
                 remainingContent,
+                minifiedContent: minifiedRemaining,
                 isPlainTable: sourceIsPlainTable,
             };
         }
@@ -281,8 +284,7 @@ export function packLuaSources(
         const finalMinifiedContent = buildFinalContent(
             slot.sources,
             slot.firstComments,
-            slot.remainingContent,
-            true
+            slot.minifiedContent
         );
         const encoded = encode(finalMinifiedContent);
         const slotName = formatSlotName(slotType, i);
@@ -291,8 +293,7 @@ export function packLuaSources(
         const finalUnminifiedContent = buildFinalContent(
             slot.sources,
             slot.firstComments,
-            slot.remainingContent,
-            false
+            slot.remainingContent
         );
 
         return {
