@@ -27,7 +27,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     '~lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
     'lua/unit-launchers.lua': 13,
-	'lua/geo+walls-t3.lua': 14,
+    'lua/geo+walls-t3.lua': 14,
 } as const;
 
 /**
@@ -338,9 +338,9 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             false: undefined,
         },
     },
-	isT3GeoWalls: {
+    isT3GeoWalls: {
         description: 'T3 Geo and T3 Walls',
-          values: {
+        values: {
             true: { tweakdefs: ['~lua/geo+walls-t3.lua'] },
             false: undefined,
         },
