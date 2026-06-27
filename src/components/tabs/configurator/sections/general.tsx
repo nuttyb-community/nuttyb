@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     Group,
@@ -12,6 +12,7 @@ import {
     Title,
     Tooltip,
 } from '@mantine/core';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { IconInfoCircle } from '@tabler/icons-react';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
@@ -22,6 +23,8 @@ import {
     START_OPTIONS,
     StartOption,
 } from '@/lib/command-generator/data/configuration';
+
+import styles from './general.module.css';
 
 interface LabelWithTooltipProps {
     label: string;
@@ -52,23 +55,7 @@ const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
             radius='md'
             p='xs'
         >
-            <span
-                style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    color: 'var(--mantine-color-dimmed)',
-                    cursor: 'help',
-                    verticalAlign: 'middle',
-                    transition: 'color 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.color =
-                        'var(--mantine-primary-color-filled)';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'var(--mantine-color-dimmed)';
-                }}
-            >
+            <span className={styles.infoIcon}>
                 <IconInfoCircle size={14} />
             </span>
         </Tooltip>
@@ -77,6 +64,26 @@ const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
 
 export const GeneralSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
+    const displayLobbyName =
+        configuration.lobbyName || getDefaultLobbyNameTag(configuration);
+    const [localLobbyName, setLocalLobbyName] = useState(displayLobbyName);
+
+    // Sync local state when external configuration changes (e.g. preset switch)
+    useEffect(() => {
+        setLocalLobbyName(displayLobbyName);
+    }, [displayLobbyName]);
+
+    const debouncedSetProperty = useDebouncedCallback((val: string) => {
+        setProperty('lobbyName', val);
+    }, 500);
+
+    const handleLobbyNameChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const val = event.currentTarget.value;
+        setLocalLobbyName(val);
+        debouncedSetProperty(val);
+    };
 
     return (
         <Stack gap='sm'>
@@ -91,13 +98,10 @@ export const GeneralSection: React.FC = () => {
                             />
                         }
                         placeholder={getDefaultLobbyNameTag(configuration)}
-                        value={
-                            configuration.lobbyName ||
-                            getDefaultLobbyNameTag(configuration)
-                        }
-                        onChange={(event) =>
-                            setProperty('lobbyName', event.currentTarget.value)
-                        }
+                        value={localLobbyName}
+                        onChange={handleLobbyNameChange}
+                        onBlur={() => debouncedSetProperty.flush()}
+                        onMouseLeave={() => debouncedSetProperty.flush()}
                     />
                     <NativeSelect
                         label='Map'

@@ -1,0 +1,135 @@
+{
+    "version": 1,
+    "name": "Timuela",
+    "description": "EvoEco + Pyrem",
+    "icon": "IconUser",
+    "configuration": {
+        "presetDifficulty": "Easy",
+        "challenges": "Mini Bosses",
+        "gameMap": "Full Metal Plate (12P)",
+        "start": "No rush",
+        "lobbyName": "Raptors [Mini Bosses][1_3x QHP 1_3x HP][EvoEco]",
+        "isEcoT4": false,
+        "isRFLRPCRebalance": true,
+        "isRFLRPCT4": true,
+        "isMegaNuke": false,
+        "incomeMult": 1,
+        "buildDistMult": 2,
+        "buildPowerMult": 1,
+        "queenCount": 12
+    },
+    "presetTweaks": [
+        {
+            "description": "Cross Faction T2",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Cross_Faction_T2.lua",
+            "replaces": "lua/cross-faction-t2.lua"
+        },
+        {
+            "description": "Main Defs",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Main.lua",
+            "replaces": "lua/main-defs.lua"
+        },
+        {
+            "description": "Mega Nuke",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Mega_Nuke.lua",
+            "replaces": "lua/mega-nuke.lua"
+        },
+        {
+            "description": "T3 Builders",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T3_Builders.lua",
+            "replaces": "lua/builders-t3.lua"
+        },
+        {
+            "description": "T3 Eco",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T3_Eco.lua",
+            "replaces": "lua/eco-t3.lua"
+        },
+        {
+            "description": "T4 Air",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T4_Air.lua",
+            "replaces": "lua/air-rework-t4.lua"
+        },
+        {
+            "description": "T4 Defences",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T4_Defenses.lua",
+            "replaces": "lua/defences-t4.lua"
+        },
+        {
+            "description": "T4 Eco",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T4_Eco.lua",
+            "replaces": "lua/eco-t4.lua"
+        },
+        {
+            "description": "T4 Epics",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T4_Epics.lua",
+            "replaces": "lua/rflrpc-t4.lua"
+        },
+        {
+            "description": "Unit Launchers",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Unit_Launchers.lua",
+            "replaces": "lua/unit-launchers.lua"
+        },
+        {
+            "description": "Expo Waves",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Waves_Experimental_Wave_Challenge.lua",
+            "replaces": "lua/wave-challenge.lua"
+        },
+        {
+            "description": "Mini Bosses",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_Waves_Mini_Bosses.lua",
+            "replaces": "lua/mini-bosses.lua"
+        },
+        {
+            "description": "EVO_XP",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_EVO_XP.lua"
+        },
+        {
+            "description": "LRPC Rebalance v2",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_LRPC_v2.lua",
+            "replaces": "lua/lrpc-rebalance.lua"
+        },
+        {
+            "description": "Main Units",
+            "type": "tweakunits",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_Main.lua",
+            "replaces": "lua/main-units.lua"
+        },
+        {
+            "description": "Arm Com",
+            "type": "tweakunits",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_NuttyB_Evolving_Commanders_Armada.lua",
+            "replaces": "lua/evocom-arm.lua"
+        },
+        {
+            "description": "Cor Com",
+            "type": "tweakunits",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_NuttyB_Evolving_Commanders_Cortex.lua",
+            "replaces": "lua/evocom-cor.lua"
+        },
+        {
+            "description": "Leg Com",
+            "type": "tweakunits",
+            "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Units_NuttyB_Evolving_Commanders_Legion.lua",
+            "replaces": "lua/evocom-leg.lua"
+        },
+        {
+            "description": "Evolve Eco",
+            "type": "tweakdefs",
+            "path": "https://raw.githubusercontent.com/timuela/BAR-widgets/refs/heads/main/tweaks/evo_eco-yardmaps.lua"
+        }
+    ]
+}

@@ -24,9 +24,18 @@ function getLuaFilesRecursively(dir: string, basePath: string): string[] {
 
         if (entry.isDirectory()) {
             results.push(...getLuaFilesRecursively(fullPath, relativePath));
-        } else if (entry.isFile() && entry.name.endsWith('.lua')) {
-            // Normalize path separators to forward slashes (matching GitHub format)
-            results.push(relativePath.replaceAll('\\', '/'));
+        } else if (entry.isFile()) {
+            const isLuaFile = entry.name.endsWith('.lua');
+            const normalizedRelative = relativePath.replaceAll('\\', '/');
+            const isPresetConfigJson =
+                (normalizedRelative.startsWith('public/presets/') ||
+                    normalizedRelative.startsWith('presets/')) &&
+                entry.name === 'config.json';
+
+            if (isLuaFile || isPresetConfigJson) {
+                // Normalize path separators to forward slashes (matching GitHub format)
+                results.push(normalizedRelative);
+            }
         }
     }
 

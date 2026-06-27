@@ -1,0 +1,7 @@
+{
+  "id": "default",
+  "name": "Default",
+  "description": "Default configuration settings.",
+  "icon": "IconRotateDot",
+  "configuration": {}
+}

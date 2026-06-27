@@ -5,6 +5,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
+    cleanLuaPath,
     type EnabledCustomTweak,
     generateCommands,
 } from '@/lib/command-generator/command-generator';
@@ -30,9 +31,17 @@ import {
     extractSourceManifest,
     parseSourceManifest,
 } from '@/lib/lua-utils/comment-handler';
+import type { Preset } from '@/lib/presets/registry';
+import { resolvePresetTweaks } from '@/lib/presets/resolver';
 import { TweakValue } from '@/types/types';
 
 import { getBundle } from './utils/bundle';
+
+const bundle = getBundle();
+if (!bundle) {
+    throw new Error('Bundle should exist. Run bun run sync to generate it.');
+}
+const luaFiles = bundle.files;
 
 /**
  * Helper function to map configuration settings to expected commands and Lua files.
@@ -90,23 +99,17 @@ function validatePriorityOrder(sources: string[]): void {
     let maxPriority = -1;
 
     for (const sourceRef of sources) {
-        // Clean path for lookup (strip ~ prefix and template variables)
-        const cleanPath = sourceRef.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
-        const priority = LUA_PRIORITIES[cleanPath] ?? DEFAULT_LUA_PRIORITY;
+        const cleanedPath = cleanLuaPath(sourceRef);
+        const priority = LUA_PRIORITIES[cleanedPath] ?? DEFAULT_LUA_PRIORITY;
 
         // Priority should never decrease (monotonic non-decreasing)
         expect(priority).toBeGreaterThanOrEqual(maxPriority);
         maxPriority = Math.max(maxPriority, priority);
     }
 }
-
 describe('Command generation', () => {
     test('Default configuration generates expected commands', () => {
         const config = DEFAULT_CONFIGURATION;
-        const bundle = getBundle();
-        if (!bundle) expect.unreachable('Bundle should exist');
-
-        const luaFiles = bundle.files;
         const result = generateCommands(config, luaFiles);
 
         // Validate slot usage statistics
@@ -147,10 +150,8 @@ describe('Command generation', () => {
                 ''
             );
 
-            // Each command must fit within MAX_SLOT_SIZE plus the command prefix
-            expect(generatedTweak.length).toBeLessThanOrEqual(
-                MAX_SLOT_SIZE + 50
-            );
+            // Each command must fit within MAX_SLOT_SIZE
+            expect(generatedTweak.length).toBeLessThanOrEqual(MAX_SLOT_SIZE);
 
             const decoded = decode(base64);
             const manifest = extractSourceManifest(decoded);
@@ -370,10 +371,7 @@ describe('Slot comment preservation', () => {
 describe('Command-centric structure (generateCommands)', () => {
     test('generateCommands returns properly structured commands', () => {
         const config = DEFAULT_CONFIGURATION;
-        const bundle = getBundle();
-        if (!bundle) expect.unreachable('Bundle should exist');
-
-        const result = generateCommands(config, bundle.files);
+        const result = generateCommands(config, luaFiles);
         const allCommands = result.chunks.flatMap((c) => c.commands);
 
         // Validate command structure contract
@@ -406,10 +404,6 @@ describe('Command-centric structure (generateCommands)', () => {
 describe('Command size validation', () => {
     test('Oversized custom tweaks are dropped gracefully', () => {
         const config = DEFAULT_CONFIGURATION;
-        const bundle = getBundle();
-        if (!bundle) expect.unreachable('Bundle should exist');
-
-        const luaFiles = bundle.files;
 
         // Create a custom tweak with base64 code that results in command > MAX_SLOT_SIZE
         const oversizedCode = 'A'.repeat(MAX_SLOT_SIZE + 1000);
@@ -435,19 +429,13 @@ describe('Command size validation', () => {
         // All chunks should still be valid
         for (const chunk of result.chunks) {
             for (const cmd of chunk.commands) {
-                expect(cmd.command.length).toBeLessThanOrEqual(
-                    MAX_SLOT_SIZE + 50
-                );
+                expect(cmd.command.length).toBeLessThanOrEqual(MAX_SLOT_SIZE);
             }
         }
     });
 
     test('Valid custom tweaks are allocated while oversized ones are dropped', () => {
         const config = DEFAULT_CONFIGURATION;
-        const bundle = getBundle();
-        if (!bundle) expect.unreachable('Bundle should exist');
-
-        const luaFiles = bundle.files;
         const validCode = encode('-- Valid tweak\nlocal x = 1');
         const oversizedCode = 'A'.repeat(MAX_SLOT_SIZE + 1000);
 
@@ -489,5 +477,142 @@ describe('Command size validation', () => {
             cmd.slot?.sources.some((s) => s.startsWith('custom:'))
         );
         expect(customCommands.length).toBe(2);
+    });
+});
+
+describe('Preset replacement tweaks', () => {
+    test('dynamically filters out replaced built-in files based on active configuration', () => {
+        // 1. Get active paths for DEFAULT_CONFIGURATION
+        const activePaths = mapSettingsToConfig(DEFAULT_CONFIGURATION)
+            .map((p) => cleanLuaPath(p))
+            .filter((p) => p.endsWith('.lua'));
+
+        expect(activePaths.length).toBeGreaterThanOrEqual(2);
+
+        const singleTarget = activePaths[0];
+        const multiTarget1 = activePaths[0];
+        const multiTarget2 = activePaths[1];
+
+        // 2. Dynamically construct a Preset config
+        const mockPreset: Preset = {
+            id: 'mock-preset',
+            name: 'Mock Preset',
+            description: 'Mock',
+            icon: 'IconBolt',
+            configuration: DEFAULT_CONFIGURATION,
+            presetTweaks: [
+                {
+                    description: 'Dynamic Single Replacement',
+                    type: 'tweakdefs',
+                    path: singleTarget,
+                    replaces: singleTarget,
+                },
+                {
+                    description: 'Dynamic Multi Replacement',
+                    type: 'tweakdefs',
+                    path: multiTarget1,
+                    replaces: [multiTarget1, multiTarget2],
+                },
+            ],
+        };
+
+        const presetTweaks = resolvePresetTweaks(mockPreset, luaFiles);
+
+        const result = generateCommands(
+            DEFAULT_CONFIGURATION,
+            luaFiles,
+            presetTweaks
+        );
+        const allCommands = result.chunks.flatMap((c) => c.commands);
+        const sources = allCommands.flatMap((c) => c.slot?.sources || []);
+
+        // Assert single target is filtered out and replacement is included
+        expect(sources.some((s) => cleanLuaPath(s) === singleTarget)).toBe(
+            false
+        );
+        expect(sources.includes('preset:Dynamic Single Replacement')).toBe(
+            true
+        );
+
+        // Assert multi targets are filtered out and replacement is included
+        expect(sources.some((s) => cleanLuaPath(s) === multiTarget1)).toBe(
+            false
+        );
+        expect(sources.some((s) => cleanLuaPath(s) === multiTarget2)).toBe(
+            false
+        );
+        expect(sources.includes('preset:Dynamic Multi Replacement')).toBe(true);
+    });
+
+    test('filters out actual replaced files from dynamic preset configs', () => {
+        const configs = luaFiles.filter((f) =>
+            /^lua\/presets\/[^/]+\/config\.json$/.test(f.path)
+        );
+
+        // Get the active paths under DEFAULT_CONFIGURATION
+        const activePaths = new Set(
+            mapSettingsToConfig(DEFAULT_CONFIGURATION).map((p) =>
+                cleanLuaPath(p)
+            )
+        );
+
+        for (const config of configs) {
+            const parsed = JSON.parse(config.data) as Preset;
+            const mockRemoteFiles: Record<string, string> = {};
+            for (const tweak of parsed.presetTweaks || []) {
+                if (tweak.path.startsWith('https://')) {
+                    mockRemoteFiles[tweak.path] = '-- Mock remote code';
+                }
+            }
+            const presetTweaks = resolvePresetTweaks(
+                parsed,
+                luaFiles,
+                mockRemoteFiles
+            );
+
+            const result = generateCommands(
+                DEFAULT_CONFIGURATION,
+                luaFiles,
+                presetTweaks
+            );
+
+            const allCommands = result.chunks.flatMap((c) => c.commands);
+            const sources = allCommands.flatMap((c) => c.slot?.sources || []);
+
+            // Assert correctness dynamically for each preset tweak
+            for (const tweak of presetTweaks) {
+                if (tweak.replaces) {
+                    const targets = Array.isArray(tweak.replaces)
+                        ? tweak.replaces
+                        : [tweak.replaces];
+                    const cleanTargets = targets.map((t) => cleanLuaPath(t));
+                    const allTargetsActive = cleanTargets.every((t) =>
+                        activePaths.has(t)
+                    );
+
+                    if (allTargetsActive) {
+                        // The preset should be enabled and present
+                        const hasPresetSource = sources.includes(
+                            `preset:${tweak.description}`
+                        );
+                        expect(hasPresetSource).toBe(true);
+
+                        // The replaced files should be filtered out
+                        for (const target of cleanTargets) {
+                            const hasOriginal = sources.some(
+                                (s) => cleanLuaPath(s) === target
+                            );
+                            expect(hasOriginal).toBe(false);
+                        }
+                    } else {
+                        // The preset should NOT be enabled/present
+                        const hasPresetSource = sources.includes(
+                            `preset:${tweak.description}`
+                        );
+                        expect(hasPresetSource).toBe(false);
+                    }
+                }
+            }
+        }
     });
 });
