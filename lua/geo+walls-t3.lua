@@ -70,7 +70,7 @@ do
     local droneLaserWeapon = {
         areaofeffect = 12,
         avoidfeature = false,
-        beamtime = 0.10,
+        beamtime = 0.05,
         corethickness = 0.12,
         craterareaofeffect = 0,
         craterboost = 0,
@@ -98,14 +98,6 @@ do
         damage = {
             default = 20,
         },
-    }
-
-    local droneLaserTargeting = {
-        badtargetcategory = 'VTOL',
-        def = 't3_drone_light_laser',
-        maindir = '0 0 1',
-        maxangledif = 90,
-        onlytargetcategory = 'NOTSUB',
     }
 
     local paragonSpawnerWeapon = {
@@ -411,7 +403,7 @@ do
             energymake = 2200,
             energystorage = 30000,
             health = 16000,
-            workertime=800,
+            workertime = 800,
             explodeas = 'customfusionexplo',
             selfdestructas = 'korgExplosion',
             customparams = {
