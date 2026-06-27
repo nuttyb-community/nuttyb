@@ -4,6 +4,24 @@ Notable changes to the Community NuttyB configurator and tweaks, grouped by date
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-06-27
+
+- Added a Preset Guide explaining how to pick, customise and share presets, linked from the About page.
+
+## 2026-06-25
+
+- Configuration Presets: quickly start from a curated setup (Casual, Pyrem, Timuela and the default), or save, upload and share your own.
+- Deleting the preset you're currently using now falls back to the default instead of leaving you with an empty configuration.
+- Added a host whitelist and on-screen warnings for presets that pull in remote tweaks, so you can see and trust where shared configurations load code from.
+
+## 2026-06-14
+
+- New T3 Geo + Walls tweak adding faction-unique T3 geothermals and walls, giving geos lasting value into the late game and tougher walls to hold off raptor and scav waves.
+
+## 2026-06-13
+
+- Renamed the higher-tier options to match the in-game tiering: "Legendary"/"Epic" labels are now "T4" (e.g. T4 Economy, T4 RFLRPC), with clearer descriptions.
+
 ## 2026-06-12
 
 - Added extra delay before Doombringers spawn (+40% anger).
