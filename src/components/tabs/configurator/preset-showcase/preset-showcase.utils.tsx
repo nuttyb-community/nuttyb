@@ -110,6 +110,10 @@ const CONFIG_METADATA: Record<
         label: 'Mega Nuke',
         tooltip: 'Enable Mega Nuke capability',
     },
+    isT3GeoWalls: {
+        label: 'T3 Geo and Walls',
+        tooltip: 'Faction Unique T3 Geos, and Walls that dont die instantly.',
+    },
 };
 
 /**
