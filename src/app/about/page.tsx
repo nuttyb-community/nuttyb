@@ -171,6 +171,16 @@ export default function Page() {
                     . The main site for the game. Game replays can be downloaded
                     here.
                 </ListItem>
+                <ListItem>
+                    <Anchor
+                        href='https://github.com/nuttyb-community/nuttyb/blob/main/docs/Preset-guide.md'
+                        target='_blank'
+                    >
+                        Preset Guide
+                    </Anchor>
+                    . Presets let you save, share, and overlay custom
+                    configurations on top of the regular tweaks.
+                </ListItem>
             </List>
 
             {changelogEntries.length > 0 && (
