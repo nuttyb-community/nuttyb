@@ -347,7 +347,7 @@ do
             idletime = 800,
             crushresistance = 2000,
             customparams = {
-                i18n_en_humanname = 'Paragon',
+                i18n_en_humanname = 'T3 Wall Paragon',
                 i18n_en_tooltip = 'Robust Laser Drone Fortification',
                 techlevel = 3,
             },
@@ -407,8 +407,8 @@ do
             explodeas = 'customfusionexplo',
             selfdestructas = 'korgExplosion',
             customparams = {
-                i18n_en_humanname = 'Legethemos',
-                i18n_en_tooltip = 'Radar/Jammer, Geo Railgun and Assist & Repair drone platform',
+                i18n_en_humanname = 'T3 Geo Legethemos',
+                i18n_en_tooltip = 'Radar/Jammer, Geo Railgun and 800BP Assist & Repair drone platform',
                 techlevel = 3,
             },
         })
@@ -446,8 +446,8 @@ do
         autoheal = 400,
         crushresistance = 2000,
         customparams = {
-            i18n_en_humanname = 'Tyrant',
-            i18n_en_tooltip = 'Regenerating Memoryalloy Fortification',
+            i18n_en_humanname = 'T3 Wall Tyrant',
+            i18n_en_tooltip = 'Regenerating Memoryalloy Fortification 200Hp/s',
             techlevel = 3,
         },
     })
@@ -460,7 +460,7 @@ do
         health = 20000,
         crushresistance = 2000,
         customparams = {
-            i18n_en_humanname = 'Equalizer',
+            i18n_en_humanname = 'T3 Wall Equalizer',
             i18n_en_tooltip = 'Lightning EMP Fortification',
             techlevel = 3,
         },
@@ -492,7 +492,7 @@ do
         explodeas = 'customfusionexplo',
         selfdestructas = 'korgExplosion',
         customparams = {
-            i18n_en_humanname = 'Barrage',
+            i18n_en_humanname = 'T3 Geo Barrage',
             i18n_en_tooltip = 'Rocket Artillery Geothermal',
             techlevel = 3,
         },
@@ -542,7 +542,7 @@ do
         selfdestructas = 'customfusionexplo',
         losEmitHeight = 100,
         customparams = {
-            i18n_en_humanname = 'Outpost',
+            i18n_en_humanname = 'T3 Geo Outpost',
             i18n_en_tooltip = 'Cloaked, Stealthy Geo Intelligence Omnistorage',
             techlevel = 3,
         },
@@ -569,6 +569,7 @@ do
         'legack',
         'legacv',
         'legoc',
+        'leganavyconsub',
     }
 
     for _, builderName in pairs(armBuilders) do
