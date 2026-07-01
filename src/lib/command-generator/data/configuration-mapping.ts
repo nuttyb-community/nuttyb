@@ -90,7 +90,7 @@ export const BASE_COMMANDS = [
     '!unit_restrictions_nonukes 0',
     '!draft_mode disabled',
     '!unit_restrictions_notacnukes 0',
-    '$welcome-message This lobby was created using https://nuttyb-community.github.io/nuttyb/ configurator. Links for widgets and useful resources can be found there on the About page.',
+    '$welcome-message This lobby was created using https://nuttyb-community.github.io/nuttyb/configurator. Links for widgets and useful resources can be found there on the About page.',
     '!unit_market 0',
     '!evocom 0',
     '!nowasting all',
