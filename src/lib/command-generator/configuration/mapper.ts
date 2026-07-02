@@ -24,6 +24,7 @@ export function getMappedData(configuration: Configuration): {
     for (const configKey in configuration) {
         const configValue = configuration[configKey as keyof Configuration];
         const mapping = CONFIGURATION_MAPPING[configKey as keyof Configuration];
+        if (!mapping) continue;
         const tweakValue = mapping.values[
             `${configValue}` as keyof typeof mapping.values
         ] as TweakValue | undefined;

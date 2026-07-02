@@ -14,14 +14,12 @@ import { useConfiguratorContext } from '@/components/contexts/configurator-conte
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { EnabledCustomTweak } from '@/lib/command-generator/command-generator';
-import {
-    type Configuration,
-    DEFAULT_CONFIGURATION,
-} from '@/lib/command-generator/data/configuration';
+import { type Configuration } from '@/lib/command-generator/data/configuration';
 import {
     ACTIVE_PRESET_ID_STORAGE_KEY,
     LOCAL_PRESETS_STORAGE_KEY,
 } from '@/lib/configuration-storage/keys';
+import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';
 import { Preset } from '@/lib/presets/registry';
 import { resolvePresetTweaks } from '@/lib/presets/resolver';
 import { isAllowedRemoteTweakUrl } from '@/lib/presets/tweak-url';
@@ -58,7 +56,7 @@ export function usePresetsContext() {
 }
 
 export function PresetsProvider({ children }: { children: React.ReactNode }) {
-    const { configuration, setProperty } = useConfiguratorContext();
+    const { configuration, setConfiguration } = useConfiguratorContext();
     const { luaFiles } = useLuaBundleContext();
 
     const [activePresetId, setActivePresetId] = useLocalStorage<string | null>(
@@ -88,10 +86,9 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                             name: parsed.name,
                             description: parsed.description || '',
                             icon: parsed.icon || 'IconSparkles',
-                            configuration: {
-                                ...DEFAULT_CONFIGURATION,
-                                ...parsed.configuration,
-                            },
+                            configuration: sanitizeConfiguration(
+                                parsed.configuration
+                            ),
                             presetTweaks: parsed.presetTweaks || [],
                             isBuiltIn: true,
                         });
@@ -136,14 +133,9 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
     /** Applies all properties from a Configuration object to the current context. */
     const applyConfiguration = useCallback(
         (config: Configuration) => {
-            const configKeys = Object.keys(config) as Array<
-                keyof typeof config
-            >;
-            for (const key of configKeys) {
-                setProperty(key, config[key]);
-            }
+            setConfiguration(config);
         },
-        [setProperty]
+        [setConfiguration]
     );
 
     const [remoteFiles, setRemoteFiles] = useState<Record<string, string>>({});

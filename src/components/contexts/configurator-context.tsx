@@ -21,6 +21,8 @@ interface ConfiguratorContextValue {
         key: K,
         value: Configuration[K]
     ) => void;
+    /** Replaces the entire configuration with the given one */
+    setConfiguration: (config: Configuration) => void;
     /** Resets configuration to default values */
     resetConfiguration: () => void;
     /** Whether configuration is still loading from localStorage */
@@ -70,6 +72,13 @@ export function ConfiguratorProvider({ children }: ConfiguratorProviderProps) {
         [setStoredConfig]
     );
 
+    const setConfiguration = useCallback(
+        (config: Configuration) => {
+            setStoredConfig(createStoredConfiguration(config));
+        },
+        [setStoredConfig]
+    );
+
     const resetConfiguration = useCallback(() => {
         setStoredConfig(createStoredConfiguration(DEFAULT_CONFIGURATION));
     }, [setStoredConfig]);
@@ -78,10 +87,17 @@ export function ConfiguratorProvider({ children }: ConfiguratorProviderProps) {
         () => ({
             configuration,
             setProperty,
+            setConfiguration,
             resetConfiguration,
             isLoading: !isLoaded,
         }),
-        [configuration, setProperty, resetConfiguration, isLoaded]
+        [
+            configuration,
+            setProperty,
+            setConfiguration,
+            resetConfiguration,
+            isLoaded,
+        ]
     );
 
     return (
