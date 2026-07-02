@@ -29,6 +29,11 @@ type UseLocalStorageResult<T> = [
 /**
  * SSR-safe localStorage hook with hydration mismatch prevention.
  *
+ * NOTE: single consumer per key. Instances do not sync with each other
+ * (each holds its own ref) or across tabs — two components reading the same
+ * key will silently diverge after the first write. Share state through a
+ * context provider instead of mounting this hook twice with one key.
+ *
  * Uses ref + forceRender pattern to avoid React hydration errors:
  * - During SSR and initial hydration, returns defaultValue
  * - After hydration, loads from localStorage and triggers re-render

@@ -26,6 +26,12 @@ export const EDITOR_SORT_MODE_STORAGE_KEY = 'nuttyb-editor-sort-mode';
 export const LOCAL_PRESETS_STORAGE_KEY = 'nuttyb-local-presets';
 
 /**
+ * Keys for storing Lua editor working copies of files and slots.
+ */
+export const EDITED_FILES_STORAGE_KEY = 'nuttyb-edited-files';
+export const EDITED_SLOTS_STORAGE_KEY = 'nuttyb-edited-slots';
+
+/**
  * Key for storing user's currently active preset ID.
  */
 export const ACTIVE_PRESET_ID_STORAGE_KEY = 'nuttyb-active-preset-id';
