@@ -4,6 +4,16 @@ Notable changes to the Community NuttyB configurator and tweaks, grouped by date
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-07-02
+
+- Fixed Lua load-order priorities: T4 Economy, RFLRPC Rebalance and T4 RFLRPC now load in their intended order (they previously fell to the back of the queue), and Mini Bosses Extended got an explicit priority.
+- Fixed a malformed `!disablemapdamage 0$` command generated for Raptor Crater Inverted.
+- Configurator is snappier: command generation no longer re-minifies every Lua file on each keystroke or editor render, and minification results are cached.
+- Imported or shared presets with unknown or invalid settings are now cleaned up automatically instead of breaking command generation with a cryptic error.
+- Deleting a preset now asks for confirmation.
+- The lobby name tag keeps auto-updating with difficulty/challenge changes until you type a custom one, and a new reset button restores the automatic tag.
+- Internal clean-up: dropped the `~` prefix for Lua file references, removed dead abstractions, and hardened the fallback Lua minifier against producing invalid code.
+
 ## 2026-06-27
 
 - Added a Preset Guide explaining how to pick, customise and share presets, linked from the About page.

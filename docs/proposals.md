@@ -2,6 +2,12 @@
 
 Audit of `src/` (Next.js Configurator app), 2026-07-02. Proposals are ranked by severity: **Critical** (wrong output shipped to users), **High** (correctness/robustness/performance defects), **Medium** (fragile design, UX hazards), **Low** (hygiene).
 
+> **Status (2026-07-02): all proposals implemented** on branch `code-cleanup` (C1, C2, H1–H4, M1–M6, L1–L6). Verified: `bun test` (67 pass), `bun lint`, `tsc --noEmit`, `knip`, and `bun run build` all clean.
+>
+> Two findings from implementation worth recording:
+> - **H1**: the zero-separator join was an accidental *size optimization* — replacing it with plain `\n` joins pushed `lua/evocom-leg.lua` (15.3k encoded) over the 16k slot limit. Final fix is a smart join: no separator except where concatenation would merge tokens (word+word, `-`+`-`, `.`+`.`).
+> - **H4**: the acceptance criterion "generated commands are byte-identical" was wrong — the `~` prefix *did* reach the output inside the `-- Source: [...]` slot manifest comments. Manifests now show bare paths; commands are otherwise unchanged.
+
 **Instructions for coding agents working these tasks:**
 
 - Work one proposal per PR. Run `bun test` and `bun lint` before committing (a pre-commit hook also enforces this).
