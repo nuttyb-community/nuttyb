@@ -10,7 +10,6 @@ interface Bundle {
 
 const DATA_STORE_PATH = './public/data' as const;
 const BUNDLE_FILE_NAME = 'lua-bundle.json' as const;
-const LUA_PREFIX = '~' as const;
 
 /**
  * Reads the lua-bundle.json file
@@ -32,10 +31,9 @@ export function extractLuaReferences(obj: unknown): string[] {
     const references: string[] = [];
 
     if (typeof obj === 'string') {
-        if (obj.startsWith(LUA_PREFIX)) {
-            // Strip ~ prefix and any template variables {VAR=value}
-            const withoutPrefix = obj.slice(LUA_PREFIX.length);
-            const basePath = withoutPrefix.split('{')[0]; // Remove {VAR=val} suffix
+        // Strip a legacy ~ prefix and any template variables {VAR=value}
+        const basePath = obj.replace(/^~/, '').split('{')[0];
+        if (basePath.startsWith('lua/') && basePath.endsWith('.lua')) {
             references.push(basePath);
         }
     } else if (Array.isArray(obj)) {

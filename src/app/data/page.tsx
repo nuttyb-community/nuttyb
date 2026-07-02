@@ -7,6 +7,7 @@ import { Code, Group, Stack, Table, Text, Title, Tooltip } from '@mantine/core';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { PageLoader } from '@/components/page-loader';
 import { DataItem, type DataItemProps } from '@/components/tabs/data/data-item';
+import { cleanLuaPath } from '@/lib/command-generator/command-generator';
 import {
     BASE_COMMANDS,
     BASE_TWEAKS,
@@ -38,7 +39,7 @@ function buildBaseItems(luaFiles: LuaFile[]): DataItemProps[] {
     // Base tweakdefs
     const tweakdefsItems: DataItemProps[] = BASE_TWEAKS.tweakdefs.map(
         (path) => {
-            const cleanPath = path.replace(/^~/, '').split('{')[0];
+            const cleanPath = cleanLuaPath(path);
             const content = luaFileMap.get(cleanPath);
 
             return {
@@ -53,7 +54,7 @@ function buildBaseItems(luaFiles: LuaFile[]): DataItemProps[] {
     // Base tweakunits
     const tweakunitsItems: DataItemProps[] = BASE_TWEAKS.tweakunits.map(
         (path) => {
-            const cleanPath = path.replace(/^~/, '').split('{')[0];
+            const cleanPath = cleanLuaPath(path);
             const content = luaFileMap.get(cleanPath);
 
             return {
@@ -96,7 +97,7 @@ function buildConfigurationView(luaFiles: LuaFile[]): ConfigOptionEntry[] {
             // Process tweakdefs Lua files
             if (tv.tweakdefs && tv.tweakdefs.length > 0) {
                 for (const path of tv.tweakdefs) {
-                    const cleanPath = path.replace(/^~/, '').split('{')[0];
+                    const cleanPath = cleanLuaPath(path);
                     const content = luaFileMap.get(cleanPath);
 
                     items.push({
@@ -111,7 +112,7 @@ function buildConfigurationView(luaFiles: LuaFile[]): ConfigOptionEntry[] {
             // Process tweakunits Lua files
             if (tv.tweakunits && tv.tweakunits.length > 0) {
                 for (const path of tv.tweakunits) {
-                    const cleanPath = path.replace(/^~/, '').split('{')[0];
+                    const cleanPath = cleanLuaPath(path);
                     const content = luaFileMap.get(cleanPath);
 
                     items.push({
