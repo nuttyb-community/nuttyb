@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import {
+    ActionIcon,
     Group,
     NativeSelect,
     NumberInput,
@@ -13,10 +14,11 @@ import {
     Tooltip,
 } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconX } from '@tabler/icons-react';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import {
+    DEFAULT_CONFIGURATION,
     GameMap,
     getDefaultLobbyNameTag,
     MAPS,
@@ -25,6 +27,21 @@ import {
 } from '@/lib/command-generator/data/configuration';
 
 import styles from './general.module.css';
+
+function clampNumber(
+    value: string | number,
+    min: number,
+    max: number,
+    fallback: number
+): number {
+    const numericValue = Number(value);
+
+    if (value === '' || !Number.isFinite(numericValue)) {
+        return fallback;
+    }
+
+    return Math.min(max, Math.max(min, numericValue));
+}
 
 interface LabelWithTooltipProps {
     label: string;
@@ -64,14 +81,13 @@ const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
 
 export const GeneralSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
-    const displayLobbyName =
-        configuration.lobbyName || getDefaultLobbyNameTag(configuration);
-    const [localLobbyName, setLocalLobbyName] = useState(displayLobbyName);
+    const lobbyName = configuration.lobbyName ?? '';
+    const [localLobbyName, setLocalLobbyName] = useState(lobbyName);
 
     // Sync local state when external configuration changes (e.g. preset switch)
     useEffect(() => {
-        setLocalLobbyName(displayLobbyName);
-    }, [displayLobbyName]);
+        setLocalLobbyName(lobbyName);
+    }, [lobbyName]);
 
     const debouncedSetProperty = useDebouncedCallback((val: string) => {
         setProperty('lobbyName', val);
@@ -83,6 +99,12 @@ export const GeneralSection: React.FC = () => {
         const val = event.currentTarget.value;
         setLocalLobbyName(val);
         debouncedSetProperty(val);
+    };
+
+    const handleResetLobbyName = () => {
+        debouncedSetProperty.cancel();
+        setLocalLobbyName('');
+        setProperty('lobbyName', '');
     };
 
     return (
@@ -101,7 +123,21 @@ export const GeneralSection: React.FC = () => {
                         value={localLobbyName}
                         onChange={handleLobbyNameChange}
                         onBlur={() => debouncedSetProperty.flush()}
-                        onMouseLeave={() => debouncedSetProperty.flush()}
+                        rightSection={
+                            localLobbyName !== '' && (
+                                <Tooltip label='Reset to auto'>
+                                    <ActionIcon
+                                        size='sm'
+                                        variant='subtle'
+                                        color='gray'
+                                        aria-label='Reset to auto'
+                                        onClick={handleResetLobbyName}
+                                    >
+                                        <IconX size={14} />
+                                    </ActionIcon>
+                                </Tooltip>
+                            )
+                        }
                     />
                     <NativeSelect
                         label='Map'
@@ -139,7 +175,15 @@ export const GeneralSection: React.FC = () => {
                         }
                         value={configuration.queenCount}
                         onChange={(value) =>
-                            setProperty('queenCount', Number(value) || 8)
+                            setProperty(
+                                'queenCount',
+                                clampNumber(
+                                    value,
+                                    1,
+                                    100,
+                                    DEFAULT_CONFIGURATION.queenCount
+                                )
+                            )
                         }
                         min={1}
                         max={100}
@@ -158,7 +202,15 @@ export const GeneralSection: React.FC = () => {
                         }
                         value={configuration.incomeMult}
                         onChange={(value) =>
-                            setProperty('incomeMult', Number(value) || 1)
+                            setProperty(
+                                'incomeMult',
+                                clampNumber(
+                                    value,
+                                    0.1,
+                                    10,
+                                    DEFAULT_CONFIGURATION.incomeMult
+                                )
+                            )
                         }
                         min={0.1}
                         max={10}
@@ -176,7 +228,15 @@ export const GeneralSection: React.FC = () => {
                         }
                         value={configuration.buildPowerMult}
                         onChange={(value) =>
-                            setProperty('buildPowerMult', Number(value) || 1)
+                            setProperty(
+                                'buildPowerMult',
+                                clampNumber(
+                                    value,
+                                    0.1,
+                                    10,
+                                    DEFAULT_CONFIGURATION.buildPowerMult
+                                )
+                            )
                         }
                         min={0.1}
                         max={10}
@@ -194,7 +254,15 @@ export const GeneralSection: React.FC = () => {
                         }
                         value={configuration.buildDistMult}
                         onChange={(value) =>
-                            setProperty('buildDistMult', Number(value) || 1.5)
+                            setProperty(
+                                'buildDistMult',
+                                clampNumber(
+                                    value,
+                                    0.5,
+                                    10,
+                                    DEFAULT_CONFIGURATION.buildDistMult
+                                )
+                            )
                         }
                         min={0.5}
                         max={10}

@@ -1,13 +1,15 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import {
     ActionIcon,
+    Button,
     Card,
     Divider,
     Flex,
     Group,
+    Popover,
     ScrollArea,
     Stack,
     Text,
@@ -115,6 +117,10 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
     onExport,
     onDelete,
 }) => {
+    const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(
+        null
+    );
+
     return (
         <ScrollArea scrollbars='x' type='hover' pb='xs'>
             <Flex gap='md' wrap='nowrap' py='xs'>
@@ -153,18 +159,77 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                                 <IconPencil size={12} />
                                             </ActionIcon>
                                         </Tooltip>
-                                        <Tooltip label='Delete Preset'>
-                                            <ActionIcon
-                                                size='sm'
-                                                variant='subtle'
-                                                color='red'
-                                                onClick={() =>
-                                                    onDelete(preset.id)
+                                        <Popover
+                                            opened={
+                                                confirmingDeleteId === preset.id
+                                            }
+                                            onChange={(opened) => {
+                                                if (!opened) {
+                                                    setConfirmingDeleteId(null);
+                                                }
+                                            }}
+                                            position='bottom'
+                                            withArrow
+                                            shadow='md'
+                                        >
+                                            <Popover.Target>
+                                                <Tooltip label='Delete Preset'>
+                                                    <ActionIcon
+                                                        size='sm'
+                                                        variant='subtle'
+                                                        color='red'
+                                                        onClick={() =>
+                                                            setConfirmingDeleteId(
+                                                                preset.id
+                                                            )
+                                                        }
+                                                    >
+                                                        <IconTrash size={12} />
+                                                    </ActionIcon>
+                                                </Tooltip>
+                                            </Popover.Target>
+                                            <Popover.Dropdown
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
                                                 }
                                             >
-                                                <IconTrash size={12} />
-                                            </ActionIcon>
-                                        </Tooltip>
+                                                <Stack gap={6}>
+                                                    <Text size='xs'>
+                                                        {`Delete '${preset.name}'?`}
+                                                    </Text>
+                                                    <Group
+                                                        gap={6}
+                                                        justify='flex-end'
+                                                    >
+                                                        <Button
+                                                            size='xs'
+                                                            variant='default'
+                                                            onClick={() =>
+                                                                setConfirmingDeleteId(
+                                                                    null
+                                                                )
+                                                            }
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                        <Button
+                                                            size='xs'
+                                                            color='red'
+                                                            onClick={() => {
+                                                                onDelete(
+                                                                    preset.id
+                                                                );
+                                                                setConfirmingDeleteId(
+                                                                    null
+                                                                );
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </Group>
+                                                </Stack>
+                                            </Popover.Dropdown>
+                                        </Popover>
                                     </>
                                 )}
                                 {/* Export is available for all presets */}
