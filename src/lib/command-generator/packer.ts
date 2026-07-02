@@ -169,6 +169,29 @@ interface ProcessedLuaSource {
 }
 
 /**
+ * Content-keyed cache for minification results. Minification (luamin) is by
+ * far the most expensive step of command generation and source contents are
+ * small in number and stable, so repeated generations (config toggles,
+ * re-renders) skip it entirely for unchanged files.
+ */
+const minifyCache = new Map<string, string>();
+const MINIFY_CACHE_MAX_ENTRIES = 256;
+
+function minifyCached(content: string): string {
+    const cached = minifyCache.get(content);
+    if (cached !== undefined) return cached;
+
+    const minified = minify(content);
+    // ponytail: evict-all on overflow — content set is ~70 stable files,
+    // switch to LRU only if this ever measurably thrashes
+    if (minifyCache.size >= MINIFY_CACHE_MAX_ENTRIES) {
+        minifyCache.clear();
+    }
+    minifyCache.set(content, minified);
+    return minified;
+}
+
+/**
  * Packs Lua sources sequentially into slots.
  * Sources must be pre-sorted by priority (ascending: 0 loads first).
  * Each slot gets a manifest comment listing all sources: -- Source: ["path1", "path2"]
@@ -197,7 +220,7 @@ export function packLuaSources(
             path: source.path,
             firstComment,
             remainingContent: remaining,
-            minifiedRemaining: minify(remaining),
+            minifiedRemaining: minifyCached(remaining),
             priority: source.priority,
         };
     });

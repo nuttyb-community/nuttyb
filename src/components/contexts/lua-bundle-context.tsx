@@ -4,8 +4,9 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import type { LuaFile } from '@/types/types';
 
-// Get basePath from Next.js config at build time
-const basePath = process.env.__NEXT_ROUTER_BASEPATH || '';
+// Get basePath from the build environment (same variable the root page uses;
+// avoids depending on the private __NEXT_ROUTER_BASEPATH internal)
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 interface LuaBundle {
     sha: string;

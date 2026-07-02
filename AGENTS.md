@@ -46,6 +46,15 @@ bun knip                   # Detect unused files and dependencies
 
 There is a pre-commit hook that automatically runs required checks automatically before committing.
 
+## Project Skills
+
+Task-specific guides for coding agents live in `.claude/skills/` (Claude Code loads them automatically; other agents should read the relevant `SKILL.md` before starting):
+
+- **`lua-tweaks`** — creating/modifying Lua tweak files: edit→sync→test workflow, wiring files into the configurator, and BAR engine gotchas (load order, `table.merge`/buildoptions semantics, slot limits).
+- **`configurator-data`** — adding/changing configurator settings and built-in presets: the cross-file checklist and a map of the command-generation pipeline.
+
+Known defects and the ranked improvement backlog are in `docs/proposals.md` — check it before fixing anything in `src/lib/command-generator/`.
+
 ## Architecture
 
 ### Key Directories

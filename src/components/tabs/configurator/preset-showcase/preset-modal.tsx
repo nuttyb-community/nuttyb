@@ -28,10 +28,8 @@ import {
     IconTrash,
 } from '@tabler/icons-react';
 
-import {
-    Configuration,
-    DEFAULT_CONFIGURATION,
-} from '@/lib/command-generator/data/configuration';
+import { Configuration } from '@/lib/command-generator/data/configuration';
+import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';
 import type { Preset } from '@/lib/presets/registry';
 import { isValidTweakUrl } from '@/lib/presets/tweak-url';
 
@@ -201,10 +199,9 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                         parsed.configuration &&
                         typeof parsed.configuration === 'object'
                     ) {
-                        setPresetConfiguration({
-                            ...DEFAULT_CONFIGURATION,
-                            ...parsed.configuration,
-                        });
+                        setPresetConfiguration(
+                            sanitizeConfiguration(parsed.configuration)
+                        );
                     }
 
                     const tweaks = parsed.presetTweaks || [];

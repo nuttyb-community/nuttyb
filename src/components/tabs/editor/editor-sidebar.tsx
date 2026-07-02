@@ -19,6 +19,7 @@ import { FileListItem } from '@/components/tabs/editor/file-list-item';
 import { SlotListItem } from '@/components/tabs/editor/slot-list-item';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { SlotContent } from '@/hooks/use-slot-content';
+import { cleanLuaPath } from '@/lib/command-generator/command-generator';
 import { EDITOR_SORT_MODE_STORAGE_KEY } from '@/lib/configuration-storage/keys';
 import type { LuaFile, LuaTweakType } from '@/types/types';
 
@@ -72,7 +73,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
         for (const slot of slotContents) {
             for (const source of slot.sources) {
                 // Extract file path from source reference
-                const cleanPath = source.replace(/^~/, '').split('{')[0];
+                const cleanPath = cleanLuaPath(source);
                 if (cleanPath.startsWith('lua/')) {
                     const existing = map.get(cleanPath) || [];
                     existing.push({

@@ -64,22 +64,29 @@ function minifyNonMinifiable(code: string): string {
         }
     }
 
-    // Join with newlines and compact whitespace within code lines
+    // Join compacted lines without separators to minimise output size,
+    // inserting one only where direct concatenation would merge tokens:
+    // word+word (`or` + `2` → `or2`), `-`+`-` (accidental comment),
+    // `.`+`.` (accidental concat/varargs operator).
     let output = '';
     for (const line of processedLines) {
-        output += line === '' ? '\n' : compactWhitespaceInLine(line) + '\n';
+        const compacted = compactWhitespaceInLine(line);
+        if (!output) {
+            output = compacted;
+            continue;
+        }
+
+        const prev = output.at(-1) ?? '';
+        const next = compacted[0] ?? '';
+        const needsSeparator =
+            (isKeyword(prev) && isKeyword(next)) ||
+            (prev === '-' && next === '-') ||
+            (prev === '.' && next === '.');
+
+        output += needsSeparator ? '\n' + compacted : compacted;
     }
 
-    output = output.replaceAll('\n', '');
-
-    // Clean up the result
-    // Remove multiple blank lines, keep at most 1
-    output = output.replaceAll(/\n\n\n+/g, '\n\n');
-
-    // Remove leading/trailing blank lines
-    output = output.trim();
-
-    return output;
+    return output.trim();
 }
 
 /**

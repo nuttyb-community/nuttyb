@@ -154,6 +154,17 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
         }
     };
 
+    // Stable identities: inline arrows here would defeat the sidebar's
+    // size-calculation memos and re-minify every file on each render.
+    const getSlotSize = useCallback(
+        (slotName: string) => calculateEncodedSize(getSlotContent(slotName)),
+        [getSlotContent]
+    );
+    const getFileSize = useCallback(
+        (path: string) => calculateEncodedSize(getCurrentContent(path)),
+        [getCurrentContent]
+    );
+
     return (
         <Flex gap='md' style={{ height: 'calc(100vh - 200px)' }}>
             <EditorSidebar
@@ -167,12 +178,8 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
                 onSelectSlot={setSelectedSlot}
                 isFileModified={isFileModified}
                 isSlotModified={isSlotModified}
-                getSlotSize={(slotName) =>
-                    calculateEncodedSize(getSlotContent(slotName))
-                }
-                getFileSize={(path) =>
-                    calculateEncodedSize(getCurrentContent(path))
-                }
+                getSlotSize={getSlotSize}
+                getFileSize={getFileSize}
                 modifiedFileCount={modifiedFileCount}
                 modifiedSlotCount={modifiedSlotCount}
             />

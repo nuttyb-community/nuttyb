@@ -107,6 +107,53 @@ function validatePriorityOrder(sources: string[]): void {
         maxPriority = Math.max(maxPriority, priority);
     }
 }
+describe('Configuration data integrity', () => {
+    test('LUA_PRIORITIES keys are clean paths (no ~ prefix or template suffix)', () => {
+        for (const key of Object.keys(LUA_PRIORITIES)) {
+            expect(key).toBe(cleanLuaPath(key));
+        }
+    });
+
+    test('every referenced Lua file has an explicit priority', () => {
+        const refs = [
+            ...BASE_TWEAKS.tweakdefs,
+            ...BASE_TWEAKS.tweakunits,
+            ...Object.values(CONFIGURATION_MAPPING).flatMap((mapping) =>
+                Object.values(mapping.values).flatMap((tweakValue) => [
+                    ...(tweakValue?.tweakdefs ?? []),
+                    ...(tweakValue?.tweakunits ?? []),
+                ])
+            ),
+        ];
+
+        expect(refs.length).toBeGreaterThan(0);
+        for (const ref of refs) {
+            expect(LUA_PRIORITIES[cleanLuaPath(ref)]).toBeDefined();
+        }
+    });
+
+    test('no interpolated command contains a stray $', () => {
+        const allCommands = [
+            ...BASE_COMMANDS,
+            ...Object.values(CONFIGURATION_MAPPING).flatMap((mapping) =>
+                Object.values(mapping.values).flatMap(
+                    (tweakValue) => tweakValue?.command ?? []
+                )
+            ),
+        ];
+
+        const interpolated = interpolateCommands(
+            allCommands,
+            DEFAULT_CONFIGURATION
+        );
+        for (const cmd of interpolated) {
+            // A leading $ is a valid lobby command prefix (e.g. $welcome-message);
+            // any other $ is an unconsumed template variable or a typo.
+            expect(cmd.slice(1)).not.toContain('$');
+        }
+    });
+});
+
 describe('Command generation', () => {
     test('Default configuration generates expected commands', () => {
         const config = DEFAULT_CONFIGURATION;
@@ -120,13 +167,8 @@ describe('Command generation', () => {
             MAX_SLOTS_PER_TYPE
         );
 
-        // Derive sections from structured chunks
-        const sections = result.chunks.map((chunk) =>
-            chunk.commands.map((cmd) => cmd.command).join('\n')
-        );
-
-        expect(sections.length).toBe(1);
-        const generatedTweaks = sections[0].split('\n');
+        // Derive the command text block from structured commands
+        const generatedTweaks = result.commands.map((cmd) => cmd.command);
 
         // Decode generated tweaks to extract source references
         const tweaks = [];
@@ -372,7 +414,7 @@ describe('Command-centric structure (generateCommands)', () => {
     test('generateCommands returns properly structured commands', () => {
         const config = DEFAULT_CONFIGURATION;
         const result = generateCommands(config, luaFiles);
-        const allCommands = result.chunks.flatMap((c) => c.commands);
+        const allCommands = result.commands;
 
         // Validate command structure contract
         for (const cmd of allCommands) {
@@ -415,6 +457,7 @@ describe('Command size validation', () => {
                 code: oversizedCode,
                 priority: 0,
                 enabled: true,
+                source: 'user',
             },
         ];
 
@@ -426,11 +469,9 @@ describe('Command size validation', () => {
             'Oversized Tweak'
         );
 
-        // All chunks should still be valid
-        for (const chunk of result.chunks) {
-            for (const cmd of chunk.commands) {
-                expect(cmd.command.length).toBeLessThanOrEqual(MAX_SLOT_SIZE);
-            }
+        // All commands should still be valid
+        for (const cmd of result.commands) {
+            expect(cmd.command.length).toBeLessThanOrEqual(MAX_SLOT_SIZE);
         }
     });
 
@@ -447,6 +488,7 @@ describe('Command size validation', () => {
                 code: validCode,
                 priority: 0,
                 enabled: true,
+                source: 'user',
             },
             {
                 id: 2,
@@ -455,6 +497,7 @@ describe('Command size validation', () => {
                 code: oversizedCode,
                 priority: 0,
                 enabled: true,
+                source: 'user',
             },
             {
                 id: 3,
@@ -463,6 +506,7 @@ describe('Command size validation', () => {
                 code: validCode,
                 priority: 0,
                 enabled: true,
+                source: 'user',
             },
         ];
 
@@ -471,8 +515,8 @@ describe('Command size validation', () => {
         expect(result.droppedCustomTweaks.length).toBe(1);
         expect(result.droppedCustomTweaks[0].description).toBe('Oversized');
 
-        // Valid tweaks should be in chunks
-        const allCommands = result.chunks.flatMap((chunk) => chunk.commands);
+        // Valid tweaks should be in the generated commands
+        const allCommands = result.commands;
         const customCommands = allCommands.filter((cmd) =>
             cmd.slot?.sources.some((s) => s.startsWith('custom:'))
         );
@@ -523,7 +567,7 @@ describe('Preset replacement tweaks', () => {
             luaFiles,
             presetTweaks
         );
-        const allCommands = result.chunks.flatMap((c) => c.commands);
+        const allCommands = result.commands;
         const sources = allCommands.flatMap((c) => c.slot?.sources || []);
 
         // Assert single target is filtered out and replacement is included
@@ -576,7 +620,7 @@ describe('Preset replacement tweaks', () => {
                 presetTweaks
             );
 
-            const allCommands = result.chunks.flatMap((c) => c.commands);
+            const allCommands = result.commands;
             const sources = allCommands.flatMap((c) => c.slot?.sources || []);
 
             // Assert correctness dynamically for each preset tweak

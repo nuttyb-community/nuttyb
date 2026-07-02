@@ -17,14 +17,15 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/defences-t3.lua': 4,
     'lua/defences-t4.lua': 4,
     'lua/mini-bosses.lua': 5,
+    'lua/mini-bosses-extended.lua': 5,
     'lua/mega-nuke.lua': 5,
     'lua/wave-challenge.lua': 6,
     'lua/cross-faction-t2.lua': 7,
     'lua/lrpc-rebalance.lua': 7,
     'lua/eco-t3.lua': 8,
-    '~lua/eco-t4.lua': 9,
-    '~lua/rflrpc-rebalance.lua': 10,
-    '~lua/rflrpc-t4.lua': 11,
+    'lua/eco-t4.lua': 9,
+    'lua/rflrpc-rebalance.lua': 10,
+    'lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
     'lua/unit-launchers.lua': 13,
     'lua/geo+walls-t3.lua': 14,
@@ -105,47 +106,46 @@ export const BASE_COMMANDS = [
  */
 export const BASE_TWEAKS = {
     tweakdefs: [
-        '~lua/main-defs.lua',
-        '~lua/eco-t3.lua',
-        '~lua/builders-t3.lua',
-        '~lua/defences-t3.lua',
-        '~lua/unit-launchers.lua',
-        '~lua/lrpc-rebalance.lua',
-        '~lua/air-rework-t4.lua',
+        'lua/main-defs.lua',
+        'lua/eco-t3.lua',
+        'lua/builders-t3.lua',
+        'lua/defences-t3.lua',
+        'lua/unit-launchers.lua',
+        'lua/lrpc-rebalance.lua',
+        'lua/air-rework-t4.lua',
     ],
     tweakunits: [
-        '~lua/main-units.lua',
-        '~lua/evocom-leg.lua',
-        '~lua/evocom-arm.lua',
-        '~lua/evocom-cor.lua',
+        'lua/main-units.lua',
+        'lua/evocom-leg.lua',
+        'lua/evocom-arm.lua',
+        'lua/evocom-cor.lua',
     ],
 } as const;
 
-// References to actual Lua files are prefixed with ~
 export const CONFIGURATION_MAPPING: ValueMapping = {
     presetDifficulty: {
         description: 'Preset difficulty level',
         values: {
             Easy: {
                 tweakdefs: [
-                    '~lua/raptor-hp-template.lua{HP_MULTIPLIER=1.3}',
-                    '~lua/queen-hp-template.lua{HP_MULTIPLIER=1.3}',
-                    '~lua/cross-faction-t2.lua',
-                    '~lua/defences-t4.lua',
+                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.3}',
+                    'lua/queen-hp-template.lua{HP_MULTIPLIER=1.3}',
+                    'lua/cross-faction-t2.lua',
+                    'lua/defences-t4.lua',
                 ],
             },
             Medium: {
                 tweakdefs: [
-                    '~lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}',
-                    '~lua/queen-hp-template.lua{HP_MULTIPLIER=1.5}',
-                    '~lua/cross-faction-t2.lua',
-                    '~lua/defences-t4.lua',
+                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}',
+                    'lua/queen-hp-template.lua{HP_MULTIPLIER=1.5}',
+                    'lua/cross-faction-t2.lua',
+                    'lua/defences-t4.lua',
                 ],
             },
             Hard: {
                 tweakdefs: [
-                    '~lua/raptor-hp-template.lua{HP_MULTIPLIER=3.0}',
-                    '~lua/queen-hp-template.lua{HP_MULTIPLIER=3.0}',
+                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=3.0}',
+                    'lua/queen-hp-template.lua{HP_MULTIPLIER=3.0}',
                 ],
             },
         },
@@ -154,12 +154,12 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'Extra challenges',
         values: {
             None: undefined,
-            'Mini Bosses': { tweakdefs: ['~lua/mini-bosses.lua'] },
+            'Mini Bosses': { tweakdefs: ['lua/mini-bosses.lua'] },
             'Mini Bosses Extended': {
-                tweakdefs: ['~lua/mini-bosses-extended.lua'],
+                tweakdefs: ['lua/mini-bosses-extended.lua'],
             },
             'Experimental Wave Challenge': {
-                tweakunits: ['~lua/wave-challenge.lua'],
+                tweakunits: ['lua/wave-challenge.lua'],
             },
         },
     },
@@ -185,7 +185,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             'Raptor Crater Inverted (16P)': {
                 command: [
                     '!map Raptor Crater',
-                    '!disablemapdamage 0$',
+                    '!disablemapdamage 0',
                     '!debugcommands invertmap',
                     '!addbox 84 81 119 116 2',
                     '!clearbox 1',
@@ -313,35 +313,35 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
     isEcoT4: {
         description: 'T4 Economy',
         values: {
-            true: { tweakdefs: ['~lua/eco-t4.lua'] },
+            true: { tweakdefs: ['lua/eco-t4.lua'] },
             false: undefined,
         },
     },
     isRFLRPCRebalance: {
         description: 'RFLRPC Rebalance',
         values: {
-            true: { tweakunits: ['~lua/rflrpc-rebalance.lua'] },
+            true: { tweakunits: ['lua/rflrpc-rebalance.lua'] },
             false: undefined,
         },
     },
     isRFLRPCT4: {
         description: 'T4 RFLRPC',
         values: {
-            true: { tweakdefs: ['~lua/rflrpc-t4.lua'] },
+            true: { tweakdefs: ['lua/rflrpc-t4.lua'] },
             false: undefined,
         },
     },
     isMegaNuke: {
         description: 'Mega Nuke',
         values: {
-            true: { tweakunits: ['~lua/mega-nuke.lua'] },
+            true: { tweakunits: ['lua/mega-nuke.lua'] },
             false: undefined,
         },
     },
     isT3GeoWalls: {
         description: 'T3 Geo and T3 Walls',
         values: {
-            true: { tweakdefs: ['~lua/geo+walls-t3.lua'] },
+            true: { tweakdefs: ['lua/geo+walls-t3.lua'] },
             false: undefined,
         },
     },

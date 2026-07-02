@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Divider, Stack } from '@mantine/core';
 
@@ -22,9 +22,14 @@ export default function Page() {
         useCustomTweaksContext();
     const { activePresetTweaks } = usePresetsContext();
 
-    const enabledCustomTweaks = [...getEnabledTweaks(), ...activePresetTweaks];
+    // Memoised: a fresh array identity here would re-run full command
+    // generation (Lua minification of the whole bundle) on every render.
+    const enabledCustomTweaks = useMemo(
+        () => [...getEnabledTweaks(), ...activePresetTweaks],
+        [getEnabledTweaks, activePresetTweaks]
+    );
     const {
-        sections,
+        commandText,
         slotUsage,
         error: tweakError,
         droppedTweaks,
@@ -37,7 +42,7 @@ export default function Page() {
 
     return (
         <TweakDataProvider
-            sections={sections}
+            commandText={commandText}
             slotUsage={slotUsage}
             error={tweakError}
             droppedTweaks={droppedTweaks}

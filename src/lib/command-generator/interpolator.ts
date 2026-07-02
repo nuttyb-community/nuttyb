@@ -1,8 +1,9 @@
 /**
  * Template interpolation for Lua file references.
  *
- * Supports syntax: ~lua/file.lua{VAR1=value1,VAR2=value2}
+ * Supports syntax: lua/file.lua{VAR1=value1,VAR2=value2}
  * Replaces $VARIABLE$ placeholders in templates with provided values.
+ * A legacy `~` prefix on references is tolerated and stripped.
  */
 
 export interface ParsedReference {
@@ -13,24 +14,19 @@ export interface ParsedReference {
 /**
  * Parses a Lua file reference into path and variables.
  *
- * @param ref Reference string (e.g., '~lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
+ * @param ref Reference string (e.g., 'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
  * @returns Parsed components or null if invalid
  *
  * @example
- * parseReference('~lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
+ * parseReference('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
  * // { filePath: 'lua/raptor-hp-template.lua', variables: { HP_MULTIPLIER: '1.5' } }
  *
- * parseReference('~lua/main-defs.lua')
+ * parseReference('lua/main-defs.lua')
  * // { filePath: 'lua/main-defs.lua', variables: {} }
  */
 function parseReference(ref: string): ParsedReference | null {
-    if (!ref.startsWith('~')) {
-        console.warn(`Invalid Lua reference (missing ~ prefix): ${ref}`);
-        return null;
-    }
-
-    // Match: ~path/to/file.lua{VAR1=val1,VAR2=val2}
-    const match = ref.match(/^~([^{]+)(?:\{([^}]+)\})?$/);
+    // Match: path/to/file.lua{VAR1=val1,VAR2=val2} (legacy ~ prefix tolerated)
+    const match = ref.match(/^~?([^{]+)(?:\{([^}]+)\})?$/);
     if (!match) {
         console.warn(`Malformed Lua reference syntax: ${ref}`);
         return null;
@@ -95,13 +91,13 @@ function interpolateTemplate(
 /**
  * Resolves a Lua file reference with optional variable interpolation.
  *
- * @param ref Lua file reference (e.g., '~lua/template.lua{VAR=value}')
+ * @param ref Lua file reference (e.g., 'lua/template.lua{VAR=value}')
  * @param luaFileMap Map of file paths to Lua source code
  * @returns Resolved Lua source code
  * @throws Error if reference is invalid or file not found
  *
  * @example
- * resolveLuaReference('~lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}', luaFileMap)
+ * resolveLuaReference('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}', luaFileMap)
  */
 export function resolveLuaReference(
     ref: string,

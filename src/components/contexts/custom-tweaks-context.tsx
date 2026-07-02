@@ -6,6 +6,7 @@ import React, {
     useContext,
     useEffect,
     useMemo,
+    useRef,
 } from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -72,12 +73,21 @@ interface StoredData {
 
 const DEFAULT_STORED_DATA: StoredData = { tweaks: [], enabledIds: [] };
 
+/** Result of validating/migrating stored data */
+interface MigrationResult {
+    data: StoredData;
+    /** True when stored data was missing fields and needs persisting back */
+    didMigrate: boolean;
+}
+
 /**
  * Validates and migrates stored custom tweaks data.
- * Assigns missing priority fields based on array index.
+ * Assigns missing priority/source fields (added in later schema versions).
  * Returns null if data is invalid/corrupted to reset to defaults.
  */
-function validateAndMigrateStoredData(stored: StoredData): StoredData | null {
+function validateAndMigrateStoredData(
+    stored: StoredData
+): MigrationResult | null {
     // Ensure required structure exists
     if (!stored || typeof stored !== 'object') {
         return null;
@@ -99,31 +109,48 @@ function validateAndMigrateStoredData(stored: StoredData): StoredData | null {
         }
     }
 
-    // Migrate: assign missing priorities based on array index
+    const didMigrate = stored.tweaks.some(
+        (tweak) => tweak.priority === undefined || tweak.source === undefined
+    );
+
+    // Migrate: assign missing priorities (by array index) and source
+    // (everything stored under this key was saved by the user)
     const migratedTweaks = stored.tweaks.map((tweak, index) => ({
         ...tweak,
         priority: tweak.priority ?? index,
+        source: tweak.source ?? ('user' as const),
     }));
 
     return {
-        ...stored,
-        tweaks: migratedTweaks,
+        data: {
+            ...stored,
+            tweaks: migratedTweaks,
+        },
+        didMigrate,
     };
 }
 
 export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
+    const didMigrateRef = useRef(false);
+
     const [storedData, setStoredData, isLoaded] = useLocalStorage<StoredData>(
         CUSTOM_TWEAKS_STORAGE_KEY,
         DEFAULT_STORED_DATA,
         {
-            onLoad: validateAndMigrateStoredData,
+            onLoad: (stored) => {
+                const result = validateAndMigrateStoredData(stored);
+                if (!result) return null;
+                didMigrateRef.current = result.didMigrate;
+                return result.data;
+            },
         }
     );
 
-    // Persist migrated data back to localStorage after initial load
+    // Persist migrated data back to localStorage after initial load,
+    // but only when a migration actually changed something
     useEffect(() => {
-        if (isLoaded) {
-            // This ensures localStorage has the current schema with priority field
+        if (isLoaded && didMigrateRef.current) {
+            didMigrateRef.current = false;
             setStoredData(storedData);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,6 +173,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
                 description: description.trim(),
                 type,
                 code: code.trim(),
+                source: 'user',
                 priority:
                     customTweaks.length > 0
                         ? Math.max(...customTweaks.map((t) => t.priority)) + 1

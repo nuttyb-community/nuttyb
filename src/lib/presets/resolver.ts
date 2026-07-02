@@ -15,12 +15,13 @@ function buildTweak(
     code: string
 ): EnabledCustomTweak {
     return {
-        id: -(index + 1), // Negative IDs for transient preset tweaks
+        id: -(index + 1), // Transient IDs, distinct from user tweak IDs
         description: tweak.description,
         type: tweak.type,
         code,
         priority: index,
         enabled: true,
+        source: 'preset',
         replaces: tweak.replaces,
     };
 }

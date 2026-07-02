@@ -1,6 +1,10 @@
 import { useCallback, useMemo } from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import {
+    EDITED_FILES_STORAGE_KEY,
+    EDITED_SLOTS_STORAGE_KEY,
+} from '@/lib/configuration-storage/keys';
 
 export interface EditedFile {
     path: string;
@@ -11,10 +15,10 @@ export interface EditedFile {
 export function useEditorStorage() {
     const [storedEditedFiles, setStoredEditedFiles] = useLocalStorage<
         Record<string, EditedFile>
-    >('nuttyb-edited-files', {});
+    >(EDITED_FILES_STORAGE_KEY, {});
     const [storedEditedSlots, setStoredEditedSlots] = useLocalStorage<
         Record<string, EditedFile>
-    >('nuttyb-edited-slots', {});
+    >(EDITED_SLOTS_STORAGE_KEY, {});
 
     const editedFiles = useMemo(
         () => new Map(Object.entries(storedEditedFiles)),
