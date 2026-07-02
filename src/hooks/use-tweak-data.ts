@@ -12,7 +12,8 @@ import type { Configuration } from '@/lib/command-generator/data/configuration';
 import type { LuaFile } from '@/types/types';
 
 export interface UseTweakDataReturn {
-    sections: string[];
+    /** All generated commands joined into one copyable text block */
+    commandText: string;
     slotUsage?: {
         tweakdefs: { used: number; total: number };
         tweakunits: { used: number; total: number };
@@ -28,7 +29,7 @@ export function useTweakData(
 ): UseTweakDataReturn {
     const result = useMemo<UseTweakDataReturn>(() => {
         if (luaFiles.length === 0) {
-            return { sections: [], droppedTweaks: [] };
+            return { commandText: '', droppedTweaks: [] };
         }
 
         try {
@@ -38,10 +39,9 @@ export function useTweakData(
                 enabledCustomTweaks
             );
 
-            // Derive sections from structured chunks
-            const sections = result.chunks.map((chunk) =>
-                chunk.commands.map((cmd) => cmd.command).join('\n')
-            );
+            const commandText = result.commands
+                .map((cmd) => cmd.command)
+                .join('\n');
 
             // Transform business type to display type
             const droppedTweaks: DroppedTweak[] =
@@ -51,7 +51,7 @@ export function useTweakData(
                 }));
 
             return {
-                sections,
+                commandText,
                 slotUsage: {
                     tweakdefs: {
                         used: result.slotUsage.tweakdefs,
@@ -67,7 +67,7 @@ export function useTweakData(
         } catch (error) {
             console.error('[useTweakData] Failed to build commands:', error);
             return {
-                sections: [],
+                commandText: '',
                 droppedTweaks: [],
                 error:
                     error instanceof Error

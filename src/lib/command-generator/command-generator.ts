@@ -73,6 +73,8 @@ export interface CustomTweak {
     code: string;
     /** Priority for ordering (lower loads first) */
     priority: number;
+    /** Origin: saved by the user, or resolved transiently from a preset */
+    source: 'user' | 'preset';
     /** Built-in file path(s) to replace, e.g. 'lua/eco-t3.lua' */
     replaces?: string | string[];
 }
@@ -101,17 +103,10 @@ export interface Command {
 }
 
 /**
- * A chunk/section of commands that fits within message size limit
- */
-export interface Chunk {
-    commands: Command[];
-}
-
-/**
  * Complete result of command generation
  */
-export interface PackingResult {
-    chunks: Chunk[]; // Structured commands grouped by message size
+export interface GenerationResult {
+    commands: Command[]; // All generated commands in emission order
     slotUsage: {
         tweakdefs: number; // Number of tweakdefs slots used
         tweakunits: number; // Number of tweakunits slots used
@@ -120,10 +115,11 @@ export interface PackingResult {
 }
 
 /**
- * Strips the ~ prefix and template variable suffix from a Lua file path.
- * Used for normalising paths before comparison or priority lookup.
+ * Strips the template variable suffix (and a legacy ~ prefix, if present)
+ * from a Lua file path. Used for normalising paths before comparison or
+ * priority lookup.
  *
- * @example cleanLuaPath('~lua/eco-t3.lua{Medium}') → 'lua/eco-t3.lua'
+ * @example cleanLuaPath('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}') → 'lua/raptor-hp-template.lua'
  */
 export function cleanLuaPath(path: string): string {
     return path.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
@@ -148,6 +144,8 @@ function getLuaPriority(path: string): number {
 
 /**
  * Gets priority for a preset tweak based on its replaced target(s).
+ * Uses the first replaced target's priority: a multi-target replacement
+ * inherits the slot position of the first file it replaces.
  */
 function getPresetPriority(replaces?: string | string[]): number {
     if (!replaces) return DEFAULT_LUA_PRIORITY;
@@ -171,9 +169,12 @@ interface CustomTweakAllocationResult {
 
 /**
  * Allocates slots for custom tweaks and generates !bset commands.
+ *
+ * @param usedSlots Slot indices already occupied by packed sources, per type
+ * @param customTweaks Enabled custom tweaks sorted by priority
  */
 function allocateCustomTweaks(
-    existingCommands: string[],
+    usedSlots: Record<LuaTweakType, Set<number>>,
     customTweaks: EnabledCustomTweak[] | undefined
 ): CustomTweakAllocationResult {
     if (!customTweaks || customTweaks.length === 0) {
@@ -182,22 +183,6 @@ function allocateCustomTweaks(
             allocated: { tweakdefs: 0, tweakunits: 0 },
             allocations: [],
         };
-    }
-
-    // Parse used slots from existing commands
-    const usedSlots: Record<LuaTweakType, Set<number>> = {
-        tweakdefs: new Set(),
-        tweakunits: new Set(),
-    };
-
-    const slotRegex = /!bset\s+(tweakdefs|tweakunits)(\d?)\s/;
-    for (const cmd of existingCommands) {
-        const match = cmd.match(slotRegex);
-        if (match) {
-            const type = match[1] as LuaTweakType;
-            const num = match[2] === '' ? 0 : Number.parseInt(match[2], 10);
-            usedSlots[type].add(num);
-        }
     }
 
     const allocations: CustomTweakAllocation[] = [];
@@ -273,15 +258,15 @@ function sortLua(sources: LuaSource[]): LuaSource[] {
 // ── Preset helpers ────────────────────────────────────────
 
 /**
- * Filters preset tweaks (negative IDs) to only those whose replaced targets
- * are all active in the current configuration.
+ * Filters preset tweaks to only those whose replaced targets are all active
+ * in the current configuration.
  */
 function filterActivePresetTweaks(
     enabledTweaks: EnabledCustomTweak[],
     activePaths: Set<string>
 ): EnabledCustomTweak[] {
     return enabledTweaks.filter((t) => {
-        if (t.id >= 0) return false;
+        if (t.source !== 'preset') return false;
         if (!t.replaces) return true; // Standalone preset tweaks always apply
         const targets = normalizeReplaces(t.replaces);
         return targets.every((target) => activePaths.has(cleanLuaPath(target)));
@@ -318,14 +303,12 @@ function resolvePresetSources(
 }
 
 /**
- * Wraps commands in a single chunk.
+ * Validates that no individual command exceeds MAX_SLOT_SIZE.
  *
- * @param commands Array of commands
- * @returns Array of command chunks (always contains exactly one chunk)
+ * @throws Error naming the offending command length
  */
-function groupIntoChunks(commands: Command[]): Chunk[] {
+function assertCommandSizes(commands: Command[]): void {
     for (const cmd of commands) {
-        // Validate that individual command doesn't exceed MAX_SLOT_SIZE
         if (cmd.command.length > MAX_SLOT_SIZE) {
             throw new Error(
                 `Command exceeds maximum length: ${cmd.command.length} > ${MAX_SLOT_SIZE}. ` +
@@ -333,8 +316,6 @@ function groupIntoChunks(commands: Command[]): Chunk[] {
             );
         }
     }
-
-    return [{ commands }];
 }
 
 /**
@@ -343,13 +324,13 @@ function groupIntoChunks(commands: Command[]): Chunk[] {
  * @param luaFiles Available Lua files from bundle
  * @param customTweaks Optional enabled custom tweaks
  *
- * @returns PackingResult with chunks, slot usage, and dropped tweaks
+ * @returns GenerationResult with commands, slot usage, and dropped tweaks
  */
 export function generateCommands(
     configuration: Configuration,
     luaFiles: LuaFile[],
     customTweaks?: EnabledCustomTweak[]
-): PackingResult {
+): GenerationResult {
     const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
 
     // 1. Map configuration to commands and Lua paths
@@ -364,9 +345,9 @@ export function generateCommands(
         [...defsPaths, ...unitsPaths].map((p) => cleanLuaPath(p))
     );
 
-    // Separate preset tweaks (negative IDs) from user custom tweaks (positive IDs)
+    // Separate preset tweaks from user custom tweaks by origin
     const enabledTweaks = customTweaks?.filter((t) => t.enabled) || [];
-    const userCustomTweaks = enabledTweaks.filter((t) => t.id > 0);
+    const userCustomTweaks = enabledTweaks.filter((t) => t.source === 'user');
 
     // Filter preset tweaks to only those whose replaced targets are active
     const presetTweaks = filterActivePresetTweaks(enabledTweaks, activePaths);
@@ -403,13 +384,19 @@ export function generateCommands(
     const tweakunitsResult = packLuaSources(sortedTweakunits, 'tweakunits');
 
     // 5. Allocate user custom tweaks to separate slots (sorted by priority first)
-    const tweakdefsCommands = tweakdefsResult.commands.map(
-        (cmd) => cmd.command
-    );
-    const tweakunitsCommands = tweakunitsResult.commands.map(
-        (cmd) => cmd.command
-    );
-    const existingBsetCommands = [...tweakdefsCommands, ...tweakunitsCommands];
+    // Slot indices come straight from the packer's structured output.
+    const usedSlots: Record<LuaTweakType, Set<number>> = {
+        tweakdefs: new Set(
+            tweakdefsResult.commands.flatMap((cmd) =>
+                cmd.slot ? [cmd.slot.index] : []
+            )
+        ),
+        tweakunits: new Set(
+            tweakunitsResult.commands.flatMap((cmd) =>
+                cmd.slot ? [cmd.slot.index] : []
+            )
+        ),
+    };
 
     // Sort custom tweaks by priority before allocation (lower priority loads first)
     const sortedCustomTweaks = userCustomTweaks.toSorted(
@@ -417,7 +404,7 @@ export function generateCommands(
     );
 
     const allocationResult = allocateCustomTweaks(
-        existingBsetCommands,
+        usedSlots,
         sortedCustomTweaks
     );
 
@@ -469,11 +456,11 @@ export function generateCommands(
         ...customCommands,
     ];
 
-    // 7. Group commands into chunks (respecting message size limit)
-    const chunks = groupIntoChunks(allCommands);
+    // 7. Validate command sizes before returning
+    assertCommandSizes(allCommands);
 
     return {
-        chunks,
+        commands: allCommands,
         slotUsage: {
             tweakdefs:
                 tweakdefsResult.slotUsage.used +

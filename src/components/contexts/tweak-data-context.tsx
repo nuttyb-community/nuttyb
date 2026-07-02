@@ -10,7 +10,8 @@ export interface DroppedTweak {
 }
 
 interface TweakDataContext {
-    sections: string[];
+    /** All generated commands joined into one copyable text block */
+    commandText: string;
     slotUsage?: {
         tweakdefs: { used: number; total: number };
         tweakunits: { used: number; total: number };
@@ -37,7 +38,7 @@ type TweakDataProviderProps = TweakDataContext & {
 };
 
 export function TweakDataProvider({
-    sections,
+    commandText,
     slotUsage,
     error,
     droppedTweaks,
@@ -46,7 +47,7 @@ export function TweakDataProvider({
     return (
         <TweakDataContext.Provider
             value={{
-                sections,
+                commandText,
                 slotUsage,
                 error,
                 droppedTweaks,

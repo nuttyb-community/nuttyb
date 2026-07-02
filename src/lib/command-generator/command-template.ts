@@ -162,10 +162,8 @@ export function buildTemplateContext(config: Configuration): TemplateContext {
     return {
         presetDifficulty: config.presetDifficulty,
         lobbyName: lobbyNameValue,
-        extras: config.challenges,
         gameMap: config.gameMap,
         start: config.start,
-        isMegaNuke: String(config.isMegaNuke),
         // Numeric settings
         incomeMult: String(config.incomeMult),
         buildDistMult: String(config.buildDistMult),

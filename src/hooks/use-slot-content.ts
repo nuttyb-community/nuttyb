@@ -33,8 +33,7 @@ export function useSlotContent(
         );
 
         // Extract all commands with slot info (tweakdefs/tweakunits only)
-        return result.chunks
-            .flatMap((chunk) => chunk.commands)
+        return result.commands
             .filter((cmd) => cmd.slot !== undefined)
             .map((cmd) => ({
                 slotName: formatSlotName(

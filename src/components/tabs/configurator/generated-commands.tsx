@@ -86,10 +86,11 @@ const CopySection: React.FC<CopySectionProps> = ({ content, label }) => {
 };
 
 export const GeneratedCommands: React.FC = () => {
-    const { sections, slotUsage, droppedTweaks, error } = useTweakDataContext();
+    const { commandText, slotUsage, droppedTweaks, error } =
+        useTweakDataContext();
 
     // Hide section entirely when no commands
-    if (sections.length === 0 && !error) {
+    if (!commandText && !error) {
         return null;
     }
 
@@ -133,9 +134,9 @@ export const GeneratedCommands: React.FC = () => {
                     </Text>
                 </Alert>
             )}
-            {sections.map((section, index) => (
-                <CopySection key={index} content={section} label='Copy All' />
-            ))}
+            {commandText && (
+                <CopySection content={commandText} label='Copy All' />
+            )}
         </Stack>
     );
 };

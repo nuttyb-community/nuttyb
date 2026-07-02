@@ -174,10 +174,8 @@ describe('buildTemplateContext', () => {
         expect(context.lobbyName).toBe(
             'Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]'
         );
-        expect(context.extras).toBe('Mini Bosses');
         expect(context.gameMap).toBe('Full Metal Plate (12P)');
         expect(context.start).toBe('No rush');
-        expect(context.isMegaNuke).toBe('false');
     });
 
     test('trims lobby name', () => {
