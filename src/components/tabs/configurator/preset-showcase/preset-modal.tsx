@@ -495,7 +495,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                                     bg='dark.7'
                                     bd='1px solid var(--mantine-color-dark-5)'
                                 >
-                                    <Grid gutter='xs' align='flex-end'>
+                                    <Grid gap='xs' align='flex-end'>
                                         <Grid.Col span={{ base: 12, sm: 6 }}>
                                             <TextInput
                                                 label='Tweak Description'

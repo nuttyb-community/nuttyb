@@ -157,7 +157,7 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = ({
                 <SegmentedControl
                     size='xs'
                     value={viewMode}
-                    onChange={(value) => onViewModeChange(value as ViewMode)}
+                    onChange={(value) => onViewModeChange(value)}
                     data={[
                         { label: 'Slot Content', value: 'slots' },
                         { label: 'Source Files', value: 'sources' },
