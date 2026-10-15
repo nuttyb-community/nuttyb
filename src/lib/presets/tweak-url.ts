@@ -37,8 +37,7 @@ export function isAllowedRemoteTweakUrl(url: string): boolean {
 export function isValidTweakUrl(path: string): boolean {
     if (!path.startsWith('https://')) {
         // Plain http is never allowed; anything else is treated as a local path.
-        if (path.startsWith('http://')) return false;
-        return true;
+        return !path.startsWith('http://');
     }
     return isAllowedRemoteTweakUrl(path);
 }

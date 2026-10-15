@@ -161,7 +161,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                     description: t.description.trim(),
                     type: t.type,
                     path: t.path.trim(),
-                    ...(replaces ? { replaces } : {}),
+                    ...(replaces && { replaces }),
                 };
             });
 

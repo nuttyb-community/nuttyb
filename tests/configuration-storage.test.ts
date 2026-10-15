@@ -17,7 +17,6 @@ describe('sanitizeConfiguration', () => {
     });
 
     test('returns defaults for undefined', () => {
-        // eslint-disable-next-line unicorn/no-useless-undefined -- explicit undefined is the case under test
         expect(sanitizeConfiguration(undefined)).toEqual(DEFAULT_CONFIGURATION);
     });
 

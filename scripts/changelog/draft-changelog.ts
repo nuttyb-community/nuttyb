@@ -46,7 +46,7 @@ function getCommitsAfter(date: string | undefined): Commit[] {
     return output
         .split('\n')
         .map((line): Commit => {
-            const [d, hash, subject] = line.split('\t');
+            const [d, hash, subject] = line.split('\t', 3);
             return { date: d, hash, subject };
         })
         .filter((c) => !date || c.date > date);
