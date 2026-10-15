@@ -46,6 +46,14 @@ do
                 i18n_en_tooltip = 'More BUILDPOWER! For the connoisseur',
             },
         })
+        -- Drop the flag inherited from T2: BAR's unit_stack_hack_fix nudges
+        -- isnanoturret units away from any structure within (xsize+zsize)*3
+        -- elmos, which at 6x6 catches every adjacent 2x2 and makes T3 frames
+        -- jump/jitter. Must be nil: customParams turns false into "false".
+        local t3Turret = unitDefs[faction .. 'nanotct3']
+        if t3Turret then
+            t3Turret.customparams.isnanoturret = nil
+        end
 
         -- Storage footprints are declared explicitly: the base defs differ
         -- (coruwadves/legadvestore are 5x5) and eco-t3.lua's 4x4 base patch

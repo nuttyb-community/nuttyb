@@ -4,6 +4,10 @@ Notable changes to the Community NuttyB configurator and tweaks, grouped by date
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-10-15
+
+- Fixed T3 Construction Turrets jumping away from their build spot and jittering next to walls and small defences. A recent BAR anti-stacking change started treating them as stacked whenever a small structure stood next to them.
+
 ## 2026-07-02
 
 - Fixed Lua load-order priorities: T4 Economy, RFLRPC Rebalance and T4 RFLRPC now load in their intended order (they previously fell to the back of the queue), and Mini Bosses Extended got an explicit priority.
