@@ -12,7 +12,7 @@ export function beautify(lua: string): string {
             RenameVariables: false,
             RenameGlobals: false,
             SolveMath: false,
-            Indentation: '    ',
+            Indentation: ' '.repeat(4),
         });
     } catch {
         console.warn(

@@ -51,7 +51,7 @@ export function validateBase64UrlTweak(code: string): TweakValidationResult {
             return { valid: false, error: 'Decoded content is empty' };
         }
 
-        const firstLine = decoded.split('\n')[0].trim();
+        const firstLine = decoded.split('\n', 1)[0].trim();
         return { valid: true, firstLine: firstLine || '(empty first line)' };
     } catch (error) {
         return {

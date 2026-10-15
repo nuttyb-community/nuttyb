@@ -32,7 +32,7 @@ export function extractLuaReferences(obj: unknown): string[] {
 
     if (typeof obj === 'string') {
         // Strip a legacy ~ prefix and any template variables {VAR=value}
-        const basePath = obj.replace(/^~/, '').split('{')[0];
+        const basePath = obj.replace(/^~/, '').split('{', 1)[0];
         if (basePath.startsWith('lua/') && basePath.endsWith('.lua')) {
             references.push(basePath);
         }

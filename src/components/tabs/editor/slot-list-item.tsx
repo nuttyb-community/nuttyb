@@ -26,7 +26,7 @@ export const SlotListItem: React.FC<SlotListItemProps> = ({
     onClick,
 }) => {
     const displaySources = sources
-        .map((s) => s.replace(/^~?lua\//, '').split('{')[0])
+        .map((s) => s.replace(/^~?lua\//, '').split('{', 1)[0])
         .join(', ');
 
     return (
