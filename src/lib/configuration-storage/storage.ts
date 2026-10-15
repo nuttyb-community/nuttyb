@@ -40,7 +40,7 @@ export function sanitizeConfiguration(partial: unknown): Configuration {
     }
 
     const input = partial as Record<string, unknown>;
-    const result = { ...DEFAULT_CONFIGURATION } as Configuration;
+    const result = { ...DEFAULT_CONFIGURATION };
     const validKeys = Object.keys(
         DEFAULT_CONFIGURATION
     ) as (keyof Configuration)[];

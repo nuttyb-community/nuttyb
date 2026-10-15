@@ -82,6 +82,8 @@ export const PresetModal: React.FC<PresetModalProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Reset form state when the modal opens
+    // ponytail: deliberate reset-on-open; key-based remount if this grows
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         if (!opened) return;
 
@@ -119,6 +121,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
         setImportSuccess(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [opened]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const configDiff = useMemo(() => {
         const configToCompare = presetConfiguration || configuration;

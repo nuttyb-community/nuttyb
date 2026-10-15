@@ -69,6 +69,8 @@ export const GeneralSection: React.FC = () => {
 
     // Sync local state when external configuration changes (e.g. preset switch)
     useEffect(() => {
+        // ponytail: deliberate prop→state resync; key-based remount if this grows
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalLobbyName(lobbyName);
     }, [lobbyName]);
 

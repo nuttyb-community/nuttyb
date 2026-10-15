@@ -444,7 +444,7 @@ export function generateCommands(
                 return 0;
             })
             .map((cmd) => ({
-                type: 'command' as TweakType,
+                type: 'command' as const,
                 command: cmd,
                 // No slot property for plain commands
             })),

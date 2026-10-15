@@ -14,7 +14,7 @@ import {
     CONFIGURATION_MAPPING,
 } from '@/lib/command-generator/data/configuration-mapping';
 import { encode } from '@/lib/encoders/base64';
-import type { LuaFile, TweakType } from '@/types/types';
+import type { LuaFile } from '@/types/types';
 
 interface ConfigValueEntry {
     value: string;
@@ -32,7 +32,7 @@ function buildBaseItems(luaFiles: LuaFile[]): DataItemProps[] {
 
     // Base commands - concatenated
     const commandItem: DataItemProps = {
-        type: 'command' as TweakType,
+        type: 'command',
         data: BASE_COMMANDS.join('\n'),
     };
 
@@ -43,7 +43,7 @@ function buildBaseItems(luaFiles: LuaFile[]): DataItemProps[] {
             const content = luaFileMap.get(cleanPath);
 
             return {
-                type: 'tweakdefs' as TweakType,
+                type: 'tweakdefs',
                 source: cleanPath,
                 data: content ? encode(content.trim()) : '',
                 isMissing: !content,
@@ -58,7 +58,7 @@ function buildBaseItems(luaFiles: LuaFile[]): DataItemProps[] {
             const content = luaFileMap.get(cleanPath);
 
             return {
-                type: 'tweakunits' as TweakType,
+                type: 'tweakunits',
                 source: cleanPath,
                 data: content ? encode(content.trim()) : '',
                 isMissing: !content,
@@ -89,7 +89,7 @@ function buildConfigurationView(luaFiles: LuaFile[]): ConfigOptionEntry[] {
             // Process commands - concatenate all into single item
             if (tv.command && tv.command.length > 0) {
                 items.push({
-                    type: 'command' as TweakType,
+                    type: 'command',
                     data: tv.command.join('\n'),
                 });
             }
@@ -101,7 +101,7 @@ function buildConfigurationView(luaFiles: LuaFile[]): ConfigOptionEntry[] {
                     const content = luaFileMap.get(cleanPath);
 
                     items.push({
-                        type: 'tweakdefs' as TweakType,
+                        type: 'tweakdefs',
                         source: cleanPath,
                         data: content ? encode(content.trim()) : '',
                         isMissing: !content,
@@ -116,7 +116,7 @@ function buildConfigurationView(luaFiles: LuaFile[]): ConfigOptionEntry[] {
                     const content = luaFileMap.get(cleanPath);
 
                     items.push({
-                        type: 'tweakunits' as TweakType,
+                        type: 'tweakunits',
                         source: cleanPath,
                         data: content ? encode(content.trim()) : '',
                         isMissing: !content,

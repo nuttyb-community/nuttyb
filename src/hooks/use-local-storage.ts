@@ -121,5 +121,7 @@ export function useLocalStorage<T>(
         [key]
     );
 
+    // ponytail: ref+forceRender hydration pattern by design (see doc above); compiler skips this hook
+    // eslint-disable-next-line react-hooks/refs
     return [valueRef.current, setValue, isLoadedRef.current];
 }
