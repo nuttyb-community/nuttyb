@@ -49,7 +49,7 @@ export default function Page() {
             <List size='sm'>
                 <ListItem>
                     <Anchor
-                        href='https://github.com/goldjee/BAR-Widgets/tree/main/dist/raptor-panel'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/raptor-panel'
                         target='_blank'
                     >
                         Raptor Panel
@@ -59,7 +59,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://github.com/goldjee/BAR-Widgets/tree/main/dist/raptor-notifications'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/raptor-notifications'
                         target='_blank'
                     >
                         Raptor Notifications
@@ -71,7 +71,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://gist.githubusercontent.com/rcorex/15ac19cad881b85d2d1e8c1f482b9525/raw/4c6103e6c4687a0f25b87ff88e978b9cb3b05632/map_nuttyb_raptor_grid_draw.lua'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/raptor-fmp-grid-draw'
                         target='_blank'
                     >
                         Raptor Grid Draw
@@ -82,7 +82,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://raw.githubusercontent.com/noryon/BARWidgets/refs/heads/main/LayoutPlanner/LayoutPlanner.lua'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/layout-planner'
                         target='_blank'
                     >
                         Layout Planner
@@ -91,7 +91,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://raw.githubusercontent.com/manshanko/bar-widgets/defae648f8c3a7ae4e06de6af241e0037bab3b20/cmd_reclaim_selected.lua'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/reclaim-selected'
                         target='_blank'
                     >
                         Reclaim Selected
@@ -101,7 +101,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://raw.githubusercontent.com/Relicus/pyrem_bar_widgets/8f3b2120c5a1b6e2104fd21be6dfedce1fdaed23/holo_place/holo_place_v4_lite.lua'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/holo-place'
                         target='_blank'
                     >
                         Holo Place
@@ -113,7 +113,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://raw.githubusercontent.com/noryon/BARWidgets/refs/heads/main/BuildOrders/BuildOrders.lua'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/build-orders'
                         target='_blank'
                     >
                         Build Orders
@@ -122,7 +122,7 @@ export default function Page() {
                 </ListItem>
                 <ListItem>
                     <Anchor
-                        href='https://raw.githubusercontent.com/Relicus/pyrem_bar_widgets/8f3b2120c5a1b6e2104fd21be6dfedce1fdaed23/split_build/split_queue_builder_v2'
+                        href='https://github.com/goldjee/BAR-Widgets/tree/main/src/split-builder-queue'
                         target='_blank'
                     >
                         Copy Queue

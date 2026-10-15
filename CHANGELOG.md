@@ -7,6 +7,8 @@ visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`
 ## 2026-10-15
 
 - Fixed T3 Construction Turrets jumping away from their build spot and jittering next to walls and small defences. A recent BAR anti-stacking change started treating them as stacked whenever a small structure stood next to them.
+- Updated About page with links to newer versions of the widgets that support the latest BAR Security Update.
+- Fixed the broken Raptor Panel and Raptor Notifications links.
 
 ## 2026-07-02
 
