@@ -5,10 +5,10 @@ import React, { useState } from 'react';
 import {
     Alert,
     Button,
-    Collapse,
     CopyButton,
     Group,
     List,
+    Popover,
     Progress,
     Stack,
     Text,
@@ -16,18 +16,21 @@ import {
     Title,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import {
-    IconArrowBackUp,
-    IconCheck,
-    IconChevronDown,
-    IconChevronUp,
-    IconCopy,
-} from '@tabler/icons-react';
+import { IconArrowBackUp, IconCheck, IconCopy } from '@tabler/icons-react';
 
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
+
+/** How long "Copied!" and "Reset done" stay on their buttons. */
+const FEEDBACK_DURATION_MS = 2000;
+/** Wide enough for the reset explanation to wrap into a few short lines. */
+const RESET_CONFIRM_WIDTH = 300;
+/** Command box height when the panel isn't stretched by the sticky column. */
+const COMMAND_ROWS = 12;
+/** A slot meter turns orange from this share of slots used. */
+const SLOT_WARNING_PERCENT = 80;
 
 interface SlotMeterProps {
     label: string;
@@ -37,7 +40,12 @@ interface SlotMeterProps {
 
 const SlotMeter: React.FC<SlotMeterProps> = ({ label, used, total }) => {
     const percent = total > 0 ? (used / total) * 100 : 100;
-    const color = used >= total ? 'red' : percent >= 80 ? 'orange' : 'blue';
+    const color =
+        used >= total
+            ? 'red'
+            : percent >= SLOT_WARNING_PERCENT
+              ? 'orange'
+              : 'blue';
 
     return (
         <Stack gap={4}>
@@ -56,47 +64,82 @@ const ResetButton: React.FC = () => {
     const { clearEnabledTweaks } = useCustomTweaksContext();
     const { selectPreset } = usePresetsContext();
     const [isResetSuccessShowing, setResetSuccessShowing] = useState(false);
+    const [isConfirming, { close: closeConfirm, toggle: toggleConfirm }] =
+        useDisclosure(false);
 
     // Back to the Medium preset, which carries the default configuration
     const handleReset = () => {
         selectPreset('default');
         clearEnabledTweaks();
+        closeConfirm();
 
         setResetSuccessShowing(true);
-        setTimeout(() => setResetSuccessShowing(false), 2000);
+        setTimeout(() => setResetSuccessShowing(false), FEEDBACK_DURATION_MS);
     };
 
     return (
-        <Button
-            variant='subtle'
-            color={isResetSuccessShowing ? 'green' : 'gray'}
-            size='compact-sm'
-            onClick={handleReset}
-            leftSection={
-                isResetSuccessShowing ? (
-                    <IconCheck {...ICON_SIZE_MD} />
-                ) : (
-                    <IconArrowBackUp {...ICON_SIZE_MD} />
-                )
-            }
+        <Popover
+            opened={isConfirming}
+            onChange={(opened) => {
+                if (!opened) closeConfirm();
+            }}
+            position='bottom-end'
+            width={RESET_CONFIRM_WIDTH}
+            shadow='md'
+            trapFocus
         >
-            {isResetSuccessShowing ? 'Reset done' : 'Reset all'}
-        </Button>
+            <Popover.Target>
+                <Button
+                    variant='subtle'
+                    color={isResetSuccessShowing ? 'green' : 'gray'}
+                    size='compact-sm'
+                    onClick={toggleConfirm}
+                    leftSection={
+                        isResetSuccessShowing ? (
+                            <IconCheck {...ICON_SIZE_MD} />
+                        ) : (
+                            <IconArrowBackUp {...ICON_SIZE_MD} />
+                        )
+                    }
+                >
+                    {isResetSuccessShowing ? 'Reset done' : 'Reset all'}
+                </Button>
+            </Popover.Target>
+            <Popover.Dropdown>
+                <Stack gap='sm'>
+                    <Text fw={700}>Reset everything?</Text>
+                    <Text size='sm'>
+                        This selects the Medium preset, which puts every setting
+                        back to its default, including the lobby name tag. Your
+                        custom tweaks are turned off.
+                    </Text>
+                    <Text size='sm'>Saved presets and tweaks are kept.</Text>
+                    <Group justify='flex-end' gap='sm'>
+                        <Button variant='default' onClick={closeConfirm}>
+                            Cancel
+                        </Button>
+                        <Button color='red' onClick={handleReset}>
+                            Reset
+                        </Button>
+                    </Group>
+                </Stack>
+            </Popover.Dropdown>
+        </Popover>
     );
 };
 
 export const GeneratedCommands: React.FC = () => {
     const { commandText, slotUsage, droppedTweaks, error } =
         useTweakDataContext();
-    const [isExpanded, { toggle }] = useDisclosure(false);
 
     return (
-        <Stack gap='md'>
+        // Fills the sticky column, so the command box takes the height left
+        <Stack gap='md' h='100%'>
             <Group justify='space-between'>
                 <Title order={2}>Commands</Title>
                 <ResetButton />
             </Group>
-            <Stack gap='md'>
+            <Stack gap='md' flex={1} mih={0}>
                 {slotUsage && !error && (
                     <>
                         <SlotMeter
@@ -137,7 +180,7 @@ export const GeneratedCommands: React.FC = () => {
                     </Alert>
                 )}
 
-                <CopyButton value={commandText} timeout={2000}>
+                <CopyButton value={commandText} timeout={FEEDBACK_DURATION_MS}>
                     {({ copied, copy }) => (
                         <Button
                             size='md'
@@ -158,38 +201,23 @@ export const GeneratedCommands: React.FC = () => {
                     )}
                 </CopyButton>
 
-                <Button
-                    variant='default'
-                    fullWidth
-                    disabled={!commandText}
-                    onClick={toggle}
-                    leftSection={
-                        isExpanded ? (
-                            <IconChevronUp {...ICON_SIZE_MD} />
-                        ) : (
-                            <IconChevronDown {...ICON_SIZE_MD} />
-                        )
-                    }
-                >
-                    {isExpanded ? 'Hide commands' : 'Show commands'}
-                </Button>
-
-                <Collapse expanded={isExpanded}>
-                    <Textarea
-                        value={commandText}
-                        readOnly
-                        autosize
-                        minRows={6}
-                        maxRows={15}
-                        aria-label='Generated commands'
-                        styles={{
-                            input: {
-                                fontFamily: 'monospace',
-                                fontSize: '12px',
-                            },
-                        }}
-                    />
-                </Collapse>
+                <Textarea
+                    value={commandText}
+                    readOnly
+                    rows={COMMAND_ROWS}
+                    aria-label='Generated commands'
+                    flex={1}
+                    // In the sticky column the box stretches into the space left
+                    styles={{
+                        root: { display: 'flex', flexDirection: 'column' },
+                        wrapper: { flex: 1 },
+                        input: {
+                            height: '100%',
+                            fontFamily: 'var(--mantine-font-family-monospace)',
+                            fontSize: 'var(--mantine-font-size-xs)',
+                        },
+                    }}
+                />
             </Stack>
         </Stack>
     );

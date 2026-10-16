@@ -8,7 +8,7 @@ import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
-import { MAX_SLOT_SIZE } from './constants';
+import { MAX_SLOT_SIZE, MAX_SLOTS_PER_TYPE } from './constants';
 import type { Configuration } from './data/configuration';
 import {
     DEFAULT_LUA_PRIORITY,
@@ -190,9 +190,9 @@ function allocateCustomTweaks(
     const allocated = { tweakdefs: 0, tweakunits: 0 };
 
     for (const tweak of customTweaks) {
-        // Find first available slot (1-9, slot 0 reserved for packed sources)
+        // Find first available slot (slot 0 is reserved for packed sources)
         let slot: number | null = null;
-        for (let i = 1; i <= 9; i++) {
+        for (let i = 1; i < MAX_SLOTS_PER_TYPE; i++) {
             if (!usedSlots[tweak.type].has(i)) {
                 slot = i;
                 break;

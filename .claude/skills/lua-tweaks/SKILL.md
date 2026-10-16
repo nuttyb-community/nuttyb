@@ -28,7 +28,7 @@ A new `lua/foo.lua` does nothing until referenced. In `src/lib/command-generator
 
 - **Load order matters.** Files are concatenated into slots in `LUA_PRIORITIES` order, and tweakdefs run **before** tweakunits. A tweakdefs file that clones a unit must load before anything referencing the clone.
 - **`table.merge` deep-merges; second argument wins** on scalar conflicts. But **array parts (like `buildoptions`) merge by index**, not by value — duplicates and ordering in `buildoptions` lists are load-bearing. Never "clean up" duplicate buildoptions entries or reorder them; a later merge may rely on index positions.
-- **Tweakunits plain tables can't share a slot.** The packer gives each plain-table file its own tweakunits slot (engine expects one table per slot). Many small plain-table files burn slots fast (10 max per type); `do...end`-style files can be merged together.
+- **Tweakunits plain tables can't share a slot.** The packer gives each plain-table file its own tweakunits slot (engine expects one table per slot). Many small plain-table files burn slots fast (30 max per type); `do...end`-style files can be merged together.
 - **Slot size limit:** ~16,000 chars per encoded `!bset` command. Files are minified then base64-encoded; the `/editor` page shows the real per-slot size.
 - **Shields have two radius definitions:** the weapondef radius and a `customparams` radius — scale both or visuals/gameplay desync.
 - **Unit display names/tooltips come from `customparams.i18n_en_humanname` / `i18n_en_tooltip`** (consumed by the name-override widget), not from `unitDef.description` — editing `description` does nothing visible.

@@ -493,6 +493,36 @@ describe('Command size validation', () => {
         }
     });
 
+    test('Custom tweaks fill slots up to the per-type limit', () => {
+        const code = encode('-- Small tweak\nlocal x = 1');
+        // More tweaks than there are slots, so the last ones must be dropped
+        const customTweaks: EnabledCustomTweak[] = Array.from(
+            { length: MAX_SLOTS_PER_TYPE },
+            (_, i) => ({
+                id: i,
+                description: `Tweak ${i}`,
+                type: 'tweakdefs' as const,
+                code,
+                priority: i,
+                enabled: true,
+                source: 'user' as const,
+            })
+        );
+
+        const result = generateCommands(
+            DEFAULT_CONFIGURATION,
+            luaFiles,
+            customTweaks
+        );
+        const slotIndices = result.commands
+            .filter((cmd) => cmd.type === 'tweakdefs')
+            .map((cmd) => cmd.slot!.index);
+
+        expect(Math.max(...slotIndices)).toBe(MAX_SLOTS_PER_TYPE - 1);
+        expect(new Set(slotIndices).size).toBe(MAX_SLOTS_PER_TYPE);
+        expect(result.droppedCustomTweaks.length).toBeGreaterThan(0);
+    });
+
     test('Valid custom tweaks are allocated while oversized ones are dropped', () => {
         const config = DEFAULT_CONFIGURATION;
         const validCode = encode('-- Valid tweak\nlocal x = 1');

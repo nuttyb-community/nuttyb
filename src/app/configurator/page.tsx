@@ -15,6 +15,13 @@ import { Configurator } from '@/components/tabs/configurator/configurator';
 import { GeneratedCommands } from '@/components/tabs/configurator/generated-commands';
 import { useTweakData } from '@/hooks/use-tweak-data';
 
+/** Space between the sticky output panel and the header or window edge. */
+const OUTPUT_GAP = 'var(--mantine-spacing-md)';
+/** The output panel sticks just below the header. */
+const OUTPUT_TOP = `calc(var(--app-shell-header-height) + ${OUTPUT_GAP})`;
+/** In two-column layout the panel fills the window height, so it never scrolls off. */
+const OUTPUT_HEIGHT = `calc(100dvh - var(--app-shell-header-height) - 2 * ${OUTPUT_GAP})`;
+
 export default function Page() {
     const { configuration, isLoading: isConfigLoading } =
         useConfiguratorContext();
@@ -63,7 +70,8 @@ export default function Page() {
                         <Grid.Col span={{ base: 12, lg: 4 }}>
                             <Box
                                 pos='sticky'
-                                top='calc(var(--app-shell-header-height) + var(--mantine-spacing-md))'
+                                top={OUTPUT_TOP}
+                                h={{ lg: OUTPUT_HEIGHT }}
                             >
                                 <GeneratedCommands />
                             </Box>
