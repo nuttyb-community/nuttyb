@@ -2,9 +2,9 @@
 
 import React, { useMemo, useState } from 'react';
 
-import { Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Stack, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconPlus } from '@tabler/icons-react';
+import { IconArrowBackUp, IconPlus } from '@tabler/icons-react';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
@@ -53,17 +53,26 @@ export const PresetShowcase: React.FC = () => {
         <Stack gap='md'>
             <Group justify='space-between'>
                 <Title order={2}>Preset</Title>
-                <Button
-                    variant='default'
-                    leftSection={<IconPlus size={16} />}
-                    onClick={handleNewPreset}
-                >
-                    New preset
-                </Button>
+                <Group gap='xs'>
+                    {isModified && activePresetId && (
+                        <Button
+                            variant='subtle'
+                            color='gray'
+                            leftSection={<IconArrowBackUp size={16} />}
+                            onClick={() => selectPreset(activePresetId)}
+                        >
+                            Revert changes
+                        </Button>
+                    )}
+                    <Button
+                        variant='default'
+                        leftSection={<IconPlus size={16} />}
+                        onClick={handleNewPreset}
+                    >
+                        New preset
+                    </Button>
+                </Group>
             </Group>
-            <Text>
-                Start from a preset, or save your current settings as a new one.
-            </Text>
 
             <PresetCardList
                 allPresets={allPresets}

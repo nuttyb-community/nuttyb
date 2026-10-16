@@ -1,7 +1,7 @@
 {
   "id": "hard",
   "name": "Hard",
-  "description": "Brutal difficulty for veterans.",
+  "description": "3× HP, no cross-faction T2 or T4 defences.",
   "icon": "IconFlame",
   "configuration": {
     "raptorHpMult": 3,

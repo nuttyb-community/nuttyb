@@ -1,148 +1,278 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import {
     ActionIcon,
     Badge,
-    Button,
+    Box,
     Card,
-    Divider,
-    Flex,
     Group,
+    List,
+    Menu,
     Popover,
     ScrollArea,
     Stack,
+    Table,
     Text,
-    Tooltip,
 } from '@mantine/core';
-import { useHover } from '@mantine/hooks';
-import { IconFileExport, IconPencil, IconTrash } from '@tabler/icons-react';
+import { useDebouncedValue, useElementSize, useHover } from '@mantine/hooks';
+import {
+    IconCircleCheckFilled,
+    IconDots,
+    IconFileExport,
+    IconPencil,
+    IconTrash,
+} from '@tabler/icons-react';
 
-import { InfoTooltip } from '@/components/common/info-tooltip';
+import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import type { Preset } from '@/lib/presets/registry';
 
-import { computeConfigDiff, getPresetIcon } from './preset-showcase.utils';
+import { computeConfigDiff } from './preset-showcase.utils';
 
-interface PresetTooltipContentProps {
-    preset: Preset;
-}
-
-const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
-    preset,
-}) => {
+const PresetDetails: React.FC<{ preset: Preset }> = ({ preset }) => {
     const overrides = useMemo(
         () => computeConfigDiff(preset.configuration),
         [preset.configuration]
     );
 
     return (
-        <Stack gap={6}>
-            <div>
-                <Text size='sm' fw={700} c='yellow.4'>
-                    {preset.name}
-                </Text>
+        <Stack gap='md'>
+            <Stack gap={2}>
+                <Text fw={700}>{preset.name}</Text>
                 {preset.description && (
-                    <Text size='xs' c='dimmed' mt={2}>
-                        {preset.description}
-                    </Text>
+                    <Text size='sm'>{preset.description}</Text>
                 )}
-            </div>
+            </Stack>
             {overrides.length > 0 && (
-                <>
-                    <Divider size='xs' color='dark.4' />
-                    <Stack gap={4}>
-                        <Text size='10px' fw={600} c='dimmed' tt='uppercase'>
-                            Settings:
-                        </Text>
-                        {overrides.map((o) => (
-                            <div key={o.label}>
-                                <Group
-                                    justify='space-between'
-                                    gap='xs'
-                                    wrap='nowrap'
-                                >
-                                    <Text
-                                        size='xs'
-                                        fw={600}
-                                        style={{ whiteSpace: 'nowrap' }}
-                                    >
-                                        {o.label}
-                                    </Text>
-                                    <Text size='xs' fw={700} c='yellow.4'>
+                <Stack gap='xs'>
+                    <Text size='sm' fw={700}>
+                        Settings
+                    </Text>
+                    <Table
+                        fz='sm'
+                        verticalSpacing={4}
+                        horizontalSpacing={0}
+                        withRowBorders={false}
+                    >
+                        <Table.Tbody>
+                            {overrides.map((o) => (
+                                <Table.Tr key={o.label}>
+                                    <Table.Td>{o.label}</Table.Td>
+                                    <Table.Td ta='right' fw={700}>
                                         {o.value}
-                                    </Text>
-                                </Group>
-                                <Text size='10px' c='dimmed' lh={1.2}>
-                                    {o.tooltip}
-                                </Text>
-                            </div>
-                        ))}
-                    </Stack>
-                </>
+                                    </Table.Td>
+                                </Table.Tr>
+                            ))}
+                        </Table.Tbody>
+                    </Table>
+                </Stack>
             )}
             {preset.presetTweaks && preset.presetTweaks.length > 0 && (
-                <>
-                    <Divider size='xs' color='dark.4' />
-                    <Stack gap={2}>
-                        <Text size='10px' fw={600} c='dimmed' tt='uppercase'>
-                            Custom Tweaks:
-                        </Text>
+                <Stack gap='xs'>
+                    <Text size='sm' fw={700}>
+                        Custom tweaks
+                    </Text>
+                    <List size='sm' spacing={4}>
                         {preset.presetTweaks.map((t, idx) => (
-                            <Text key={idx} size='xs' truncate>
-                                • {t.description || t.path.split('/').pop()}
-                            </Text>
+                            <List.Item key={idx}>
+                                {t.description || t.path.split('/').pop()}
+                            </List.Item>
                         ))}
-                    </Stack>
-                </>
+                    </List>
+                </Stack>
             )}
         </Stack>
     );
 };
 
-interface PresetCardFrameProps {
-    isActive: boolean;
-    isDisabled: boolean;
-    onClick: () => void;
-    children: React.ReactNode;
+interface PresetMenuProps {
+    preset: Preset;
+    onEdit: (preset: Preset) => void;
+    onExport: (id: string) => void;
+    onDelete: (id: string) => void;
 }
 
-const PresetCardFrame: React.FC<PresetCardFrameProps> = ({
+/** Actions for the user's own presets; delete asks for a second click. */
+const PresetMenu: React.FC<PresetMenuProps> = ({
+    preset,
+    onEdit,
+    onExport,
+    onDelete,
+}) => {
+    const [isConfirmingDelete, setConfirmingDelete] = useState(false);
+
+    return (
+        <Menu position='bottom-end' onClose={() => setConfirmingDelete(false)}>
+            <Menu.Target>
+                <ActionIcon
+                    variant='subtle'
+                    color='gray'
+                    aria-label={`${preset.name} actions`}
+                >
+                    <IconDots size={18} />
+                </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+                <Menu.Item
+                    leftSection={<IconPencil {...ICON_SIZE_MD} />}
+                    onClick={() => onEdit(preset)}
+                >
+                    Edit
+                </Menu.Item>
+                <Menu.Item
+                    leftSection={<IconFileExport {...ICON_SIZE_MD} />}
+                    onClick={() => onExport(preset.id)}
+                >
+                    Export JSON
+                </Menu.Item>
+                <Menu.Item
+                    color='red'
+                    leftSection={<IconTrash {...ICON_SIZE_MD} />}
+                    closeMenuOnClick={isConfirmingDelete}
+                    onClick={() =>
+                        isConfirmingDelete
+                            ? onDelete(preset.id)
+                            : setConfirmingDelete(true)
+                    }
+                >
+                    {isConfirmingDelete ? 'Click again to delete' : 'Delete'}
+                </Menu.Item>
+            </Menu.Dropdown>
+        </Menu>
+    );
+};
+
+interface PresetCardProps extends PresetMenuProps {
+    isActive: boolean;
+    isModified: boolean;
+    onSelect: (id: string) => void;
+}
+
+const PresetCard: React.FC<PresetCardProps> = ({
+    preset,
     isActive,
-    isDisabled,
-    onClick,
-    children,
+    isModified,
+    onSelect,
+    ...menuProps
 }) => {
     const { hovered, ref } = useHover<HTMLDivElement>();
-    const isHighlighted = hovered && !isDisabled && !isActive;
+    // Details open after a short hover, or right away on keyboard focus
+    const [hoveredLong] = useDebouncedValue(hovered, 400);
+    const [isKeyboardFocused, setKeyboardFocused] = useState(false);
+    const isDisabled = preset.status === 'disabled';
+    const select = () => {
+        if (!isDisabled) onSelect(preset.id);
+    };
 
-    // Same hover and selected states as the landing page link cards
     return (
-        <Card
-            ref={ref}
-            p='xs'
-            w={160}
-            h={125}
-            flex='none'
-            withBorder
-            bd={
-                isActive || isHighlighted
-                    ? '1px solid var(--mantine-primary-color-filled)'
-                    : undefined
-            }
-            bg={
-                isActive
-                    ? 'var(--mantine-primary-color-light)'
-                    : isHighlighted
-                      ? 'var(--mantine-color-default-hover)'
-                      : undefined
-            }
-            opacity={isDisabled ? 0.5 : undefined}
-            onClick={onClick}
-            style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
-        >
-            {children}
-        </Card>
+        // The menu sits beside the card, not inside it: a radio can't contain a button
+        <Box pos='relative' flex='none' w={220}>
+            <Popover
+                opened={(hovered && hoveredLong) || isKeyboardFocused}
+                width={320}
+                position='bottom-start'
+                shadow='md'
+            >
+                <Popover.Target>
+                    <Card
+                        ref={ref}
+                        role='radio'
+                        aria-checked={isActive}
+                        aria-disabled={isDisabled}
+                        tabIndex={0}
+                        // Mantine's focus ring utility class
+                        className='mantine-focus-auto'
+                        withBorder
+                        padding='md'
+                        h='100%'
+                        // Selected: primary border and fill. Hover: background only.
+                        bd={
+                            isActive
+                                ? '1px solid var(--mantine-primary-color-filled)'
+                                : undefined
+                        }
+                        bg={
+                            isActive
+                                ? 'var(--mantine-primary-color-light)'
+                                : hovered && !isDisabled
+                                  ? 'var(--mantine-color-default-hover)'
+                                  : undefined
+                        }
+                        opacity={isDisabled ? 0.5 : undefined}
+                        style={{
+                            cursor: isDisabled ? 'not-allowed' : 'pointer',
+                            // Inside the edge: the scroll area clips anything outside
+                            outlineOffset: -2,
+                        }}
+                        onClick={select}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                select();
+                            }
+                        }}
+                        onFocus={(e) =>
+                            setKeyboardFocused(
+                                e.currentTarget.matches(':focus-visible')
+                            )
+                        }
+                        onBlur={() => setKeyboardFocused(false)}
+                    >
+                        <Stack gap={4}>
+                            {/* Right padding keeps the title clear of the menu button */}
+                            <Group
+                                gap={6}
+                                wrap='nowrap'
+                                pr={preset.isBuiltIn ? 0 : 'lg'}
+                            >
+                                {isActive && (
+                                    <Text c='blue' lh={0}>
+                                        <IconCircleCheckFilled size={18} />
+                                    </Text>
+                                )}
+                                {/* Long names give way to the badge with an ellipsis */}
+                                <Text fw={700} truncate flex={1} miw={0}>
+                                    {preset.name}
+                                </Text>
+                                {isActive && isModified && (
+                                    <Badge
+                                        size='sm'
+                                        variant='light'
+                                        flex='none'
+                                    >
+                                        Modified
+                                    </Badge>
+                                )}
+                                {isDisabled && (
+                                    <Badge
+                                        size='sm'
+                                        variant='light'
+                                        color='gray'
+                                        flex='none'
+                                    >
+                                        Disabled
+                                    </Badge>
+                                )}
+                            </Group>
+                            {preset.description && (
+                                <Text size='sm' lineClamp={2}>
+                                    {preset.description}
+                                </Text>
+                            )}
+                        </Stack>
+                    </Card>
+                </Popover.Target>
+                <Popover.Dropdown>
+                    <PresetDetails preset={preset} />
+                </Popover.Dropdown>
+            </Popover>
+            {!preset.isBuiltIn && (
+                <Box pos='absolute' top={10} right={10}>
+                    <PresetMenu preset={preset} {...menuProps} />
+                </Box>
+            )}
+        </Box>
     );
 };
 
@@ -159,204 +289,65 @@ interface PresetCardListProps {
 export const PresetCardList: React.FC<PresetCardListProps> = ({
     allPresets,
     activePresetId,
-    isModified,
-    onSelect,
-    onEdit,
-    onExport,
-    onDelete,
+    ...cardProps
 }) => {
-    const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(
-        null
-    );
+    const { ref: frameRef, width: frameWidth } = useElementSize();
+    const { ref: rowRef, width: rowWidth } = useElementSize();
+    const viewportRef = useRef<HTMLDivElement>(null);
+    const [isAtEnd, setAtEnd] = useState(false);
+    // Fade the right edge while more cards are hidden that way
+    const hasMoreRight = rowWidth > frameWidth + 1 && !isAtEnd;
 
     return (
-        <ScrollArea scrollbars='x' type='hover' pb='xs'>
-            <Flex gap='md' wrap='nowrap' py='xs'>
-                {allPresets.map((preset) => {
-                    const isActive = activePresetId === preset.id;
-                    const isDisabled = preset.status === 'disabled';
-                    const showModified = isActive && isModified;
-
-                    return (
-                        <PresetCardFrame
-                            key={preset.id}
-                            isActive={isActive}
-                            isDisabled={isDisabled}
-                            onClick={() => {
-                                if (!isDisabled) onSelect(preset.id);
-                            }}
-                        >
-                            {isDisabled && (
-                                <Tooltip label='This preset is disabled. Edit it to re-enable.'>
-                                    <Badge
-                                        size='xs'
-                                        variant='light'
-                                        color='gray'
-                                        style={{
-                                            position: 'absolute',
-                                            top: 4,
-                                            left: 4,
-                                        }}
-                                    >
-                                        Disabled
-                                    </Badge>
-                                </Tooltip>
-                            )}
-                            {/* Top action bar row */}
-                            <Group
-                                gap={2}
-                                justify='flex-end'
-                                h={22}
-                                w='100%'
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {!preset.isBuiltIn && (
-                                    <>
-                                        <Tooltip label='Edit Preset'>
-                                            <ActionIcon
-                                                size='sm'
-                                                variant='subtle'
-                                                color='yellow'
-                                                onClick={() => onEdit(preset)}
-                                            >
-                                                <IconPencil size={12} />
-                                            </ActionIcon>
-                                        </Tooltip>
-                                        <Popover
-                                            opened={
-                                                confirmingDeleteId === preset.id
-                                            }
-                                            onChange={(opened) => {
-                                                if (!opened) {
-                                                    setConfirmingDeleteId(null);
-                                                }
-                                            }}
-                                            position='bottom'
-                                            withArrow
-                                            shadow='md'
-                                        >
-                                            <Popover.Target>
-                                                <Tooltip label='Delete Preset'>
-                                                    <ActionIcon
-                                                        size='sm'
-                                                        variant='subtle'
-                                                        color='red'
-                                                        onClick={() =>
-                                                            setConfirmingDeleteId(
-                                                                preset.id
-                                                            )
-                                                        }
-                                                    >
-                                                        <IconTrash size={12} />
-                                                    </ActionIcon>
-                                                </Tooltip>
-                                            </Popover.Target>
-                                            <Popover.Dropdown
-                                                onClick={(e) =>
-                                                    e.stopPropagation()
-                                                }
-                                            >
-                                                <Stack gap={6}>
-                                                    <Text size='xs'>
-                                                        {`Delete '${preset.name}'?`}
-                                                    </Text>
-                                                    <Group
-                                                        gap={6}
-                                                        justify='flex-end'
-                                                    >
-                                                        <Button
-                                                            size='xs'
-                                                            variant='default'
-                                                            onClick={() =>
-                                                                setConfirmingDeleteId(
-                                                                    null
-                                                                )
-                                                            }
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                        <Button
-                                                            size='xs'
-                                                            color='red'
-                                                            onClick={() => {
-                                                                onDelete(
-                                                                    preset.id
-                                                                );
-                                                                setConfirmingDeleteId(
-                                                                    null
-                                                                );
-                                                            }}
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </Group>
-                                                </Stack>
-                                            </Popover.Dropdown>
-                                        </Popover>
-                                    </>
-                                )}
-                                {/* Export is available for all presets */}
-                                <Tooltip label='Export Preset JSON'>
-                                    <ActionIcon
-                                        size='sm'
-                                        variant='subtle'
-                                        color='blue'
-                                        onClick={() => onExport(preset.id)}
-                                    >
-                                        <IconFileExport size={12} />
-                                    </ActionIcon>
-                                </Tooltip>
-                            </Group>
-
-                            <InfoTooltip
-                                label={<PresetTooltipContent preset={preset} />}
-                                w={280}
-                                position='bottom'
-                                openDelay={300}
-                                showIcon={false}
-                            >
-                                <Flex
-                                    direction='column'
-                                    align='center'
-                                    justify='center'
-                                    flex={1}
-                                    mt={-2}
-                                    gap='xs'
-                                >
-                                    <Text
-                                        c={isActive ? 'blue' : 'dimmed'}
-                                        lh={0}
-                                    >
-                                        {getPresetIcon(preset.icon, 24)}
-                                    </Text>
-                                    <Text
-                                        size='sm'
-                                        fw={700}
-                                        ta='center'
-                                        truncate='end'
-                                        w='100%'
-                                    >
-                                        {preset.name}
-                                        {showModified && ' *'}
-                                    </Text>
-
-                                    {preset.description && (
-                                        <Text
-                                            size='xs'
-                                            c='dimmed'
-                                            ta='center'
-                                            truncate='end'
-                                            w='100%'
-                                        >
-                                            {preset.description}
-                                        </Text>
-                                    )}
-                                </Flex>
-                            </InfoTooltip>
-                        </PresetCardFrame>
+        <Box ref={frameRef} pos='relative'>
+            {/* Scrolls sideways once the cards outgrow the column */}
+            <ScrollArea
+                scrollbars='x'
+                type='auto'
+                viewportRef={viewportRef}
+                onScrollPositionChange={({ x }) => {
+                    const viewport = viewportRef.current;
+                    if (!viewport) return;
+                    setAtEnd(
+                        x + viewport.clientWidth >= viewport.scrollWidth - 1
                     );
-                })}
-            </Flex>
-        </ScrollArea>
+                }}
+            >
+                <Group
+                    ref={rowRef}
+                    role='radiogroup'
+                    aria-label='Preset'
+                    gap='md'
+                    wrap='nowrap'
+                    align='stretch'
+                    w='max-content'
+                    // Clears the overlaid 12px scrollbar with a 16px gap
+                    pb={28}
+                >
+                    {allPresets.map((preset) => (
+                        <PresetCard
+                            key={preset.id}
+                            preset={preset}
+                            isActive={activePresetId === preset.id}
+                            {...cardProps}
+                        />
+                    ))}
+                </Group>
+            </ScrollArea>
+            <Box
+                pos='absolute'
+                top={0}
+                right={0}
+                bottom={0}
+                w={64}
+                opacity={hasMoreRight ? 1 : 0}
+                style={{
+                    background:
+                        'linear-gradient(to right, transparent, var(--mantine-color-body))',
+                    pointerEvents: 'none',
+                    transition: 'opacity 150ms ease',
+                }}
+            />
+        </Box>
     );
 };

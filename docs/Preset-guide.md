@@ -36,9 +36,9 @@ The difficulty levels are presets too. **Easy**, **Medium** and **Hard** set the
 
 ### Option 1: Export as JSON
 
-Click **Export** on your preset card. Share the downloaded `.json` file.
+Open the **⋯** menu on your preset card and click **Export JSON**. Share the downloaded `.json` file.
 
-Recipients import it via **Import Preset from JSON File** in the preset panel (Click **New Preset** to open the panel)
+Recipients import it via **Import Preset from JSON File** in the preset panel (click **New preset** to open it).
 
 ### Option 2: Host on the Configurator
 

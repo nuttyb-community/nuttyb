@@ -1,7 +1,7 @@
 {
   "id": "casual",
   "name": "Casual",
-  "description": "Easy start options for a relaxed gameplay experience.",
+  "description": "1.3× HP, 2× income and 6 queens.",
   "icon": "IconMoodSmile",
   "status": "enabled",
   "configuration": {

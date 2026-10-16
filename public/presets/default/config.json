@@ -1,7 +1,7 @@
 {
   "id": "default",
   "name": "Medium",
-  "description": "Balanced challenge for experienced players.",
+  "description": "1.5× raptor and queen HP.",
   "icon": "IconRotateDot",
   "configuration": {}
 }
