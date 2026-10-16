@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import {
     Alert,
@@ -13,9 +13,9 @@ import {
     Textarea,
     Title,
 } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 
-import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 
@@ -51,22 +51,14 @@ export const GeneratedCommands: React.FC = () => {
     const { commandText, slotUsage, droppedTweaks, error } =
         useTweakDataContext();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>(
-        'idle'
-    );
+    const clipboard = useClipboard();
 
     // The clipboard can be blocked; then select the text so Ctrl+C works
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(commandText);
-            setCopyState('copied');
-            setTimeout(() => setCopyState('idle'), FEEDBACK_DURATION_MS);
-        } catch {
-            setCopyState('failed');
-            textareaRef.current?.focus();
-            textareaRef.current?.select();
-        }
-    };
+    useEffect(() => {
+        if (!clipboard.error) return;
+        textareaRef.current?.focus();
+        textareaRef.current?.select();
+    }, [clipboard.error]);
 
     return (
         // Fills the sticky column, so the command box takes the height left
@@ -122,25 +114,25 @@ export const GeneratedCommands: React.FC = () => {
                     <Button
                         size='md'
                         fullWidth
-                        color={copyState === 'copied' ? 'teal' : 'blue'}
+                        color={clipboard.copied ? 'teal' : 'blue'}
                         disabled={!commandText}
-                        onClick={() => void handleCopy()}
+                        onClick={() => clipboard.copy(commandText)}
                         leftSection={
-                            copyState === 'copied' ? (
+                            clipboard.copied ? (
                                 <IconCheck {...ICON_SIZE_MD} />
                             ) : (
                                 <IconCopy {...ICON_SIZE_MD} />
                             )
                         }
                     >
-                        {copyState === 'copied' ? 'Copied!' : 'Copy commands'}
+                        {clipboard.copied ? 'Copied!' : 'Copy commands'}
                     </Button>
                     <Text size='sm'>
                         Paste them into the chat of a lobby you host.
                     </Text>
                 </Stack>
 
-                {copyState === 'failed' && (
+                {clipboard.error && (
                     <Alert color='red' title="Couldn't copy automatically">
                         The commands are selected below. Press Ctrl+C (⌘C on a
                         Mac) to copy them.

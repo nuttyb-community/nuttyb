@@ -6,7 +6,6 @@ import { Button, Group, Popover, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconArrowBackUp, IconCheck } from '@tabler/icons-react';
 
-import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
@@ -26,7 +25,8 @@ export const ResetButton: React.FC = () => {
         closeConfirm();
 
         setResetSuccessShowing(true);
-        setTimeout(() => setResetSuccessShowing(false), FEEDBACK_DURATION_MS);
+        // As long as useClipboard's "Copied" state
+        setTimeout(() => setResetSuccessShowing(false), 2000);
     };
 
     return (

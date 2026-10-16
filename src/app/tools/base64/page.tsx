@@ -5,7 +5,6 @@ import { useState } from 'react';
 import {
     Button,
     Checkbox,
-    CopyButton,
     Group,
     SegmentedControl,
     SimpleGrid,
@@ -14,9 +13,9 @@ import {
     Textarea,
     Title,
 } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconCopy } from '@tabler/icons-react';
 
-import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import {
     PAGE_HEIGHT,
@@ -83,6 +82,7 @@ export default function Page() {
     const [mode, setMode] = useState<Mode>('encode');
     const [isFormatterEnabled, setFormatterEnabled] = useState(true);
     const [inputText, setInputText] = useState('');
+    const clipboard = useClipboard();
 
     const { output, error } = convert(inputText, mode, isFormatterEnabled);
 
@@ -148,29 +148,22 @@ export default function Page() {
                             styles={BOX_STYLES}
                         />
                         <Group>
-                            <CopyButton
-                                value={output}
-                                timeout={FEEDBACK_DURATION_MS}
+                            <Button
+                                color={clipboard.copied ? 'teal' : 'blue'}
+                                disabled={!output}
+                                onClick={() => clipboard.copy(output)}
+                                leftSection={
+                                    clipboard.copied ? (
+                                        <IconCheck {...ICON_SIZE_MD} />
+                                    ) : (
+                                        <IconCopy {...ICON_SIZE_MD} />
+                                    )
+                                }
                             >
-                                {({ copied, copy }) => (
-                                    <Button
-                                        color={copied ? 'teal' : 'blue'}
-                                        disabled={!output}
-                                        onClick={copy}
-                                        leftSection={
-                                            copied ? (
-                                                <IconCheck {...ICON_SIZE_MD} />
-                                            ) : (
-                                                <IconCopy {...ICON_SIZE_MD} />
-                                            )
-                                        }
-                                    >
-                                        {copied
-                                            ? 'Copied!'
-                                            : `Copy ${BOX_LABELS[mode].output}`}
-                                    </Button>
-                                )}
-                            </CopyButton>
+                                {clipboard.copied
+                                    ? 'Copied!'
+                                    : `Copy ${BOX_LABELS[mode].output}`}
+                            </Button>
                         </Group>
                     </Stack>
                 </SimpleGrid>

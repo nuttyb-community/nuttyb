@@ -36,8 +36,8 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     onReset,
     onDownload,
 }) => {
-    const clipboard = useClipboard({ timeout: 2000 });
-    const base64Clipboard = useClipboard({ timeout: 2000 });
+    const clipboard = useClipboard();
+    const base64Clipboard = useClipboard();
 
     // Track editor instance for potential future features
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);

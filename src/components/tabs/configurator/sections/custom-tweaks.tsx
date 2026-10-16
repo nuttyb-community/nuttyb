@@ -25,7 +25,6 @@ import {
 } from '@tabler/icons-react';
 
 import { ConfirmDeleteMenuItem } from '@/components/common/confirm-delete-menu-item';
-import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD, ICON_STYLE } from '@/components/common/icon-style';
 import { TweakTypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
@@ -41,7 +40,7 @@ interface TweakMenuProps {
 /** Edit, copy and delete; delete asks for a second click, like presets. */
 const TweakMenu: React.FC<TweakMenuProps> = ({ tweak, onEdit }) => {
     const { deleteTweak } = useCustomTweaksContext();
-    const clipboard = useClipboard({ timeout: FEEDBACK_DURATION_MS });
+    const clipboard = useClipboard();
 
     return (
         <Menu position='bottom-end'>
