@@ -4,13 +4,12 @@ import React from 'react';
 
 import { NumberInput, SimpleGrid, Stack, Title } from '@mantine/core';
 
-import { useConfiguratorContext } from '@/components/contexts/configurator-context';
-import { DEFAULT_CONFIGURATION } from '@/lib/command-generator/data/configuration';
-
-import { clampNumber, LabelWithTooltip } from './general';
+import { LabelWithTooltip } from '@/components/common/info-tooltip';
+import { useNumberSetting } from '@/hooks/use-number-setting';
 
 export const DifficultySection: React.FC = () => {
-    const { configuration, setProperty } = useConfiguratorContext();
+    const raptorHpMult = useNumberSetting('raptorHpMult', 0.1, 10);
+    const queenHpMult = useNumberSetting('queenHpMult', 0.1, 10);
 
     return (
         <Stack gap='md'>
@@ -23,20 +22,7 @@ export const DifficultySection: React.FC = () => {
                             tooltip='Health of regular raptors (0.1 - 10)'
                         />
                     }
-                    value={configuration.raptorHpMult}
-                    onChange={(value) =>
-                        setProperty(
-                            'raptorHpMult',
-                            clampNumber(
-                                value,
-                                0.1,
-                                10,
-                                DEFAULT_CONFIGURATION.raptorHpMult
-                            )
-                        )
-                    }
-                    min={0.1}
-                    max={10}
+                    {...raptorHpMult}
                     step={0.1}
                     decimalScale={1}
                     allowNegative={false}
@@ -49,20 +35,7 @@ export const DifficultySection: React.FC = () => {
                             tooltip='Health of raptor queens (0.1 - 10)'
                         />
                     }
-                    value={configuration.queenHpMult}
-                    onChange={(value) =>
-                        setProperty(
-                            'queenHpMult',
-                            clampNumber(
-                                value,
-                                0.1,
-                                10,
-                                DEFAULT_CONFIGURATION.queenHpMult
-                            )
-                        )
-                    }
-                    min={0.1}
-                    max={10}
+                    {...queenHpMult}
                     step={0.1}
                     decimalScale={1}
                     allowNegative={false}

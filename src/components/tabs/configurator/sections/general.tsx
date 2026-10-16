@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import {
     ActionIcon,
-    Group,
     NativeSelect,
     NumberInput,
     SimpleGrid,
@@ -16,11 +15,11 @@ import {
 import { useDebouncedCallback } from '@mantine/hooks';
 import { IconX } from '@tabler/icons-react';
 
-import { InfoTooltip } from '@/components/common/info-tooltip';
+import { LabelWithTooltip } from '@/components/common/info-tooltip';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
+import { useNumberSetting } from '@/hooks/use-number-setting';
 import {
-    DEFAULT_CONFIGURATION,
     GameMap,
     getDefaultLobbyNameTag,
     MAPS,
@@ -28,44 +27,13 @@ import {
     StartOption,
 } from '@/lib/command-generator/data/configuration';
 
-export function clampNumber(
-    value: string | number,
-    min: number,
-    max: number,
-    fallback: number
-): number {
-    const numericValue = Number(value);
-
-    if (value === '' || !Number.isFinite(numericValue)) {
-        return fallback;
-    }
-
-    return Math.min(max, Math.max(min, numericValue));
-}
-
-interface LabelWithTooltipProps {
-    label: string;
-    tooltip: string;
-}
-
-export const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
-    label,
-    tooltip,
-}) => (
-    <Group
-        gap={4}
-        align='center'
-        wrap='nowrap'
-        style={{ display: 'inline-flex' }}
-    >
-        <span>{label}</span>
-        <InfoTooltip label={tooltip} />
-    </Group>
-);
-
 export const GeneralSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
     const { activePresetName } = usePresetsContext();
+    const queenCount = useNumberSetting('queenCount', 1, 100);
+    const incomeMult = useNumberSetting('incomeMult', 0.1, 10);
+    const buildPowerMult = useNumberSetting('buildPowerMult', 0.1, 10);
+    const buildDistMult = useNumberSetting('buildDistMult', 0.5, 10);
     const lobbyName = configuration.lobbyName ?? '';
     const [localLobbyName, setLocalLobbyName] = useState(lobbyName);
 
@@ -163,20 +131,7 @@ export const GeneralSection: React.FC = () => {
                                 tooltip='Number of raptor queens (1 - 100)'
                             />
                         }
-                        value={configuration.queenCount}
-                        onChange={(value) =>
-                            setProperty(
-                                'queenCount',
-                                clampNumber(
-                                    value,
-                                    1,
-                                    100,
-                                    DEFAULT_CONFIGURATION.queenCount
-                                )
-                            )
-                        }
-                        min={1}
-                        max={100}
+                        {...queenCount}
                         step={1}
                         allowNegative={false}
                         required
@@ -190,20 +145,7 @@ export const GeneralSection: React.FC = () => {
                                 tooltip='Affects both energy and metal production (0.1 - 10)'
                             />
                         }
-                        value={configuration.incomeMult}
-                        onChange={(value) =>
-                            setProperty(
-                                'incomeMult',
-                                clampNumber(
-                                    value,
-                                    0.1,
-                                    10,
-                                    DEFAULT_CONFIGURATION.incomeMult
-                                )
-                            )
-                        }
-                        min={0.1}
-                        max={10}
+                        {...incomeMult}
                         step={0.1}
                         decimalScale={1}
                         allowNegative={false}
@@ -216,20 +158,7 @@ export const GeneralSection: React.FC = () => {
                                 tooltip='Affects build power (0.1 - 10). Suggest matching the resource income multiplier for balance.'
                             />
                         }
-                        value={configuration.buildPowerMult}
-                        onChange={(value) =>
-                            setProperty(
-                                'buildPowerMult',
-                                clampNumber(
-                                    value,
-                                    0.1,
-                                    10,
-                                    DEFAULT_CONFIGURATION.buildPowerMult
-                                )
-                            )
-                        }
-                        min={0.1}
-                        max={10}
+                        {...buildPowerMult}
                         step={0.1}
                         decimalScale={1}
                         allowNegative={false}
@@ -242,20 +171,7 @@ export const GeneralSection: React.FC = () => {
                                 tooltip='Defines how far you can build compared to vanilla BAR (0.5 - 10)'
                             />
                         }
-                        value={configuration.buildDistMult}
-                        onChange={(value) =>
-                            setProperty(
-                                'buildDistMult',
-                                clampNumber(
-                                    value,
-                                    0.5,
-                                    10,
-                                    DEFAULT_CONFIGURATION.buildDistMult
-                                )
-                            )
-                        }
-                        min={0.5}
-                        max={10}
+                        {...buildDistMult}
                         step={0.1}
                         decimalScale={1}
                         allowNegative={false}
