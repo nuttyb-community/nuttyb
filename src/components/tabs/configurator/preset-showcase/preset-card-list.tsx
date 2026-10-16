@@ -115,7 +115,6 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
     const [hoveredLong] = useDebouncedValue(hovered, 400);
     const [isKeyboardFocused, setKeyboardFocused] = useState(false);
     const isActive = activePresetId === preset.id;
-    const isDisabled = preset.status === 'disabled';
 
     return (
         // The menu sits beside the card, not inside it: a radio can't contain a button
@@ -132,9 +131,6 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
                         ref={ref}
                         name='preset'
                         checked={isActive}
-                        // Not `disabled`: that would stop the arrow keys here.
-                        // selectPreset ignores disabled presets.
-                        aria-disabled={isDisabled}
                         onClick={() => selectPreset(preset.id)}
                         p='md'
                         h='100%'
@@ -149,16 +145,12 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
                         bg={
                             isActive
                                 ? 'var(--mantine-primary-color-light)'
-                                : hovered && !isDisabled
+                                : hovered
                                   ? 'var(--mantine-color-default-hover)'
                                   : undefined
                         }
-                        opacity={isDisabled ? 0.5 : undefined}
-                        style={{
-                            cursor: isDisabled ? 'not-allowed' : undefined,
-                            // Inside the edge: the scroll area clips anything outside
-                            outlineOffset: -2,
-                        }}
+                        // Inside the edge: the scroll area clips anything outside
+                        style={{ outlineOffset: -2 }}
                         onFocus={(e) =>
                             setKeyboardFocused(
                                 e.currentTarget.matches(':focus-visible')
@@ -189,16 +181,6 @@ const PresetCard: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
                                         flex='none'
                                     >
                                         Modified
-                                    </Badge>
-                                )}
-                                {isDisabled && (
-                                    <Badge
-                                        size='sm'
-                                        variant='light'
-                                        color='gray'
-                                        flex='none'
-                                    >
-                                        Disabled
                                     </Badge>
                                 )}
                             </Group>
@@ -233,11 +215,7 @@ export const PresetCardList: React.FC<{
     const [isAtEnd, setAtEnd] = useState(false);
     // Fade the right edge while more cards are hidden that way
     const hasMoreRight = rowWidth > frameWidth + 1 && !isAtEnd;
-    // Stored presets are never built-in, whatever the saved data says
-    const presets = [
-        ...builtInPresets,
-        ...localPresets.map((p) => ({ ...p, isBuiltIn: false })),
-    ];
+    const presets = [...builtInPresets, ...localPresets];
 
     return (
         <Box ref={frameRef} pos='relative'>

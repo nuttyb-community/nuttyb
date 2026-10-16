@@ -65,7 +65,17 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
     );
     const [localPresets, setLocalPresets] = useLocalStorage<Preset[]>(
         LOCAL_PRESETS_STORAGE_KEY,
-        []
+        [],
+        {
+            // Saved presets are never built-in, whatever the stored data says.
+            // The form has no status toggle any more, so none stay disabled.
+            onLoad: (stored) =>
+                stored.map((preset) => ({
+                    ...preset,
+                    isBuiltIn: false,
+                    status: 'enabled',
+                })),
+        }
     );
 
     // Combine hardcoded base presets and dynamically loaded presets from the bundle
@@ -121,8 +131,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         [parsedPresets]
     );
 
-    /** Finds a preset by ID across both built-in and local presets,
-     *  regardless of status (used by export/edit flows). */
+    /** Finds a preset by ID across the enabled built-in and local presets. */
     const findPresetById = useCallback(
         (id: string): Preset | null =>
             builtInPresets.find((p) => p.id === id) ||
@@ -131,12 +140,10 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         [builtInPresets, localPresets]
     );
 
-    // Get the active preset details (disabled presets never count as active)
-    const activePreset = useMemo<Preset | null>(() => {
-        if (!activePresetId) return null;
-        const preset = findPresetById(activePresetId);
-        return preset && preset.status !== 'disabled' ? preset : null;
-    }, [activePresetId, findPresetById]);
+    const activePreset = useMemo<Preset | null>(
+        () => (activePresetId ? findPresetById(activePresetId) : null),
+        [activePresetId, findPresetById]
+    );
 
     /** Applies all properties from a Configuration object to the current context. */
     const applyConfiguration = useCallback(
@@ -247,7 +254,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
     const selectPreset = useCallback(
         (id: string) => {
             const preset = findPresetById(id);
-            if (!preset || preset.status === 'disabled') return;
+            if (!preset) return;
 
             applyConfiguration(preset.configuration);
             setActivePresetId(id);
@@ -260,10 +267,7 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (parsedPresets.length === 0) return; // bundle still loading
         if (!activePresetId) return;
-        const stored = findPresetById(activePresetId);
-        if (!stored || stored.status === 'disabled') {
-            selectPreset('default');
-        }
+        if (!findPresetById(activePresetId)) selectPreset('default');
     }, [parsedPresets, activePresetId, findPresetById, selectPreset]);
 
     const savePreset = useCallback(

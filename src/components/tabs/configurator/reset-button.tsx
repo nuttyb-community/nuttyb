@@ -43,10 +43,9 @@ export const ResetButton: React.FC = () => {
         >
             <Popover.Target>
                 <Button
-                    // Red marks it as destructive; green confirms it ran
-                    color={isResetSuccessShowing ? 'green' : 'red'}
                     onClick={toggleConfirm}
                     variant='default'
+                    // Red text marks it as destructive
                     c='red'
                     leftSection={
                         isResetSuccessShowing ? (
