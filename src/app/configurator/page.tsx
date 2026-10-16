@@ -10,17 +10,17 @@ import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 import { TweakDataProvider } from '@/components/contexts/tweak-data-context';
 import { PageLoader } from '@/components/page-loader';
-import { PageWrapper } from '@/components/page-wrapper';
+import {
+    PAGE_HEIGHT,
+    PAGE_PADDING,
+    PageWrapper,
+} from '@/components/page-wrapper';
 import { Configurator } from '@/components/tabs/configurator/configurator';
 import { GeneratedCommands } from '@/components/tabs/configurator/generated-commands';
 import { useTweakData } from '@/hooks/use-tweak-data';
 
-/** Space between the sticky output panel and the header or window edge. */
-const OUTPUT_GAP = 'var(--mantine-spacing-md)';
-/** The output panel sticks just below the header. */
-const OUTPUT_TOP = `calc(var(--app-shell-header-height) + ${OUTPUT_GAP})`;
-/** In two-column layout the panel fills the window height, so it never scrolls off. */
-const OUTPUT_HEIGHT = `calc(100dvh - var(--app-shell-header-height) - 2 * ${OUTPUT_GAP})`;
+/** The output panel sticks just below the header, one page padding down. */
+const OUTPUT_TOP = `calc(var(--app-shell-header-height) + ${PAGE_PADDING})`;
 
 export default function Page() {
     const { configuration, isLoading: isConfigLoading } =
@@ -54,7 +54,7 @@ export default function Page() {
     if (error) return <div>Error loading Lua bundle: {error.message}</div>;
 
     return (
-        <PageWrapper py='md'>
+        <PageWrapper py={PAGE_PADDING}>
             <TweakDataProvider
                 commandText={commandText}
                 slotUsage={slotUsage}
@@ -69,7 +69,8 @@ export default function Page() {
                         <Box
                             pos='sticky'
                             top={OUTPUT_TOP}
-                            h={{ lg: OUTPUT_HEIGHT }}
+                            // In two-column layout the panel fills the window, so it never scrolls off
+                            h={{ lg: PAGE_HEIGHT }}
                         >
                             <GeneratedCommands />
                         </Box>

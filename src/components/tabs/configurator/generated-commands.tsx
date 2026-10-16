@@ -19,11 +19,6 @@ import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 
-/** Command box height when the panel isn't stretched by the sticky column. */
-const COMMAND_ROWS = 12;
-/** A slot meter turns orange from this share of slots used. */
-const SLOT_WARNING_PERCENT = 80;
-
 interface SlotMeterProps {
     label: string;
     used: number;
@@ -35,7 +30,7 @@ const SlotMeter: React.FC<SlotMeterProps> = ({ label, used, total }) => {
     const color =
         used >= total
             ? 'red'
-            : percent >= SLOT_WARNING_PERCENT
+            : percent >= 80 // Orange from 80% of the slots used
               ? 'orange'
               : 'blue';
 
@@ -156,7 +151,8 @@ export const GeneratedCommands: React.FC = () => {
                     ref={textareaRef}
                     value={commandText}
                     readOnly
-                    rows={COMMAND_ROWS}
+                    // Height when the sticky column doesn't stretch it
+                    rows={12}
                     aria-label='Generated commands'
                     flex={1}
                     // In the sticky column the box stretches into the space left

@@ -25,10 +25,6 @@ import {
 import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
 import { LUA_TWEAK_TYPES, type LuaTweakType } from '@/types/types';
 
-/** The code box starts this tall and grows up to the max before scrolling. */
-const CODE_MIN_ROWS = 4;
-const CODE_MAX_ROWS = 12;
-
 interface CustomTweakFormProps {
     /** The tweak to edit; a new one is added when null. */
     tweak: CustomTweak | null;
@@ -126,8 +122,9 @@ const CustomTweakForm: React.FC<CustomTweakFormProps> = ({
                         error={codeError}
                         required
                         autosize
-                        minRows={CODE_MIN_ROWS}
-                        maxRows={CODE_MAX_ROWS}
+                        // Grows with the code, then scrolls
+                        minRows={4}
+                        maxRows={12}
                         styles={{
                             input: {
                                 fontFamily:

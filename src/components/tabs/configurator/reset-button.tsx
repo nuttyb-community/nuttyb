@@ -11,9 +11,6 @@ import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 
-/** Wide enough for the reset explanation to wrap into a few short lines. */
-const RESET_CONFIRM_WIDTH = 300;
-
 /** Resets the whole configurator, after a confirmation popover. */
 export const ResetButton: React.FC = () => {
     const { clearEnabledTweaks } = useCustomTweaksContext();
@@ -39,7 +36,8 @@ export const ResetButton: React.FC = () => {
                 if (!opened) closeConfirm();
             }}
             position='bottom-end'
-            width={RESET_CONFIRM_WIDTH}
+            // Wide enough for the explanation to wrap into a few short lines
+            width={300}
             shadow='md'
             trapFocus
         >
