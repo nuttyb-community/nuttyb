@@ -1,62 +1,217 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Checkbox, Flex, Stack, Title } from '@mantine/core';
+import {
+    ActionIcon,
+    Button,
+    Checkbox,
+    Group,
+    Menu,
+    Stack,
+    Table,
+    Text,
+    Title,
+} from '@mantine/core';
+import { useClipboard, useDisclosure } from '@mantine/hooks';
+import {
+    IconArrowDown,
+    IconArrowUp,
+    IconCheck,
+    IconCopy,
+    IconDots,
+    IconPencil,
+    IconPlus,
+    IconTrash,
+} from '@tabler/icons-react';
 
+import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
+import { ICON_SIZE_MD, ICON_STYLE } from '@/components/common/icon-style';
 import { TweakTypeBadge } from '@/components/common/type-badge';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
-import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
-import type { LuaTweakType } from '@/types/types';
+import type { CustomTweak } from '@/lib/command-generator/command-generator';
+
+import { CustomTweakModal } from './custom-tweak-modal';
+
+interface TweakMenuProps {
+    tweak: CustomTweak;
+    onEdit: (tweak: CustomTweak) => void;
+}
+
+/** Edit, copy and delete; delete asks for a second click, like presets. */
+const TweakMenu: React.FC<TweakMenuProps> = ({ tweak, onEdit }) => {
+    const { deleteTweak } = useCustomTweaksContext();
+    const clipboard = useClipboard({ timeout: FEEDBACK_DURATION_MS });
+    const [isConfirmingDelete, setConfirmingDelete] = useState(false);
+
+    return (
+        <Menu position='bottom-end' onClose={() => setConfirmingDelete(false)}>
+            <Menu.Target>
+                <ActionIcon
+                    variant='subtle'
+                    color='gray'
+                    aria-label={`${tweak.description} actions`}
+                >
+                    <IconDots {...ICON_STYLE} />
+                </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+                <Menu.Item
+                    leftSection={<IconPencil {...ICON_SIZE_MD} />}
+                    onClick={() => onEdit(tweak)}
+                >
+                    Edit
+                </Menu.Item>
+                <Menu.Item
+                    leftSection={
+                        clipboard.copied ? (
+                            <IconCheck {...ICON_SIZE_MD} />
+                        ) : (
+                            <IconCopy {...ICON_SIZE_MD} />
+                        )
+                    }
+                    // Stays open so "Copied" can show
+                    closeMenuOnClick={false}
+                    onClick={() => clipboard.copy(tweak.code)}
+                >
+                    {clipboard.copied ? 'Copied' : 'Copy code'}
+                </Menu.Item>
+                <Menu.Item
+                    color='red'
+                    leftSection={<IconTrash {...ICON_SIZE_MD} />}
+                    closeMenuOnClick={isConfirmingDelete}
+                    onClick={() =>
+                        isConfirmingDelete
+                            ? deleteTweak(tweak.id)
+                            : setConfirmingDelete(true)
+                    }
+                >
+                    {isConfirmingDelete ? 'Click again to delete' : 'Delete'}
+                </Menu.Item>
+            </Menu.Dropdown>
+        </Menu>
+    );
+};
+
+interface TweakRowProps extends TweakMenuProps {
+    isFirst: boolean;
+    isLast: boolean;
+}
+
+const TweakRow: React.FC<TweakRowProps> = ({
+    tweak,
+    isFirst,
+    isLast,
+    onEdit,
+}) => {
+    const { isEnabled, toggleTweak, moveTweakUp, moveTweakDown } =
+        useCustomTweaksContext();
+
+    return (
+        <Table.Tr>
+            {/* Takes the spare width, so the buttons column hugs its content */}
+            <Table.Td w='100%'>
+                <Group gap='xs' wrap='nowrap'>
+                    <Checkbox
+                        label={tweak.description}
+                        checked={isEnabled(tweak.id)}
+                        onChange={() => toggleTweak(tweak.id)}
+                    />
+                    <TweakTypeBadge type={tweak.type} />
+                </Group>
+            </Table.Td>
+            <Table.Td>
+                <Group gap='xs' wrap='nowrap' justify='flex-end'>
+                    {/* Order only matters once there are two */}
+                    {!(isFirst && isLast) && (
+                        <>
+                            <ActionIcon
+                                variant='subtle'
+                                color='gray'
+                                onClick={() => moveTweakUp(tweak.id)}
+                                disabled={isFirst}
+                                aria-label={`Move ${tweak.description} up`}
+                            >
+                                <IconArrowUp {...ICON_STYLE} />
+                            </ActionIcon>
+                            <ActionIcon
+                                variant='subtle'
+                                color='gray'
+                                onClick={() => moveTweakDown(tweak.id)}
+                                disabled={isLast}
+                                aria-label={`Move ${tweak.description} down`}
+                            >
+                                <IconArrowDown {...ICON_STYLE} />
+                            </ActionIcon>
+                        </>
+                    )}
+                    <TweakMenu tweak={tweak} onEdit={onEdit} />
+                </Group>
+            </Table.Td>
+        </Table.Tr>
+    );
+};
 
 export const CustomTweaksSection: React.FC = () => {
-    const { customTweaks, isEnabled, toggleTweak, enabledIds } =
-        useCustomTweaksContext();
-    const { slotUsage } = useTweakDataContext();
+    const { customTweaks } = useCustomTweaksContext();
+    const [isModalOpen, { open: openModal, close: closeModal }] =
+        useDisclosure(false);
+    // Kept after closing, so the title doesn't change during the exit animation
+    const [editedTweak, setEditedTweak] = useState<CustomTweak | null>(null);
 
-    // Check if a tweak can be enabled (has available slot)
-    const canEnable = (type: LuaTweakType, tweakId: number): boolean => {
-        if (enabledIds.has(tweakId)) return true; // Already enabled
-        if (!slotUsage) return true; // Optimistic: allow when slot data not yet loaded
+    const sortedTweaks = customTweaks.toSorted(
+        (a, b) => a.priority - b.priority
+    );
 
-        // Check if there's a slot available for this type
-        const available = slotUsage[type].total - slotUsage[type].used;
-        return available > 0;
+    const openEditor = (tweak: CustomTweak | null) => {
+        setEditedTweak(tweak);
+        openModal();
     };
-
-    // Don't render if no custom tweaks
-    if (customTweaks.length === 0) {
-        return null;
-    }
 
     return (
         <Stack gap='md'>
-            <Title order={2}>Custom tweaks</Title>
-            <Flex gap='md' align='baseline' direction='row' wrap='wrap'>
-                {customTweaks
-                    .toSorted((a, b) => a.priority - b.priority)
-                    .map((tweak) => {
-                        const enabled = isEnabled(tweak.id);
-                        const disabled = !canEnable(tweak.type, tweak.id);
+            <Stack gap='xs'>
+                <Title order={2}>Custom tweaks</Title>
+                <Text size='sm'>
+                    Your own tweakdefs and tweakunits code, added to the
+                    commands while it&apos;s turned on.
+                    {sortedTweaks.length > 1 &&
+                        ' Tweaks load from top to bottom.'}
+                </Text>
+            </Stack>
 
-                        return (
-                            <Flex
+            {sortedTweaks.length > 0 && (
+                // Stripes and hover tie each name to its buttons across the row
+                <Table striped highlightOnHover withRowBorders={false}>
+                    <Table.Tbody>
+                        {sortedTweaks.map((tweak, index) => (
+                            <TweakRow
                                 key={tweak.id}
-                                gap='xs'
-                                align='center'
-                                wrap='nowrap'
-                            >
-                                <Checkbox
-                                    label={tweak.description}
-                                    checked={enabled}
-                                    disabled={disabled}
-                                    onChange={() => toggleTweak(tweak.id)}
-                                />
-                                <TweakTypeBadge type={tweak.type} />
-                            </Flex>
-                        );
-                    })}
-            </Flex>
+                                tweak={tweak}
+                                isFirst={index === 0}
+                                isLast={index === sortedTweaks.length - 1}
+                                onEdit={openEditor}
+                            />
+                        ))}
+                    </Table.Tbody>
+                </Table>
+            )}
+
+            <Group>
+                <Button
+                    variant='default'
+                    leftSection={<IconPlus {...ICON_SIZE_MD} />}
+                    onClick={() => openEditor(null)}
+                >
+                    Add custom tweak
+                </Button>
+            </Group>
+
+            <CustomTweakModal
+                opened={isModalOpen}
+                onClose={closeModal}
+                tweak={editedTweak}
+            />
         </Stack>
     );
 };

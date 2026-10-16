@@ -20,12 +20,17 @@ import { LuaTweakType } from '@/types/types';
 interface CustomTweaksContextValue {
     /** All saved custom tweaks */
     customTweaks: CustomTweak[];
-    /** Add a new custom tweak */
+    /** Add a new custom tweak, turned on */
     addTweak: (
         description: string,
         type: LuaTweakType,
         code: string
     ) => CustomTweak;
+    /** Replace a tweak's name, type and code */
+    updateTweak: (
+        id: number,
+        changes: Pick<CustomTweak, 'description' | 'type' | 'code'>
+    ) => void;
     /** Delete a custom tweak by ID */
     deleteTweak: (id: number) => void;
     /** Toggle enabled state for a tweak */
@@ -179,13 +184,36 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
                         ? Math.max(...customTweaks.map((t) => t.priority)) + 1
                         : 0,
             };
+            // Turned on straight away: adding a tweak means wanting to use it
             setStoredData((prev) => ({
-                ...prev,
                 tweaks: [...prev.tweaks, newTweak],
+                enabledIds: [...prev.enabledIds, newTweak.id],
             }));
             return newTweak;
         },
         [setStoredData, customTweaks]
+    );
+
+    const updateTweak = useCallback(
+        (
+            id: number,
+            changes: Pick<CustomTweak, 'description' | 'type' | 'code'>
+        ) => {
+            setStoredData((prev) => ({
+                ...prev,
+                tweaks: prev.tweaks.map((tweak) =>
+                    tweak.id === id
+                        ? {
+                              ...tweak,
+                              description: changes.description.trim(),
+                              type: changes.type,
+                              code: changes.code.trim(),
+                          }
+                        : tweak
+                ),
+            }));
+        },
+        [setStoredData]
     );
 
     const deleteTweak = useCallback(
@@ -290,6 +318,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
         () => ({
             customTweaks,
             addTweak,
+            updateTweak,
             deleteTweak,
             toggleTweak,
             isEnabled,
@@ -303,6 +332,7 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
         [
             customTweaks,
             addTweak,
+            updateTweak,
             deleteTweak,
             toggleTweak,
             isEnabled,

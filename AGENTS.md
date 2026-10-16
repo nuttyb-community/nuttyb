@@ -62,10 +62,10 @@ Known defects and the ranked improvement backlog are in `docs/proposals.md` — 
 - `docs/`: Documentation files, including contributing guidelines
 - `lua/`: Lua sources code for NuttyB tweaks
 - `src/app/`: Next.js 16 App Router pages
-    - `/configurator`: Main configuration interface
-    - `/base64`: Direct base64 bundle viewer
-    - `/custom`: Custom configuration tools
-    - `/data`: Bundle data viewer
+    - `/`: Landing page
+    - `/configurator`: Main configuration interface, including custom tweaks
+    - `/tools/base64`: Base64 encoder and decoder for Lua
+    - `/tools/editor`: Lua bundle editor
 - `src/components/`: React components (uses Mantine UI library)
 - `src/lib/`: Common reusable business logic
     - `command-generator/`: Generates lobby commands and bundles
