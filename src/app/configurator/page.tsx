@@ -10,6 +10,7 @@ import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 import { TweakDataProvider } from '@/components/contexts/tweak-data-context';
 import { PageLoader } from '@/components/page-loader';
+import { PageWrapper } from '@/components/page-wrapper';
 import { Configurator } from '@/components/tabs/configurator/configurator';
 import { GeneratedCommands } from '@/components/tabs/configurator/generated-commands';
 import { useTweakData } from '@/hooks/use-tweak-data';
@@ -41,17 +42,19 @@ export default function Page() {
     if (error) return <div>Error loading Lua bundle: {error.message}</div>;
 
     return (
-        <TweakDataProvider
-            commandText={commandText}
-            slotUsage={slotUsage}
-            error={tweakError}
-            droppedTweaks={droppedTweaks}
-        >
-            <Stack gap='xl'>
-                <Configurator />
-                <Divider />
-                <GeneratedCommands />
-            </Stack>
-        </TweakDataProvider>
+        <PageWrapper py='md'>
+            <TweakDataProvider
+                commandText={commandText}
+                slotUsage={slotUsage}
+                error={tweakError}
+                droppedTweaks={droppedTweaks}
+            >
+                <Stack gap='xl'>
+                    <Configurator />
+                    <Divider />
+                    <GeneratedCommands />
+                </Stack>
+            </TweakDataProvider>
+        </PageWrapper>
     );
 }

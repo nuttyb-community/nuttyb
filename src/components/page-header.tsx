@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { Anchor, Button, Container, Group, Menu, Title } from '@mantine/core';
+import { Anchor, Button, Group, Menu, Text } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
 import NextImage, { type StaticImageData } from 'next/image';
 import NextLink from 'next/link';
@@ -10,6 +10,7 @@ import { usePathname } from 'next/navigation';
 
 import logo from '@/assets/logo.svg';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
+import { PageWrapper } from '@/components/page-wrapper';
 import { Link, LINKS } from '@/lib/navigation';
 
 const toolLinks: Link[] = Object.values(LINKS.tools);
@@ -19,14 +20,14 @@ export const PageHeader: React.FC = () => {
     const isActive = (href: string) => pathname.startsWith(href);
 
     return (
-        <Container size={1600} h='100%'>
+        <PageWrapper h='100%'>
             <Group h='100%' justify='space-between'>
                 <Anchor
                     component={NextLink}
                     href='/'
                     aria-label='NuttyB CE home'
                     underline='never'
-                    c='white'
+                    c='inherit'
                 >
                     <Group gap='sm' wrap='nowrap'>
                         <NextImage
@@ -36,9 +37,10 @@ export const PageHeader: React.FC = () => {
                             height={42}
                         />
                         {/* ponytail: logo-only below xs keeps the header on one line down to ~380px; burger menu if the nav grows */}
-                        <Title order={1} visibleFrom='xs'>
+                        {/* Brand, not a heading: the page title is the page's only h1 */}
+                        <Text fz='h2' fw={700} visibleFrom='xs'>
                             NuttyB CE
-                        </Title>
+                        </Text>
                     </Group>
                 </Anchor>
                 <Group gap='md'>
@@ -80,6 +82,6 @@ export const PageHeader: React.FC = () => {
                     </Menu>
                 </Group>
             </Group>
-        </Container>
+        </PageWrapper>
     );
 };

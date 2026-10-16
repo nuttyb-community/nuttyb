@@ -2,8 +2,6 @@ import {
     AppShell,
     AppShellHeader,
     AppShellMain,
-    ColorSchemeScript,
-    Container,
     mantineHtmlProps,
     MantineProvider,
 } from '@mantine/core';
@@ -23,23 +21,20 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang='en' {...mantineHtmlProps}>
-            <head>
-                <ColorSchemeScript />
-            </head>
+        // The theme is always dark, so the HTML starts dark: no ColorSchemeScript,
+        // which would default to light and flash it until hydration
+        <html lang='en' {...mantineHtmlProps} data-mantine-color-scheme='dark'>
             <body className={'antialiased'}>
                 <MantineProvider
                     defaultColorScheme='dark'
                     forceColorScheme='dark'
                 >
                     <Providers>
-                        <AppShell padding='md' header={{ height: 60 }}>
+                        <AppShell header={{ height: 60 }}>
                             <AppShellHeader bg='dark' withBorder={false}>
                                 <PageHeader />
                             </AppShellHeader>
-                            <AppShellMain>
-                                <Container size={1600}>{children}</Container>
-                            </AppShellMain>
+                            <AppShellMain>{children}</AppShellMain>
                         </AppShell>
                     </Providers>
                 </MantineProvider>

@@ -13,6 +13,7 @@ import {
     Title,
 } from '@mantine/core';
 
+import { PageWrapper } from '@/components/page-wrapper';
 import { decode, encode } from '@/lib/encoders/base64';
 import { beautify } from '@/lib/lua-utils/beautifier';
 import { minify } from '@/lib/lua-utils/minificator';
@@ -45,54 +46,56 @@ export default function Page() {
     }, []);
 
     return (
-        <Stack gap='xl'>
-            <Stack gap='sm'>
-                <Title order={2}>Base64 Encoder/Decoder</Title>
-                <Text c='dimmed' size='sm'>
-                    In order to use your Lua code in the game, it needs to be
-                    encoded in Base64 format. Use this tool to encode or decode
-                    Base64 strings.
-                </Text>
-            </Stack>
+        <PageWrapper py='md'>
+            <Stack gap='xl'>
+                <Stack gap='sm'>
+                    <Title order={2}>Base64 Encoder/Decoder</Title>
+                    <Text c='dimmed' size='sm'>
+                        In order to use your Lua code in the game, it needs to
+                        be encoded in Base64 format. Use this tool to encode or
+                        decode Base64 strings.
+                    </Text>
+                </Stack>
 
-            <Stack>
-                <Radio.Group value={mode} onChange={handleModeChange}>
-                    <Flex gap='md'>
-                        <Radio value='encode' label='Encode' />
-                        <Radio value='decode' label='Decode' />
-                    </Flex>
-                </Radio.Group>
+                <Stack>
+                    <Radio.Group value={mode} onChange={handleModeChange}>
+                        <Flex gap='md'>
+                            <Radio value='encode' label='Encode' />
+                            <Radio value='decode' label='Decode' />
+                        </Flex>
+                    </Radio.Group>
 
-                <Checkbox
-                    label='Enable formatter'
-                    description='Minify Lua before encoding and beautify after decoding'
-                    checked={isFormatterEnabled}
-                    onChange={(event) =>
-                        setFormatterEnabled(event.currentTarget.checked)
-                    }
-                />
-
-                <SimpleGrid cols={2}>
-                    <Textarea
-                        label='Input'
-                        placeholder='Your text goes here'
-                        value={inputText}
+                    <Checkbox
+                        label='Enable formatter'
+                        description='Minify Lua before encoding and beautify after decoding'
+                        checked={isFormatterEnabled}
                         onChange={(event) =>
-                            setInputText(event.currentTarget.value)
+                            setFormatterEnabled(event.currentTarget.checked)
                         }
-                        autosize
-                        maxRows={17}
                     />
-                    <Textarea
-                        label='Output'
-                        placeholder='Generated text will be here'
-                        readOnly
-                        value={outputText}
-                        autosize
-                        maxRows={17}
-                    />
-                </SimpleGrid>
+
+                    <SimpleGrid cols={2}>
+                        <Textarea
+                            label='Input'
+                            placeholder='Your text goes here'
+                            value={inputText}
+                            onChange={(event) =>
+                                setInputText(event.currentTarget.value)
+                            }
+                            autosize
+                            maxRows={17}
+                        />
+                        <Textarea
+                            label='Output'
+                            placeholder='Generated text will be here'
+                            readOnly
+                            value={outputText}
+                            autosize
+                            maxRows={17}
+                        />
+                    </SimpleGrid>
+                </Stack>
             </Stack>
-        </Stack>
+        </PageWrapper>
     );
 }
