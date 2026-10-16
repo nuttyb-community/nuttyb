@@ -1,32 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import {
     Alert,
     Button,
-    CopyButton,
     Group,
     List,
-    Popover,
     Progress,
     Stack,
     Text,
     Textarea,
     Title,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { IconArrowBackUp, IconCheck, IconCopy } from '@tabler/icons-react';
+import { IconCheck, IconCopy } from '@tabler/icons-react';
 
+import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
-import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
-import { usePresetsContext } from '@/components/contexts/presets-context';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
 
-/** How long "Copied!" and "Reset done" stay on their buttons. */
-const FEEDBACK_DURATION_MS = 2000;
-/** Wide enough for the reset explanation to wrap into a few short lines. */
-const RESET_CONFIRM_WIDTH = 300;
 /** Command box height when the panel isn't stretched by the sticky column. */
 const COMMAND_ROWS = 12;
 /** A slot meter turns orange from this share of slots used. */
@@ -60,85 +52,31 @@ const SlotMeter: React.FC<SlotMeterProps> = ({ label, used, total }) => {
     );
 };
 
-const ResetButton: React.FC = () => {
-    const { clearEnabledTweaks } = useCustomTweaksContext();
-    const { selectPreset } = usePresetsContext();
-    const [isResetSuccessShowing, setResetSuccessShowing] = useState(false);
-    const [isConfirming, { close: closeConfirm, toggle: toggleConfirm }] =
-        useDisclosure(false);
-
-    // Back to the Medium preset, which carries the default configuration
-    const handleReset = () => {
-        selectPreset('default');
-        clearEnabledTweaks();
-        closeConfirm();
-
-        setResetSuccessShowing(true);
-        setTimeout(() => setResetSuccessShowing(false), FEEDBACK_DURATION_MS);
-    };
-
-    return (
-        <Popover
-            opened={isConfirming}
-            onChange={(opened) => {
-                if (!opened) closeConfirm();
-            }}
-            position='bottom-end'
-            width={RESET_CONFIRM_WIDTH}
-            shadow='md'
-            trapFocus
-        >
-            <Popover.Target>
-                <Button
-                    variant='subtle'
-                    color={isResetSuccessShowing ? 'green' : 'gray'}
-                    size='compact-sm'
-                    onClick={toggleConfirm}
-                    leftSection={
-                        isResetSuccessShowing ? (
-                            <IconCheck {...ICON_SIZE_MD} />
-                        ) : (
-                            <IconArrowBackUp {...ICON_SIZE_MD} />
-                        )
-                    }
-                >
-                    {isResetSuccessShowing ? 'Reset done' : 'Reset all'}
-                </Button>
-            </Popover.Target>
-            <Popover.Dropdown>
-                <Stack gap='sm'>
-                    <Text fw={700}>Reset everything?</Text>
-                    <Text size='sm'>
-                        This selects the Medium preset, which puts every setting
-                        back to its default, including the lobby name tag. Your
-                        custom tweaks are turned off.
-                    </Text>
-                    <Text size='sm'>Saved presets and tweaks are kept.</Text>
-                    <Group justify='flex-end' gap='sm'>
-                        <Button variant='default' onClick={closeConfirm}>
-                            Cancel
-                        </Button>
-                        <Button color='red' onClick={handleReset}>
-                            Reset
-                        </Button>
-                    </Group>
-                </Stack>
-            </Popover.Dropdown>
-        </Popover>
-    );
-};
-
 export const GeneratedCommands: React.FC = () => {
     const { commandText, slotUsage, droppedTweaks, error } =
         useTweakDataContext();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>(
+        'idle'
+    );
+
+    // The clipboard can be blocked; then select the text so Ctrl+C works
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(commandText);
+            setCopyState('copied');
+            setTimeout(() => setCopyState('idle'), FEEDBACK_DURATION_MS);
+        } catch {
+            setCopyState('failed');
+            textareaRef.current?.focus();
+            textareaRef.current?.select();
+        }
+    };
 
     return (
         // Fills the sticky column, so the command box takes the height left
         <Stack gap='md' h='100%'>
-            <Group justify='space-between'>
-                <Title order={2}>Commands</Title>
-                <ResetButton />
-            </Group>
+            <Title order={2}>Commands</Title>
             <Stack gap='md' flex={1} mih={0}>
                 {slotUsage && !error && (
                     <>
@@ -154,54 +92,68 @@ export const GeneratedCommands: React.FC = () => {
                 )}
 
                 {error && (
-                    <Alert color='red' title='Command Generation Error'>
+                    <Alert color='red' title="Couldn't generate the commands">
                         {error}
                     </Alert>
                 )}
 
                 {droppedTweaks.length > 0 && (
-                    <Alert color='orange' title='Some tweaks were not included'>
-                        <Text size='sm'>
-                            No slots available for the following tweaks:
-                        </Text>
-                        <List>
-                            {droppedTweaks.map((t, i) => (
-                                <List.Item key={i}>
-                                    <Text size='sm'>
-                                        <strong>{t.description}</strong> (
-                                        {t.type})
-                                    </Text>
-                                </List.Item>
-                            ))}
-                        </List>
-                        <Text size='sm' mt='sm'>
-                            Disable some other tweaks to free up slots.
-                        </Text>
+                    <Alert
+                        color='orange'
+                        title='Some custom tweaks were left out'
+                    >
+                        <Stack gap='xs'>
+                            <Text size='sm'>
+                                They didn&apos;t fit into the free slots:
+                            </Text>
+                            <List size='sm'>
+                                {droppedTweaks.map((t, i) => (
+                                    <List.Item key={i}>
+                                        <Text span size='sm' fw={700}>
+                                            {t.description}
+                                        </Text>{' '}
+                                        · {t.type}
+                                    </List.Item>
+                                ))}
+                            </List>
+                            <Text size='sm'>
+                                Turn off other tweaks to make room.
+                            </Text>
+                        </Stack>
                     </Alert>
                 )}
 
-                <CopyButton value={commandText} timeout={FEEDBACK_DURATION_MS}>
-                    {({ copied, copy }) => (
-                        <Button
-                            size='md'
-                            fullWidth
-                            color={copied ? 'teal' : 'blue'}
-                            disabled={!commandText}
-                            onClick={copy}
-                            leftSection={
-                                copied ? (
-                                    <IconCheck {...ICON_SIZE_MD} />
-                                ) : (
-                                    <IconCopy {...ICON_SIZE_MD} />
-                                )
-                            }
-                        >
-                            {copied ? 'Copied!' : 'Copy commands'}
-                        </Button>
-                    )}
-                </CopyButton>
+                <Stack gap='xs'>
+                    <Button
+                        size='md'
+                        fullWidth
+                        color={copyState === 'copied' ? 'teal' : 'blue'}
+                        disabled={!commandText}
+                        onClick={() => void handleCopy()}
+                        leftSection={
+                            copyState === 'copied' ? (
+                                <IconCheck {...ICON_SIZE_MD} />
+                            ) : (
+                                <IconCopy {...ICON_SIZE_MD} />
+                            )
+                        }
+                    >
+                        {copyState === 'copied' ? 'Copied!' : 'Copy commands'}
+                    </Button>
+                    <Text size='sm'>
+                        Paste them into the chat of a lobby you host.
+                    </Text>
+                </Stack>
+
+                {copyState === 'failed' && (
+                    <Alert color='red' title="Couldn't copy automatically">
+                        The commands are selected below. Press Ctrl+C (⌘C on a
+                        Mac) to copy them.
+                    </Alert>
+                )}
 
                 <Textarea
+                    ref={textareaRef}
                     value={commandText}
                     readOnly
                     rows={COMMAND_ROWS}
