@@ -166,7 +166,8 @@ export const LuaEditor: React.FC<LuaEditorProps> = ({
     );
 
     return (
-        <Flex gap='md' style={{ height: 'calc(100vh - 200px)' }}>
+        // Fills the height the page leaves below its heading
+        <Flex gap='md' flex={1} mih={0}>
             <EditorSidebar
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}

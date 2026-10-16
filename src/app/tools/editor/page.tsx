@@ -5,7 +5,11 @@ import { Stack, Text, Title } from '@mantine/core';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { PageLoader } from '@/components/page-loader';
-import { PageWrapper } from '@/components/page-wrapper';
+import {
+    PAGE_HEIGHT,
+    PAGE_PADDING,
+    PageWrapper,
+} from '@/components/page-wrapper';
 import { LuaEditor } from '@/components/tabs/editor/editor';
 
 export default function Page() {
@@ -19,12 +23,13 @@ export default function Page() {
     if (error) return <div>Error loading Lua bundle: {error.message}</div>;
 
     return (
-        <PageWrapper py='md'>
-            <Stack gap='md'>
+        <PageWrapper py={PAGE_PADDING}>
+            <Stack gap='lg' h={PAGE_HEIGHT}>
                 <Stack gap='xs'>
-                    <Title order={2}>Lua Editor</Title>
-                    <Text c='dimmed' size='sm'>
-                        Edit Lua tweaks live with a VS Code-like experience
+                    <Title order={1}>Lua editor</Title>
+                    <Text>
+                        Read and edit the Lua in each command slot or source
+                        file, then copy it as Base64.
                     </Text>
                 </Stack>
 
