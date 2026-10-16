@@ -9,13 +9,13 @@
  * - $?content?$ : Optional section, removed entirely if any $variable$ inside is empty
  *
  * @example
- * // Template: '!rename NuttyB CE [$presetDifficulty$] $?[$lobbyName$]?$'
+ * // Template: '!bSet raptor_queen_count $queenCount$ $?[$lobbyName$]?$'
  * //
- * // With { presetDifficulty: 'Medium', lobbyName: 'My Game' }
- * // -> '!rename NuttyB CE [Medium] [My Game]'
+ * // With { queenCount: '12', lobbyName: 'My Game' }
+ * // -> '!bSet raptor_queen_count 12 [My Game]'
  * //
- * // With { presetDifficulty: 'Medium', lobbyName: '' }
- * // -> '!rename NuttyB CE [Medium]'
+ * // With { queenCount: '12', lobbyName: '' }
+ * // -> '!bSet raptor_queen_count 12'
  */
 
 import {
@@ -122,10 +122,10 @@ function replaceRequiredVariables(
  *
  * @example
  * interpolateCommandTemplate(
- *     '!rename NuttyB CE [$presetDifficulty$] $?[$lobbyName$]?$',
- *     { presetDifficulty: 'Medium', lobbyName: '' }
+ *     '!rename NuttyB CE $?[$lobbyName$]?$',
+ *     { lobbyName: '' }
  * )
- * // Returns: '!rename NuttyB CE [Medium]'
+ * // Returns: '!rename NuttyB CE'
  */
 export function interpolateCommandTemplate(
     template: string,
@@ -148,10 +148,13 @@ export function interpolateCommandTemplate(
  * @param config Configuration object
  * @returns Template context with all config values as strings
  */
-export function buildTemplateContext(config: Configuration): TemplateContext {
+export function buildTemplateContext(
+    config: Configuration,
+    presetName?: string
+): TemplateContext {
     let lobbyNameValue = config.lobbyName?.trim() ?? '';
     if (!lobbyNameValue) {
-        lobbyNameValue = getDefaultLobbyNameTag(config);
+        lobbyNameValue = getDefaultLobbyNameTag(config, presetName);
     }
 
     // Strip outer brackets because the template wraps it in brackets: $?[$lobbyName$]?$
@@ -160,7 +163,6 @@ export function buildTemplateContext(config: Configuration): TemplateContext {
     }
 
     return {
-        presetDifficulty: config.presetDifficulty,
         lobbyName: lobbyNameValue,
         gameMap: config.gameMap,
         start: config.start,
@@ -182,9 +184,10 @@ export function buildTemplateContext(config: Configuration): TemplateContext {
  */
 export function interpolateCommands(
     commands: readonly string[],
-    config: Configuration
+    config: Configuration,
+    presetName?: string
 ): string[] {
-    const context = buildTemplateContext(config);
+    const context = buildTemplateContext(config, presetName);
 
     return commands.map((cmd) => {
         if (isCommandTemplate(cmd)) {

@@ -26,6 +26,8 @@ import { isAllowedRemoteTweakUrl } from '@/lib/presets/tweak-url';
 
 interface PresetsContextValue {
     activePresetId: string | null;
+    /** Shown in the default lobby name tag */
+    activePresetName?: string;
     activePresetTweaks: EnabledCustomTweak[];
     builtInPresets: Preset[];
     localPresets: Preset[];
@@ -38,7 +40,6 @@ interface PresetsContextValue {
     ) => void;
     deleteLocalPreset: (id: string) => void;
     exportPreset: (id: string) => void;
-    clearActivePreset: () => void;
 }
 
 const PresetsContext = createContext<PresetsContextValue | undefined>(
@@ -103,8 +104,8 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 }
             }
         }
-        // Sort dynamic presets so 'default' is always first, then casual, hardcore, etc.
-        const order = ['default', 'casual'];
+        // Difficulty presets from easiest (Medium is 'default'), then the rest by name
+        const order = ['casual', 'easy', 'default', 'hard'];
         dynamicPresets.sort((a, b) => {
             const indexA = order.indexOf(a.id);
             const indexB = order.indexOf(b.id);
@@ -356,13 +357,10 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         [findPresetById]
     );
 
-    const clearActivePreset = useCallback(() => {
-        setActivePresetId(null);
-    }, [setActivePresetId]);
-
     const value = useMemo(
         () => ({
             activePresetId,
+            activePresetName: activePreset?.name,
             activePresetTweaks,
             builtInPresets,
             localPresets,
@@ -371,11 +369,11 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             saveCurrentAsPreset,
             deleteLocalPreset,
             exportPreset,
-            clearActivePreset,
             savePreset,
         }),
         [
             activePresetId,
+            activePreset,
             activePresetTweaks,
             builtInPresets,
             localPresets,
@@ -384,7 +382,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             saveCurrentAsPreset,
             deleteLocalPreset,
             exportPreset,
-            clearActivePreset,
             savePreset,
         ]
     );

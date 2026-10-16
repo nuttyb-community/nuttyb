@@ -32,15 +32,17 @@ describe('sanitizeConfiguration', () => {
 
     test('drops unknown keys and keeps known valid ones', () => {
         const result = sanitizeConfiguration({
+            // Removed in favour of the HP and difficulty-tweak settings
             presetDifficulty: 'Hard',
+            raptorHpMult: 3,
             bogusKey: 42,
         });
 
         expect(result).not.toHaveProperty('bogusKey');
-        expect(result.presetDifficulty).toBe('Hard');
+        expect(result).not.toHaveProperty('presetDifficulty');
         expect(result).toEqual({
             ...DEFAULT_CONFIGURATION,
-            presetDifficulty: 'Hard',
+            raptorHpMult: 3,
         });
     });
 
@@ -57,7 +59,6 @@ describe('sanitizeConfiguration', () => {
     test('passes a fully valid config through unchanged', () => {
         const validConfig: Configuration = {
             ...DEFAULT_CONFIGURATION,
-            presetDifficulty: 'Hard',
             challenges: 'Mini Bosses Extended',
             gameMap: 'Darkside (12P)',
             start: 'Zero grace',
@@ -67,6 +68,10 @@ describe('sanitizeConfiguration', () => {
             isRFLRPCT4: false,
             isMegaNuke: true,
             isT3GeoWalls: true,
+            isCrossFactionT2: false,
+            isDefencesT4: false,
+            raptorHpMult: 3,
+            queenHpMult: 2.5,
             incomeMult: 2,
             buildDistMult: 3,
             buildPowerMult: 4,

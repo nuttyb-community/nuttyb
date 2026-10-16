@@ -323,13 +323,15 @@ function assertCommandSizes(commands: Command[]): void {
  * @param configuration User's selected configuration
  * @param luaFiles Available Lua files from bundle
  * @param customTweaks Optional enabled custom tweaks
+ * @param presetName Active preset's name, used in the default lobby name tag
  *
  * @returns GenerationResult with commands, slot usage, and dropped tweaks
  */
 export function generateCommands(
     configuration: Configuration,
     luaFiles: LuaFile[],
-    customTweaks?: EnabledCustomTweak[]
+    customTweaks?: EnabledCustomTweak[],
+    presetName?: string
 ): GenerationResult {
     const luaFileMap = new Map(luaFiles.map((f) => [f.path, f.data]));
 
@@ -364,7 +366,8 @@ export function generateCommands(
     // 2. Interpolate command templates
     const interpolatedCommands = interpolateCommands(
         rawCommands,
-        configuration
+        configuration,
+        presetName
     );
 
     // 3. Resolve and pack tweakdefs (including preset tweaks merged into main pack)

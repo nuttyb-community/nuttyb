@@ -1,7 +1,7 @@
 {
   "id": "default",
-  "name": "Default",
-  "description": "Default configuration settings.",
+  "name": "Medium",
+  "description": "Balanced challenge for experienced players.",
   "icon": "IconRotateDot",
   "configuration": {}
 }

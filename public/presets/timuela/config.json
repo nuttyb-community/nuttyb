@@ -5,7 +5,8 @@
     "icon": "IconUser",
     "status": "enabled",
     "configuration": {
-        "presetDifficulty": "Easy",
+        "raptorHpMult": 1.3,
+        "queenHpMult": 1.3,
         "challenges": "Mini Bosses",
         "gameMap": "Full Metal Plate (12P)",
         "start": "No rush",

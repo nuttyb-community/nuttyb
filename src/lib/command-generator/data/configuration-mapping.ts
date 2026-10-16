@@ -126,33 +126,6 @@ export const BASE_TWEAKS = {
 } as const;
 
 export const CONFIGURATION_MAPPING: ValueMapping = {
-    presetDifficulty: {
-        description: 'Preset difficulty level',
-        values: {
-            Easy: {
-                tweakdefs: [
-                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.3}',
-                    'lua/queen-hp-template.lua{HP_MULTIPLIER=1.3}',
-                    'lua/cross-faction-t2.lua',
-                    'lua/defences-t4.lua',
-                ],
-            },
-            Medium: {
-                tweakdefs: [
-                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}',
-                    'lua/queen-hp-template.lua{HP_MULTIPLIER=1.5}',
-                    'lua/cross-faction-t2.lua',
-                    'lua/defences-t4.lua',
-                ],
-            },
-            Hard: {
-                tweakdefs: [
-                    'lua/raptor-hp-template.lua{HP_MULTIPLIER=3.0}',
-                    'lua/queen-hp-template.lua{HP_MULTIPLIER=3.0}',
-                ],
-            },
-        },
-    },
     challenges: {
         description: 'Extra challenges',
         values: {
@@ -360,6 +333,29 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             true: { tweakdefs: ['lua/geo+walls-t3.lua'] },
             false: undefined,
         },
+    },
+    isCrossFactionT2: {
+        description: 'Cross-faction T2 labs',
+        values: {
+            true: { tweakdefs: ['lua/cross-faction-t2.lua'] },
+            false: undefined,
+        },
+    },
+    isDefencesT4: {
+        description: 'T4 defences',
+        values: {
+            true: { tweakdefs: ['lua/defences-t4.lua'] },
+            false: undefined,
+        },
+    },
+    // HP multipliers - added as template parameters in getMappedData()
+    raptorHpMult: {
+        description: 'Raptor HP multiplier',
+        values: {},
+    },
+    queenHpMult: {
+        description: 'Queen HP multiplier',
+        values: {},
     },
     // Numeric settings - handled via command templates, not value mapping
     incomeMult: {

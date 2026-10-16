@@ -6,11 +6,14 @@ A preset is **not** a standalone set of instructions that replaces everything. T
 
 When you select a preset:
 
-- It **applies your preset's configuration** (settings like difficulty, map, economy multipliers, etc.). Only the keys you define override the defaults — everything else stays.
-- It **keeps all the regular toggleable tweaks** from the main configurator. You can still toggle them on/off.
+- It **applies your preset's configuration** (settings like raptor HP, map, economy multipliers, etc.). Only the keys you define override the defaults — everything else stays.
+- It **keeps all the regular settings** in the configurator, so you can fine-tune the preset afterwards. Changed settings mark the preset as modified (`*`).
+- Its **name goes into the default lobby name tag**, e.g. `NuttyB CE [Mini Bosses][Medium][No Mex]`. A custom lobby name tag replaces it.
 - Any **custom Lua tweaks** in your preset get merged into the bundle. If a tweak has a `replaces` field matching a built-in tweak, yours replaces it. If not, it's added alongside everything else.
 
 > Only one preset can be active at a time. You can export presets and manually merge them into one if needed.
+
+The difficulty levels are presets too. **Easy**, **Medium** and **Hard** set the raptor and queen HP multipliers, cross-faction T2 labs and T4 defences. **Medium** carries the default configuration, and **Reset all** returns to it.
 
 ## Why Use Presets?
 
@@ -23,7 +26,7 @@ When you select a preset:
 
 ## How to Create a Preset
 
-1. Click **New Preset** (Green button Top right corner).
+1. Click **New preset** (next to the Preset heading in the configurator).
 2. Fill in name, description, and pick an icon.
 3. (Optional) Add custom Lua tweaks — either a raw GitHub URL (`raw.githubusercontent.com` or `gist.githubusercontent.com`) or a local bundle path.
 
@@ -64,7 +67,10 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
     "icon": "IconBolt",
     "status": "enabled",
     "configuration": {
-        "presetDifficulty": "Easy",
+        "raptorHpMult": 1.3,
+        "queenHpMult": 1.3,
+        "isCrossFactionT2": true,
+        "isDefencesT4": true,
         "challenges": "Mini Bosses",
         "gameMap": "Full Metal Plate (12P)",
         "start": "No rush",
@@ -106,7 +112,10 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 
 | Key | Type | Values |
 |---|---|---|
-| `presetDifficulty` | string | `"Easy"`, `"Medium"`, `"Hard"` |
+| `raptorHpMult` | number | Raptor HP multiplier (0.1 – 10) |
+| `queenHpMult` | number | Queen HP multiplier (0.1 – 10) |
+| `isCrossFactionT2` | boolean | Enable cross-faction T2 labs (70% extra cost) |
+| `isDefencesT4` | boolean | Enable T4 defences |
 | `challenges` | string | `"None"`, `"Mini Bosses"`, `"Mini Bosses Extended"`, `"Experimental Wave Challenge"` |
 | `gameMap` | string | Map name (e.g. `"Full Metal Plate (12P)"`) |
 | `start` | string | `"No rush"`, `"No rush solo"`, `"Zero grace"`, `"Surrounded"` |
@@ -115,6 +124,7 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 | `isRFLRPCRebalance` | boolean | Enable LRPC rebalance |
 | `isRFLRPCT4` | boolean | Enable T4 LRPC |
 | `isMegaNuke` | boolean | Enable mega nuke |
+| `isT3GeoWalls` | boolean | Enable T3 geo and walls |
 | `incomeMult` | number | Income multiplier (0.1 – 10) |
 | `buildDistMult` | number | Build distance multiplier (0.5 – 10) |
 | `buildPowerMult` | number | Build power multiplier (0.1 – 10) |
@@ -132,7 +142,7 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 ## Character Limits & Minification
 
 - The configurator has a **built-in minifier** — no need to minify manually.
-- Use the **Base64 Tab** to check if your bundle exceeds the max character limit.
+- Use **Developer tools → Base64** to check if your bundle exceeds the max character limit.
 - If it does, the configurator throws an error (it won't fail silently).
 
 ## FAQ

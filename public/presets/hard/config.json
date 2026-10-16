@@ -1,0 +1,12 @@
+{
+  "id": "hard",
+  "name": "Hard",
+  "description": "Brutal difficulty for veterans.",
+  "icon": "IconFlame",
+  "configuration": {
+    "raptorHpMult": 3,
+    "queenHpMult": 3,
+    "isCrossFactionT2": false,
+    "isDefencesT4": false
+  }
+}

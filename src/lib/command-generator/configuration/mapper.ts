@@ -19,7 +19,12 @@ export function getMappedData(configuration: Configuration): {
 } {
     const commands: string[] = [...BASE_COMMANDS];
     const tweakunits: string[] = [...BASE_TWEAKS.tweakunits];
-    const tweakdefs: string[] = [...BASE_TWEAKS.tweakdefs];
+    const tweakdefs: string[] = [
+        ...BASE_TWEAKS.tweakdefs,
+        // Numbers can't be value-mapped, so they fill the HP templates directly
+        `lua/raptor-hp-template.lua{HP_MULTIPLIER=${configuration.raptorHpMult}}`,
+        `lua/queen-hp-template.lua{HP_MULTIPLIER=${configuration.queenHpMult}}`,
+    ];
 
     for (const configKey in configuration) {
         const configValue = configuration[configKey as keyof Configuration];

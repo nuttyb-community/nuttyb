@@ -1,4 +1,3 @@
-export const PRESET_DIFFICULTIES = ['Easy', 'Medium', 'Hard'] as const;
 export const CHALLENGES = [
     'None',
     'Mini Bosses',
@@ -26,13 +25,11 @@ export const START_OPTIONS = [
     'Surrounded',
 ] as const;
 
-export type PresetDifficulty = (typeof PRESET_DIFFICULTIES)[number];
 export type Challenges = (typeof CHALLENGES)[number];
 export type GameMap = (typeof MAPS)[number];
 export type StartOption = (typeof START_OPTIONS)[number];
 
 export interface Configuration {
-    presetDifficulty: PresetDifficulty;
     challenges: Challenges;
     gameMap: GameMap;
     start: StartOption;
@@ -42,7 +39,11 @@ export interface Configuration {
     isRFLRPCT4: boolean;
     isMegaNuke: boolean;
     isT3GeoWalls: boolean;
+    isCrossFactionT2: boolean;
+    isDefencesT4: boolean;
     // Numeric multipliers
+    raptorHpMult: number;
+    queenHpMult: number;
     incomeMult: number;
     buildDistMult: number;
     buildPowerMult: number;
@@ -50,7 +51,6 @@ export interface Configuration {
 }
 
 export const DEFAULT_CONFIGURATION: Configuration = {
-    presetDifficulty: 'Medium',
     challenges: 'Mini Bosses',
     gameMap: 'Full Metal Plate (12P)',
     start: 'No rush',
@@ -60,7 +60,11 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     isRFLRPCT4: true,
     isMegaNuke: false,
     isT3GeoWalls: false,
+    isCrossFactionT2: true,
+    isDefencesT4: true,
     // Numeric multipliers
+    raptorHpMult: 1.5,
+    queenHpMult: 1.5,
     incomeMult: 1,
     buildDistMult: 1.5,
     buildPowerMult: 1,
@@ -68,23 +72,13 @@ export const DEFAULT_CONFIGURATION: Configuration = {
 };
 
 /**
- * Generates the default lobby name tag based on configuration settings.
+ * Generates the default lobby name tag from the challenge and the active
+ * preset's name. Without a preset, the preset part is left out.
  */
-export function getDefaultLobbyNameTag(config: {
-    presetDifficulty: PresetDifficulty;
-    challenges: Challenges;
-}): string {
-    let diffTag = '1_5x';
-    switch (config.presetDifficulty) {
-        case 'Easy':
-            diffTag = '1_3x';
-            break;
-        case 'Hard':
-            diffTag = '3x';
-            break;
-        // No default
-    }
-
+export function getDefaultLobbyNameTag(
+    config: { challenges: Challenges },
+    presetName?: string
+): string {
     let challengeTag = '';
     switch (config.challenges) {
         case 'Mini Bosses':
@@ -105,5 +99,7 @@ export function getDefaultLobbyNameTag(config: {
         // No default
     }
 
-    return `Raptors${challengeTag}[${diffTag} QHP ${diffTag} HP][No Mex]`;
+    const presetTag = presetName ? `[${presetName}]` : '';
+
+    return `Raptors${challengeTag}${presetTag}[No Mex]`;
 }

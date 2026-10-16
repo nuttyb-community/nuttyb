@@ -25,7 +25,6 @@ import {
 } from '@tabler/icons-react';
 
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
-import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 import { useTweakDataContext } from '@/components/contexts/tweak-data-context';
@@ -54,15 +53,14 @@ const SlotMeter: React.FC<SlotMeterProps> = ({ label, used, total }) => {
 };
 
 const ResetButton: React.FC = () => {
-    const { resetConfiguration } = useConfiguratorContext();
     const { clearEnabledTweaks } = useCustomTweaksContext();
-    const { clearActivePreset } = usePresetsContext();
+    const { selectPreset } = usePresetsContext();
     const [isResetSuccessShowing, setResetSuccessShowing] = useState(false);
 
+    // Back to the Medium preset, which carries the default configuration
     const handleReset = () => {
-        resetConfiguration();
+        selectPreset('default');
         clearEnabledTweaks();
-        clearActivePreset();
 
         setResetSuccessShowing(true);
         setTimeout(() => setResetSuccessShowing(false), 2000);

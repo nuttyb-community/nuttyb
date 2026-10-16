@@ -18,6 +18,7 @@ import { IconX } from '@tabler/icons-react';
 
 import { InfoTooltip } from '@/components/common/info-tooltip';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
+import { usePresetsContext } from '@/components/contexts/presets-context';
 import {
     DEFAULT_CONFIGURATION,
     GameMap,
@@ -27,7 +28,7 @@ import {
     StartOption,
 } from '@/lib/command-generator/data/configuration';
 
-function clampNumber(
+export function clampNumber(
     value: string | number,
     min: number,
     max: number,
@@ -47,7 +48,7 @@ interface LabelWithTooltipProps {
     tooltip: string;
 }
 
-const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
+export const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
     label,
     tooltip,
 }) => (
@@ -64,6 +65,7 @@ const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
 
 export const GeneralSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
+    const { activePresetName } = usePresetsContext();
     const lobbyName = configuration.lobbyName ?? '';
     const [localLobbyName, setLocalLobbyName] = useState(lobbyName);
 
@@ -104,7 +106,10 @@ export const GeneralSection: React.FC = () => {
                                 tooltip='It will be added to auto-generated lobby name'
                             />
                         }
-                        placeholder={getDefaultLobbyNameTag(configuration)}
+                        placeholder={getDefaultLobbyNameTag(
+                            configuration,
+                            activePresetName
+                        )}
                         value={localLobbyName}
                         onChange={handleLobbyNameChange}
                         onBlur={() => debouncedSetProperty.flush()}

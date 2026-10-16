@@ -25,7 +25,8 @@ export interface UseTweakDataReturn {
 export function useTweakData(
     configuration: Configuration,
     luaFiles: LuaFile[],
-    enabledCustomTweaks?: EnabledCustomTweak[]
+    enabledCustomTweaks?: EnabledCustomTweak[],
+    presetName?: string
 ): UseTweakDataReturn {
     const result = useMemo<UseTweakDataReturn>(() => {
         if (luaFiles.length === 0) {
@@ -36,7 +37,8 @@ export function useTweakData(
             const result = generateCommands(
                 configuration,
                 luaFiles,
-                enabledCustomTweaks
+                enabledCustomTweaks,
+                presetName
             );
 
             const commandText = result.commands
@@ -75,7 +77,7 @@ export function useTweakData(
                         : 'Failed to generate commands',
             };
         }
-    }, [configuration, luaFiles, enabledCustomTweaks]);
+    }, [configuration, luaFiles, enabledCustomTweaks, presetName]);
 
     return result;
 }

@@ -10,6 +10,7 @@ import {
     generateCommands,
 } from '@/lib/command-generator/command-generator';
 import { interpolateCommands } from '@/lib/command-generator/command-template';
+import { getMappedData } from '@/lib/command-generator/configuration/mapper';
 import {
     MAX_SLOT_SIZE,
     MAX_SLOTS_PER_TYPE,
@@ -218,6 +219,23 @@ describe('Command generation', () => {
         for (const expectedTweak of expectedTweaks) {
             expect(tweaks).toContain(expectedTweak);
         }
+    });
+});
+
+describe('HP multipliers', () => {
+    test('fill the HP template parameters', () => {
+        const { tweakdefs } = getMappedData({
+            ...DEFAULT_CONFIGURATION,
+            raptorHpMult: 3,
+            queenHpMult: 2.5,
+        });
+
+        expect(tweakdefs).toContain(
+            'lua/raptor-hp-template.lua{HP_MULTIPLIER=3}'
+        );
+        expect(tweakdefs).toContain(
+            'lua/queen-hp-template.lua{HP_MULTIPLIER=2.5}'
+        );
     });
 });
 

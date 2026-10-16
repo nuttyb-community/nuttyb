@@ -1,0 +1,10 @@
+{
+  "id": "easy",
+  "name": "Easy",
+  "description": "Gentle introduction with extra tools.",
+  "icon": "IconFeather",
+  "configuration": {
+    "raptorHpMult": 1.3,
+    "queenHpMult": 1.3
+  }
+}

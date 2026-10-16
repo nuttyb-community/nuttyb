@@ -5,7 +5,6 @@
     "icon": "IconBolt",
     "status": "disabled",
     "configuration": {
-        "presetDifficulty": "Medium",
         "challenges": "Mini Bosses",
         "queenCount": 12
     },

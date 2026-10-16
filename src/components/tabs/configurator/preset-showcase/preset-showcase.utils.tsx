@@ -3,6 +3,7 @@ import React from 'react';
 import {
     IconBolt,
     IconDownload,
+    IconFeather,
     IconFlame,
     IconMoodSmile,
     IconRotateDot,
@@ -33,6 +34,7 @@ export const ICON_MAP: Record<
     IconSparkles: { label: 'Sparkles', component: IconSparkles },
     IconDownload: { label: 'Download', component: IconDownload },
     IconUser: { label: 'User', component: IconUser },
+    IconFeather: { label: 'Feather', component: IconFeather },
 };
 
 /** Subset of icons available in the preset save/edit modal. */
@@ -56,9 +58,21 @@ const CONFIG_METADATA: Record<
     keyof Configuration,
     { label: string; tooltip: string }
 > = {
-    presetDifficulty: {
-        label: 'Difficulty',
-        tooltip: 'Preset base difficulty (Easy, Medium, Hard)',
+    raptorHpMult: {
+        label: 'Raptor HP Multiplier',
+        tooltip: 'Health of regular raptors (0.1 - 10)',
+    },
+    queenHpMult: {
+        label: 'Queen HP Multiplier',
+        tooltip: 'Health of raptor queens (0.1 - 10)',
+    },
+    isCrossFactionT2: {
+        label: 'Cross-faction T2',
+        tooltip: "Build other factions' T2 labs at 70% extra cost",
+    },
+    isDefencesT4: {
+        label: 'T4 Defences',
+        tooltip: 'T4 defensive structures',
     },
     lobbyName: {
         label: 'Lobby Name Tag',

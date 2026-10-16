@@ -116,7 +116,7 @@ const PresetCardFrame: React.FC<PresetCardFrameProps> = ({
     const { hovered, ref } = useHover<HTMLDivElement>();
     const isHighlighted = hovered && !isDisabled && !isActive;
 
-    // Same states as the landing page link cards and the difficulty cards
+    // Same hover and selected states as the landing page link cards
     return (
         <Card
             ref={ref}

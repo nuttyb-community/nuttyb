@@ -2,111 +2,73 @@
 
 import React from 'react';
 
-import {
-    Flex,
-    List,
-    Radio,
-    SimpleGrid,
-    Stack,
-    Text,
-    Title,
-} from '@mantine/core';
+import { NumberInput, SimpleGrid, Stack, Title } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
-import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
-import {
-    PRESET_DIFFICULTIES,
-    PresetDifficulty,
-} from '@/lib/command-generator/data/configuration';
+import { DEFAULT_CONFIGURATION } from '@/lib/command-generator/data/configuration';
 
-const PRESET_DETAILS: Record<
-    PresetDifficulty,
-    { title: string; description: string; features: string[] }
-> = {
-    Easy: {
-        title: 'Easy',
-        description: 'Gentle introduction with extra tools',
-        features: [
-            '1.3x enemy HP',
-            '1.3x queen HP',
-            'Cross-faction T2 labs',
-            'T4 defences',
-        ],
-    },
-    Medium: {
-        title: 'Medium',
-        description: 'Balanced challenge for experienced players',
-        features: [
-            '1.5x enemy HP',
-            '1.5x queen HP',
-            'Cross-faction T2 labs',
-            'T4 defences',
-        ],
-    },
-    Hard: {
-        title: 'Hard',
-        description: 'Brutal difficulty for veterans',
-        features: ['3x enemy HP', '3x queen HP'],
-    },
-};
+import { clampNumber, LabelWithTooltip } from './general';
 
 export const DifficultySection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
-    const { clearEnabledTweaks } = useCustomTweaksContext();
-
-    const handlePresetChange = (value: string) => {
-        setProperty('presetDifficulty', value as PresetDifficulty);
-        clearEnabledTweaks();
-    };
 
     return (
         <Stack gap='md'>
             <Title order={2}>Difficulty</Title>
-            <Radio.Group
-                value={configuration.presetDifficulty}
-                onChange={handlePresetChange}
-            >
-                <SimpleGrid cols={{ base: 1, sm: 3 }} spacing='md'>
-                    {PRESET_DIFFICULTIES.map((preset) => {
-                        const details = PRESET_DETAILS[preset];
-                        return (
-                            <Radio.Card
-                                key={preset}
-                                value={preset}
-                                radius='md'
-                                p='sm'
-                                bd={
-                                    preset === configuration.presetDifficulty
-                                        ? '1px solid var(--mantine-primary-color-filled)'
-                                        : undefined
-                                }
-                                bg={
-                                    preset === configuration.presetDifficulty
-                                        ? 'var(--mantine-primary-color-light)'
-                                        : undefined
-                                }
-                            >
-                                <Stack gap='xs' style={{ flex: 1 }}>
-                                    <Flex align='center' gap='md'>
-                                        <Radio.Indicator />
-                                        <Text fw={700}>{details.title}</Text>
-                                    </Flex>
-                                    <Text size='sm' c='dimmed'>
-                                        {details.description}
-                                    </Text>
-                                    <List>
-                                        {details.features.map((feature) => (
-                                            <List.Item key={feature}>
-                                                {feature}
-                                            </List.Item>
-                                        ))}
-                                    </List>
-                                </Stack>
-                            </Radio.Card>
-                        );
-                    })}
-                </SimpleGrid>
-            </Radio.Group>
+            <SimpleGrid spacing='xl' cols={2}>
+                <NumberInput
+                    label={
+                        <LabelWithTooltip
+                            label='Raptor HP multiplier'
+                            tooltip='Health of regular raptors (0.1 - 10)'
+                        />
+                    }
+                    value={configuration.raptorHpMult}
+                    onChange={(value) =>
+                        setProperty(
+                            'raptorHpMult',
+                            clampNumber(
+                                value,
+                                0.1,
+                                10,
+                                DEFAULT_CONFIGURATION.raptorHpMult
+                            )
+                        )
+                    }
+                    min={0.1}
+                    max={10}
+                    step={0.1}
+                    decimalScale={1}
+                    allowNegative={false}
+                    required
+                />
+                <NumberInput
+                    label={
+                        <LabelWithTooltip
+                            label='Queen HP multiplier'
+                            tooltip='Health of raptor queens (0.1 - 10)'
+                        />
+                    }
+                    value={configuration.queenHpMult}
+                    onChange={(value) =>
+                        setProperty(
+                            'queenHpMult',
+                            clampNumber(
+                                value,
+                                0.1,
+                                10,
+                                DEFAULT_CONFIGURATION.queenHpMult
+                            )
+                        )
+                    }
+                    min={0.1}
+                    max={10}
+                    step={0.1}
+                    decimalScale={1}
+                    allowNegative={false}
+                    required
+                />
+            </SimpleGrid>
         </Stack>
     );
 };

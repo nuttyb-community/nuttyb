@@ -21,7 +21,7 @@ export default function Page() {
     const { luaFiles, isLoading: isLuaLoading, error } = useLuaBundleContext();
     const { getEnabledTweaks, isLoading: isTweaksLoading } =
         useCustomTweaksContext();
-    const { activePresetTweaks } = usePresetsContext();
+    const { activePresetTweaks, activePresetName } = usePresetsContext();
 
     // Memoised: a fresh array identity here would re-run full command
     // generation (Lua minification of the whole bundle) on every render.
@@ -34,7 +34,12 @@ export default function Page() {
         slotUsage,
         error: tweakError,
         droppedTweaks,
-    } = useTweakData(configuration, luaFiles, enabledCustomTweaks);
+    } = useTweakData(
+        configuration,
+        luaFiles,
+        enabledCustomTweaks,
+        activePresetName
+    );
 
     const isLoading = isLuaLoading || isConfigLoading || isTweaksLoading;
 

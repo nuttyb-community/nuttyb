@@ -3,19 +3,13 @@ import {
     Configuration,
     DEFAULT_CONFIGURATION,
     MAPS,
-    PRESET_DIFFICULTIES,
     START_OPTIONS,
 } from '@/lib/command-generator/data/configuration';
 
 /** Enum fields mapped to their allowed value sets, for sanitization. */
 const ENUM_FIELDS: {
-    [K in
-        | 'presetDifficulty'
-        | 'challenges'
-        | 'gameMap'
-        | 'start']: readonly Configuration[K][];
+    [K in 'challenges' | 'gameMap' | 'start']: readonly Configuration[K][];
 } = {
-    presetDifficulty: PRESET_DIFFICULTIES,
     challenges: CHALLENGES,
     gameMap: MAPS,
     start: START_OPTIONS,

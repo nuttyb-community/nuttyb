@@ -149,7 +149,6 @@ describe('interpolateCommandTemplate', () => {
         test('generates command with lobby name', () => {
             expect(
                 interpolateCommandTemplate(renameTemplate, {
-                    presetDifficulty: 'Medium',
                     lobbyName: 'My Game',
                 })
             ).toBe('!rename NuttyB CE [My Game]');
@@ -158,7 +157,6 @@ describe('interpolateCommandTemplate', () => {
         test('generates command without lobby name', () => {
             expect(
                 interpolateCommandTemplate(renameTemplate, {
-                    presetDifficulty: 'Medium',
                     lobbyName: '',
                 })
             ).toBe('!rename NuttyB CE');
@@ -170,10 +168,7 @@ describe('buildTemplateContext', () => {
     test('builds context from configuration', () => {
         const context = buildTemplateContext(DEFAULT_CONFIGURATION);
 
-        expect(context.presetDifficulty).toBe('Medium');
-        expect(context.lobbyName).toBe(
-            'Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]'
-        );
+        expect(context.lobbyName).toBe('Raptors [Mini Bosses][No Mex]');
         expect(context.gameMap).toBe('Full Metal Plate (12P)');
         expect(context.start).toBe('No rush');
     });
@@ -186,6 +181,12 @@ describe('buildTemplateContext', () => {
 
         expect(context.lobbyName).toBe('My Game');
     });
+
+    test('puts the preset name in the default lobby name tag', () => {
+        const context = buildTemplateContext(DEFAULT_CONFIGURATION, 'Medium');
+
+        expect(context.lobbyName).toBe('Raptors [Mini Bosses][Medium][No Mex]');
+    });
 });
 
 describe('interpolateCommands', () => {
@@ -196,11 +197,15 @@ describe('interpolateCommands', () => {
             '!balance',
         ];
 
-        const result = interpolateCommands(commands, DEFAULT_CONFIGURATION);
+        const result = interpolateCommands(
+            commands,
+            DEFAULT_CONFIGURATION,
+            'Medium'
+        );
 
         expect(result).toEqual([
             '!preset coop',
-            '!rename NuttyB CE [Raptors [Mini Bosses][1_5x QHP 1_5x HP][No Mex]]',
+            '!rename NuttyB CE [Raptors [Mini Bosses][Medium][No Mex]]',
             '!balance',
         ]);
     });
@@ -222,7 +227,6 @@ describe('interpolateCommands', () => {
 
         const config = {
             ...DEFAULT_CONFIGURATION,
-            presetDifficulty: 'Hard' as const,
             lobbyName: 'Epic Battle',
         };
 

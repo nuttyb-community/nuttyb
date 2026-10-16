@@ -1,11 +1,12 @@
 {
   "id": "casual",
-  "name": "Casual Start",
+  "name": "Casual",
   "description": "Easy start options for a relaxed gameplay experience.",
   "icon": "IconMoodSmile",
   "status": "enabled",
   "configuration": {
-    "presetDifficulty": "Easy",
+    "raptorHpMult": 1.3,
+    "queenHpMult": 1.3,
     "challenges": "None",
     "start": "No rush",
     "incomeMult": 2,
