@@ -4,45 +4,50 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
     ActionIcon,
+    Alert,
     Button,
-    Card,
-    Divider,
-    Flex,
-    Grid,
     Group,
+    Input,
     Modal,
-    ScrollArea,
-    Select,
+    MultiSelect,
+    Paper,
+    SegmentedControl,
     Stack,
-    Switch,
     Text,
     Textarea,
     TextInput,
-    Tooltip,
 } from '@mantine/core';
 import {
     IconAlertTriangle,
-    IconCircleCheck,
-    IconCircleX,
     IconFileImport,
     IconPlus,
     IconTrash,
 } from '@tabler/icons-react';
 
-import { InfoTooltip } from '@/components/common/info-tooltip';
 import { Configuration } from '@/lib/command-generator/data/configuration';
+import { LUA_PRIORITIES } from '@/lib/command-generator/data/configuration-mapping';
 import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';
-import type { Preset, PresetStatus } from '@/lib/presets/registry';
+import type { Preset } from '@/lib/presets/registry';
 import { isValidTweakUrl } from '@/lib/presets/tweak-url';
 
 import {
     computeConfigDiff,
-    getPresetIcon,
-    ICON_MAP,
-    ICON_OPTIONS,
+    ConfigDiffTable,
     mapPresetTweaksToFormRows,
     type TweakFormRow,
 } from './preset-showcase.utils';
+
+/** Built-in Lua files a preset tweak can replace. */
+const BUILT_IN_LUA_FILES = Object.keys(LUA_PRIORITIES).toSorted();
+
+/** Where the preset's settings come from, explained above the table. */
+const SETTINGS_SOURCE_TEXT = {
+    current: 'Saved from your current configuration.',
+    preset: 'Stored in this preset. Select the preset to change them.',
+    import: 'Taken from the imported file.',
+} as const;
+
+const isRemotePath = (path: string) => /^https?:\/\//.test(path.trim());
 
 interface PresetModalProps {
     opened: boolean;
@@ -69,15 +74,14 @@ export const PresetModal: React.FC<PresetModalProps> = ({
 }) => {
     const [presetName, setPresetName] = useState('');
     const [presetDescription, setPresetDescription] = useState('');
-    const [selectedIcon, setSelectedIcon] = useState('IconSparkles');
-    const [presetStatus, setPresetStatus] = useState<PresetStatus>('enabled');
     const [presetConfiguration, setPresetConfiguration] =
         useState<Configuration | null>(null);
+    const [settingsSource, setSettingsSource] =
+        useState<keyof typeof SETTINGS_SOURCE_TEXT>('current');
     const [presetTweaks, setPresetTweaks] = useState<TweakFormRow[]>([]);
     const [importError, setImportError] = useState<string | null>(null);
-    const [saveError, setSaveError] = useState<string | null>(null);
-    const [importSuccess, setImportSuccess] = useState(false);
-    const [hasRemoteTweaks, setHasRemoteTweaks] = useState(false);
+    // Empty tweak paths are only flagged after a save attempt
+    const [hasTriedSave, setTriedSave] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -87,101 +91,73 @@ export const PresetModal: React.FC<PresetModalProps> = ({
     useEffect(() => {
         if (!opened) return;
 
-        if (editPreset) {
-            setPresetName(editPreset.name);
-            setPresetDescription(editPreset.description || '');
-            setSelectedIcon(editPreset.icon || 'IconSparkles');
-            setPresetStatus(editPreset.status ?? 'enabled');
-            setPresetConfiguration(
-                isEditPresetActive
-                    ? { ...configuration }
-                    : { ...editPreset.configuration }
-            );
-            setPresetTweaks(
-                mapPresetTweaksToFormRows(editPreset.presetTweaks || [])
-            );
-            const hasRemote = (editPreset.presetTweaks || []).some(
-                (t) =>
-                    t.path &&
-                    (t.path.startsWith('http://') ||
-                        t.path.startsWith('https://'))
-            );
-            setHasRemoteTweaks(hasRemote);
-        } else {
-            setPresetName('');
-            setPresetDescription('');
-            setSelectedIcon('IconSparkles');
-            setPresetStatus('enabled');
-            setPresetConfiguration({ ...configuration });
-            setPresetTweaks([]);
-            setHasRemoteTweaks(false);
-        }
+        const useStoredSettings = editPreset && !isEditPresetActive;
+        setPresetName(editPreset?.name ?? '');
+        setPresetDescription(editPreset?.description ?? '');
+        setPresetConfiguration(
+            useStoredSettings
+                ? { ...editPreset.configuration }
+                : { ...configuration }
+        );
+        setSettingsSource(useStoredSettings ? 'preset' : 'current');
+        setPresetTweaks(
+            mapPresetTweaksToFormRows(editPreset?.presetTweaks ?? [])
+        );
         setImportError(null);
-        setSaveError(null);
-        setImportSuccess(false);
+        setTriedSave(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [opened]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
-    const configDiff = useMemo(() => {
-        const configToCompare = presetConfiguration || configuration;
-        return computeConfigDiff(configToCompare);
-    }, [presetConfiguration, configuration]);
+    const configDiff = useMemo(
+        () => computeConfigDiff(presetConfiguration ?? configuration),
+        [presetConfiguration, configuration]
+    );
+
+    const hasRemoteTweaks = presetTweaks.some((t) => isRemotePath(t.path));
+
+    // Unsupported hosts are flagged as you type; empty paths only after saving
+    const getPathError = (path: string): string | undefined => {
+        const trimmed = path.trim();
+        if (!trimmed)
+            return hasTriedSave
+                ? 'Enter a GitHub URL or a bundled path'
+                : undefined;
+        if (!isValidTweakUrl(trimmed))
+            return 'Only raw.githubusercontent.com and gist.githubusercontent.com URLs are allowed';
+        return undefined;
+    };
 
     const handleSave = () => {
+        setTriedSave(true);
         if (!presetName.trim()) return;
 
-        const hasInvalidUrl = presetTweaks.some(
-            (t) => t.path.trim() && !isValidTweakUrl(t.path.trim())
+        const hasInvalidPath = presetTweaks.some(
+            (t) => !t.path.trim() || !isValidTweakUrl(t.path.trim())
         );
-
-        if (hasInvalidUrl) {
-            setSaveError(
-                'One or more tweaks contain an unsupported remote URL. Only GitHub URLs (raw/gist) are allowed.'
-            );
-            return;
-        }
-
-        setSaveError(null);
-
-        const formattedPresetTweaks = presetTweaks
-            .filter((t) => t.path.trim())
-            .map((t) => {
-                const replacesStr = t.replaces.trim();
-                let replaces: string | string[] | undefined;
-                if (replacesStr) {
-                    replaces = replacesStr.includes(',')
-                        ? replacesStr
-                              .split(',')
-                              .map((s) => s.trim())
-                              .filter(Boolean)
-                        : replacesStr;
-                }
-                return {
-                    description: t.description.trim(),
-                    type: t.type,
-                    path: t.path.trim(),
-                    ...(replaces && { replaces }),
-                };
-            });
+        if (hasInvalidPath) return;
 
         onSave(
             {
                 name: presetName.trim(),
-                description: presetDescription.trim() || 'Custom user preset.',
-                icon: selectedIcon,
-                status: presetStatus,
-                configuration: presetConfiguration || { ...configuration },
-                presetTweaks: formattedPresetTweaks,
+                description: presetDescription.trim(),
+                configuration: presetConfiguration ?? { ...configuration },
+                presetTweaks: presetTweaks.map((t) => ({
+                    description: t.description.trim(),
+                    type: t.type,
+                    path: t.path.trim(),
+                    ...(t.replaces.length > 0 && {
+                        replaces:
+                            t.replaces.length === 1
+                                ? t.replaces[0]
+                                : t.replaces,
+                    }),
+                })),
             },
             editPreset?.id
         );
 
         onClose();
-    };
-
-    const handleImportClick = () => {
-        fileInputRef.current?.click();
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,19 +170,25 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                     const parsed = JSON.parse(content) as Partial<Preset>;
                     if (!parsed.name || typeof parsed.name !== 'string') {
                         setImportError(
-                            'Invalid preset: Missing or invalid preset name.'
+                            'The file has no preset name, so it is not a preset.'
                         );
-                        setImportSuccess(false);
                         return;
                     }
 
-                    setPresetName(parsed.name || '');
-                    setPresetDescription(parsed.description || '');
-                    setSelectedIcon(parsed.icon || 'IconSparkles');
-                    setPresetStatus(
-                        parsed.status === 'disabled' ? 'disabled' : 'enabled'
-                    );
+                    const tweaks = Array.isArray(parsed.presetTweaks)
+                        ? parsed.presetTweaks
+                        : [];
+                    if (
+                        tweaks.some((t) => t.path && !isValidTweakUrl(t.path))
+                    ) {
+                        setImportError(
+                            'The preset loads scripts from hosts other than GitHub, which are not allowed.'
+                        );
+                        return;
+                    }
 
+                    setPresetName(parsed.name);
+                    setPresetDescription(parsed.description ?? '');
                     if (
                         parsed.configuration &&
                         typeof parsed.configuration === 'object'
@@ -214,40 +196,16 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                         setPresetConfiguration(
                             sanitizeConfiguration(parsed.configuration)
                         );
+                        setSettingsSource('import');
                     }
-
-                    const tweaks = parsed.presetTweaks || [];
-                    if (Array.isArray(tweaks)) {
-                        const hasInvalidUrl = tweaks.some(
-                            (t) => t.path && !isValidTweakUrl(t.path)
-                        );
-                        if (hasInvalidUrl) {
-                            setImportError(
-                                'Preset contains unsupported remote URLs. Only GitHub URLs (raw/gist) are allowed.'
-                            );
-                            setImportSuccess(false);
-                            return;
-                        }
-                        setPresetTweaks(mapPresetTweaksToFormRows(tweaks));
-                        const hasRemote = tweaks.some(
-                            (t) =>
-                                t.path &&
-                                (t.path.startsWith('http://') ||
-                                    t.path.startsWith('https://'))
-                        );
-                        setHasRemoteTweaks(hasRemote);
-                    }
+                    setPresetTweaks(mapPresetTweaksToFormRows(tweaks));
                     setImportError(null);
-                    setSaveError(null);
-                    setImportSuccess(true);
                 } catch {
-                    setImportError('Failed to parse JSON file.');
-                    setImportSuccess(false);
+                    setImportError('The file is not valid JSON.');
                 }
             })
             .catch(() => {
-                setImportError('Failed to read file content.');
-                setImportSuccess(false);
+                setImportError('The file could not be read.');
             });
 
         event.target.value = '';
@@ -261,7 +219,7 @@ export const PresetModal: React.FC<PresetModalProps> = ({
                 description: '',
                 type: 'tweakdefs',
                 path: '',
-                replaces: '',
+                replaces: [],
             },
         ]);
     };
@@ -270,22 +228,9 @@ export const PresetModal: React.FC<PresetModalProps> = ({
         setPresetTweaks((prev) => prev.filter((t) => t.id !== id));
     };
 
-    const handleTweakChange = (
-        id: string,
-        field: 'description' | 'type' | 'path' | 'replaces',
-        value: string
-    ) => {
+    const updateTweak = (id: string, changes: Partial<TweakFormRow>) => {
         setPresetTweaks((prev) =>
-            prev.map((t) => {
-                if (t.id !== id) return t;
-                if (field === 'type') {
-                    return {
-                        ...t,
-                        type: value as 'tweakdefs' | 'tweakunits',
-                    };
-                }
-                return { ...t, [field]: value };
-            })
+            prev.map((t) => (t.id === id ? { ...t, ...changes } : t))
         );
     };
 
@@ -293,329 +238,197 @@ export const PresetModal: React.FC<PresetModalProps> = ({
         <Modal
             opened={opened}
             onClose={onClose}
-            title={editPreset ? 'Edit Preset' : 'Create New Preset'}
+            title={editPreset ? 'Edit preset' : 'New preset'}
             size='lg'
             centered
         >
-            <Stack gap='md'>
-                {/* Top JSON Import Option */}
-                <input
-                    type='file'
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    accept='.json'
-                    onChange={handleFileChange}
-                />
-                <Button
-                    size='sm'
-                    variant='outline'
-                    color='blue'
-                    leftSection={<IconFileImport size={16} />}
-                    onClick={handleImportClick}
-                    fullWidth
-                >
-                    Import Preset from JSON File
-                </Button>
-
+            <Stack gap='lg'>
                 {importError && (
-                    <Group gap={6} wrap='nowrap' align='flex-start'>
-                        <IconCircleX
-                            size={14}
-                            color='var(--mantine-color-red-5)'
-                            style={{ flexShrink: 0, marginTop: '2px' }}
-                        />
-                        <Text size='xs' c='red' fw={500}>
-                            Import Error: {importError}
-                        </Text>
-                    </Group>
+                    <Alert
+                        color='red'
+                        title='Could not import the preset'
+                        withCloseButton
+                        onClose={() => setImportError(null)}
+                    >
+                        {importError}
+                    </Alert>
                 )}
 
-                {importSuccess && !importError && (
-                    <Group gap={6} wrap='nowrap' align='flex-start'>
-                        <IconCircleCheck
-                            size={14}
-                            color='var(--mantine-color-green-5)'
-                            style={{ flexShrink: 0, marginTop: '2px' }}
-                        />
-                        <Text size='xs' c='green.5' fw={500}>
-                            Preset imported successfully!
-                        </Text>
-                    </Group>
-                )}
-
-                {saveError && (
-                    <Group gap={6} wrap='nowrap' align='flex-start'>
-                        <IconCircleX
-                            size={14}
-                            color='var(--mantine-color-red-5)'
-                            style={{ flexShrink: 0, marginTop: '2px' }}
-                        />
-                        <Text size='xs' c='red' fw={500}>
-                            Save Error: {saveError}
-                        </Text>
-                    </Group>
-                )}
-
-                {hasRemoteTweaks && (
-                    <Group gap={6} wrap='nowrap' align='flex-start'>
-                        <IconAlertTriangle
-                            size={14}
-                            color='var(--mantine-color-yellow-5)'
-                            style={{ flexShrink: 0, marginTop: '2px' }}
-                        />
-                        <Text size='xs' c='yellow.5' fw={500}>
-                            Warning: This preset loads external scripts hosted
-                            on GitHub, make sure to trust the author.
-                        </Text>
-                    </Group>
-                )}
-
-                <Divider
-                    label='Preset Configuration Details'
-                    labelPosition='center'
-                />
-
-                <TextInput
-                    label='Preset Name'
-                    placeholder="e.g. Pyrem's Preset"
-                    value={presetName}
-                    onChange={(e) => setPresetName(e.currentTarget.value)}
-                    required
-                    data-autofocus
-                />
-
-                <Textarea
-                    label='Description'
-                    placeholder='Provide a brief description of the preset...'
-                    value={presetDescription}
-                    onChange={(e) =>
-                        setPresetDescription(e.currentTarget.value)
-                    }
-                    rows={2}
-                />
+                <Stack gap='md'>
+                    <TextInput
+                        label='Name'
+                        placeholder="e.g. Pyrem's preset"
+                        value={presetName}
+                        onChange={(e) => setPresetName(e.currentTarget.value)}
+                        error={
+                            hasTriedSave && !presetName.trim()
+                                ? 'Give the preset a name'
+                                : undefined
+                        }
+                        required
+                        data-autofocus
+                    />
+                    <Textarea
+                        label='Description'
+                        description='Shown on the preset card. Say what the preset changes.'
+                        placeholder='e.g. 2× income, 6 queens, no mini bosses'
+                        value={presetDescription}
+                        onChange={(e) =>
+                            setPresetDescription(e.currentTarget.value)
+                        }
+                        autosize
+                        minRows={2}
+                    />
+                </Stack>
 
                 <Stack gap='xs'>
-                    <Text size='sm' fw={500}>
-                        Select Icon
+                    <Text fw={700}>Settings</Text>
+                    <Text size='sm'>
+                        {SETTINGS_SOURCE_TEXT[settingsSource]}
                     </Text>
-                    <Group gap='sm'>
-                        {ICON_OPTIONS.map((iconName) => {
-                            const entry = ICON_MAP[iconName];
-                            return (
-                                <Tooltip label={entry.label} key={iconName}>
+                    {configDiff.length > 0 ? (
+                        <ConfigDiffTable overrides={configDiff} />
+                    ) : (
+                        <Text size='sm' c='dimmed'>
+                            Same as the default configuration.
+                        </Text>
+                    )}
+                </Stack>
+
+                <Stack gap='sm'>
+                    <Stack gap={2}>
+                        <Text fw={700}>Custom tweaks</Text>
+                        <Text size='sm'>
+                            Lua scripts loaded with this preset, from GitHub or
+                            the bundle.
+                        </Text>
+                    </Stack>
+
+                    {hasRemoteTweaks && (
+                        <Alert
+                            color='yellow'
+                            icon={<IconAlertTriangle size={18} />}
+                            title='This preset runs scripts from GitHub'
+                        >
+                            They load from their authors&apos; repositories.
+                            Only use presets from people you trust.
+                        </Alert>
+                    )}
+
+                    {presetTweaks.map((tweak, index) => (
+                        <Paper key={tweak.id} withBorder p='md'>
+                            <Stack gap='sm'>
+                                <Group gap='sm' align='flex-end' wrap='nowrap'>
+                                    <TextInput
+                                        label='Description'
+                                        placeholder='e.g. Cross-faction T2'
+                                        value={tweak.description}
+                                        onChange={(e) =>
+                                            updateTweak(tweak.id, {
+                                                description:
+                                                    e.currentTarget.value,
+                                            })
+                                        }
+                                        flex={1}
+                                    />
+                                    <Input.Wrapper label='Type'>
+                                        <SegmentedControl
+                                            display='flex'
+                                            data={['tweakdefs', 'tweakunits']}
+                                            value={tweak.type}
+                                            onChange={(value) =>
+                                                updateTweak(tweak.id, {
+                                                    type: value,
+                                                })
+                                            }
+                                        />
+                                    </Input.Wrapper>
                                     <ActionIcon
-                                        size='xl'
-                                        variant={
-                                            selectedIcon === iconName
-                                                ? 'filled'
-                                                : 'outline'
-                                        }
-                                        color={
-                                            selectedIcon === iconName
-                                                ? 'yellow'
-                                                : 'gray'
-                                        }
+                                        variant='subtle'
+                                        color='red'
+                                        size='input-sm'
+                                        aria-label={`Remove tweak ${index + 1}`}
                                         onClick={() =>
-                                            setSelectedIcon(iconName)
+                                            handleRemoveTweak(tweak.id)
                                         }
                                     >
-                                        {getPresetIcon(iconName, 22)}
+                                        <IconTrash size={18} />
                                     </ActionIcon>
-                                </Tooltip>
-                            );
-                        })}
+                                </Group>
+                                <TextInput
+                                    label='Lua file'
+                                    description='A raw GitHub or gist URL, or a bundled path such as lua/eco-t3.lua'
+                                    placeholder='https://raw.githubusercontent.com/…/tweak.lua'
+                                    value={tweak.path}
+                                    onChange={(e) =>
+                                        updateTweak(tweak.id, {
+                                            path: e.currentTarget.value,
+                                        })
+                                    }
+                                    error={getPathError(tweak.path)}
+                                    required
+                                />
+                                <MultiSelect
+                                    label='Replaces'
+                                    description='Built-in files this tweak replaces. Leave empty to add it alongside them.'
+                                    placeholder={
+                                        tweak.replaces.length === 0
+                                            ? 'Nothing'
+                                            : undefined
+                                    }
+                                    // Keep imported paths that aren't built-in files
+                                    data={[
+                                        ...new Set([
+                                            ...BUILT_IN_LUA_FILES,
+                                            ...tweak.replaces,
+                                        ]),
+                                    ]}
+                                    value={tweak.replaces}
+                                    onChange={(replaces) =>
+                                        updateTweak(tweak.id, { replaces })
+                                    }
+                                    searchable
+                                    clearable
+                                />
+                            </Stack>
+                        </Paper>
+                    ))}
+
+                    <Group>
+                        <Button
+                            variant='default'
+                            leftSection={<IconPlus size={16} />}
+                            onClick={handleAddTweak}
+                        >
+                            Add tweak
+                        </Button>
                     </Group>
                 </Stack>
 
-                <Group gap={4} align='center'>
-                    <Switch
-                        label='Enabled'
-                        checked={presetStatus === 'enabled'}
-                        onChange={(e) =>
-                            setPresetStatus(
-                                e.currentTarget.checked ? 'enabled' : 'disabled'
-                            )
-                        }
+                <Group justify='space-between'>
+                    <input
+                        type='file'
+                        ref={fileInputRef}
+                        hidden
+                        accept='.json'
+                        onChange={handleFileChange}
                     />
-                    <InfoTooltip
-                        label='Disabled presets stay in the showcase (greyed out) but cannot be selected.'
-                        w={260}
-                    />
-                </Group>
-
-                {configDiff.length > 0 && (
-                    <Stack gap='xs'>
-                        <Text size='xs' fw={600} c='dimmed'>
-                            ACTIVE CONFIGURATION OVERRIDES:
-                        </Text>
-                        <Flex gap='xs' wrap='wrap'>
-                            {configDiff.map((diff) => (
-                                <Card
-                                    key={diff.label}
-                                    py='4px'
-                                    px='8px'
-                                    radius='sm'
-                                    bg='dark.6'
-                                    bd='1px solid var(--mantine-color-dark-4)'
-                                >
-                                    <Text size='xs' span fw={600} c='yellow.4'>
-                                        {diff.label}:{' '}
-                                    </Text>
-                                    <Text size='xs' span c='white'>
-                                        {diff.value}
-                                    </Text>
-                                </Card>
-                            ))}
-                        </Flex>
-                    </Stack>
-                )}
-
-                <Divider
-                    label='Preset Tweaks (Optional)'
-                    labelPosition='center'
-                />
-
-                <Text size='xs' c='dimmed' mt={-5}>
-                    Add custom Lua scripts to load from a path or GitHub URL
-                    when this preset is active.
-                </Text>
-
-                {presetTweaks.length > 0 && (
-                    <ScrollArea.Autosize
-                        mah={300}
-                        type='hover'
-                        offsetScrollbars
-                    >
-                        <Stack gap='xs'>
-                            {presetTweaks.map((tweak) => (
-                                <Card
-                                    key={tweak.id}
-                                    p='xs'
-                                    radius='sm'
-                                    bg='dark.7'
-                                    bd='1px solid var(--mantine-color-dark-5)'
-                                >
-                                    <Grid gap='xs' align='flex-end'>
-                                        <Grid.Col span={{ base: 12, sm: 6 }}>
-                                            <TextInput
-                                                label='Tweak Description'
-                                                placeholder='e.g. Cross Faction T2'
-                                                value={tweak.description}
-                                                onChange={(e) =>
-                                                    handleTweakChange(
-                                                        tweak.id,
-                                                        'description',
-                                                        e.currentTarget.value
-                                                    )
-                                                }
-                                                size='xs'
-                                            />
-                                        </Grid.Col>
-                                        <Grid.Col span={{ base: 10, sm: 5 }}>
-                                            <Select
-                                                label='Tweak Type'
-                                                data={[
-                                                    {
-                                                        value: 'tweakdefs',
-                                                        label: 'Tweakdefs (Logic)',
-                                                    },
-                                                    {
-                                                        value: 'tweakunits',
-                                                        label: 'Tweakunits (Properties)',
-                                                    },
-                                                ]}
-                                                value={tweak.type}
-                                                onChange={(val) =>
-                                                    handleTweakChange(
-                                                        tweak.id,
-                                                        'type',
-                                                        val || 'tweakdefs'
-                                                    )
-                                                }
-                                                size='xs'
-                                            />
-                                        </Grid.Col>
-                                        <Grid.Col span={{ base: 2, sm: 1 }}>
-                                            <Flex
-                                                justify='center'
-                                                align='flex-end'
-                                                pb={4}
-                                                h='100%'
-                                            >
-                                                <ActionIcon
-                                                    color='red'
-                                                    variant='subtle'
-                                                    onClick={() =>
-                                                        handleRemoveTweak(
-                                                            tweak.id
-                                                        )
-                                                    }
-                                                    size='md'
-                                                >
-                                                    <IconTrash size={16} />
-                                                </ActionIcon>
-                                            </Flex>
-                                        </Grid.Col>
-                                        <Grid.Col span={{ base: 12, sm: 7 }}>
-                                            <TextInput
-                                                label='Path or GitHub URL'
-                                                placeholder='e.g. https://raw.githubusercontent.com/.../tweak.lua'
-                                                value={tweak.path}
-                                                onChange={(e) =>
-                                                    handleTweakChange(
-                                                        tweak.id,
-                                                        'path',
-                                                        e.currentTarget.value
-                                                    )
-                                                }
-                                                size='xs'
-                                                required
-                                            />
-                                        </Grid.Col>
-                                        <Grid.Col span={{ base: 12, sm: 5 }}>
-                                            <TextInput
-                                                label='Replaces (Optional)'
-                                                placeholder='e.g. lua/eco-t3.lua'
-                                                value={tweak.replaces}
-                                                onChange={(e) =>
-                                                    handleTweakChange(
-                                                        tweak.id,
-                                                        'replaces',
-                                                        e.currentTarget.value
-                                                    )
-                                                }
-                                                size='xs'
-                                            />
-                                        </Grid.Col>
-                                    </Grid>
-                                </Card>
-                            ))}
-                        </Stack>
-                    </ScrollArea.Autosize>
-                )}
-
-                <Button
-                    size='xs'
-                    variant='light'
-                    color='gray'
-                    leftSection={<IconPlus size={14} />}
-                    onClick={handleAddTweak}
-                    fullWidth
-                >
-                    Add Custom Tweak Row
-                </Button>
-
-                <Group justify='flex-end' mt='md'>
-                    <Button variant='subtle' color='gray' onClick={onClose}>
-                        Cancel
-                    </Button>
                     <Button
-                        color='yellow'
-                        onClick={handleSave}
-                        disabled={!presetName.trim()}
+                        variant='subtle'
+                        color='gray'
+                        leftSection={<IconFileImport size={16} />}
+                        onClick={() => fileInputRef.current?.click()}
                     >
-                        {editPreset ? 'Save Changes' : 'Create Preset'}
+                        Import JSON…
                     </Button>
+                    <Group gap='sm'>
+                        <Button variant='default' onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSave}>
+                            {editPreset ? 'Save changes' : 'Create preset'}
+                        </Button>
+                    </Group>
                 </Group>
             </Stack>
         </Modal>

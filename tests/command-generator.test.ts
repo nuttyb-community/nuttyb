@@ -560,7 +560,6 @@ describe('Preset replacement tweaks', () => {
             id: 'mock-preset',
             name: 'Mock Preset',
             description: 'Mock',
-            icon: 'IconBolt',
             configuration: DEFAULT_CONFIGURATION,
             presetTweaks: [
                 {

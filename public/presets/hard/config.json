@@ -2,7 +2,6 @@
   "id": "hard",
   "name": "Hard",
   "description": "3× HP, no cross-faction T2 or T4 defences.",
-  "icon": "IconFlame",
   "configuration": {
     "raptorHpMult": 3,
     "queenHpMult": 3,

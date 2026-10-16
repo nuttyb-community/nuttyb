@@ -13,7 +13,6 @@ import {
     Popover,
     ScrollArea,
     Stack,
-    Table,
     Text,
 } from '@mantine/core';
 import { useDebouncedValue, useElementSize, useHover } from '@mantine/hooks';
@@ -28,7 +27,7 @@ import {
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import type { Preset } from '@/lib/presets/registry';
 
-import { computeConfigDiff } from './preset-showcase.utils';
+import { computeConfigDiff, ConfigDiffTable } from './preset-showcase.utils';
 
 const PresetDetails: React.FC<{ preset: Preset }> = ({ preset }) => {
     const overrides = useMemo(
@@ -49,23 +48,7 @@ const PresetDetails: React.FC<{ preset: Preset }> = ({ preset }) => {
                     <Text size='sm' fw={700}>
                         Settings
                     </Text>
-                    <Table
-                        fz='sm'
-                        verticalSpacing={4}
-                        horizontalSpacing={0}
-                        withRowBorders={false}
-                    >
-                        <Table.Tbody>
-                            {overrides.map((o) => (
-                                <Table.Tr key={o.label}>
-                                    <Table.Td>{o.label}</Table.Td>
-                                    <Table.Td ta='right' fw={700}>
-                                        {o.value}
-                                    </Table.Td>
-                                </Table.Tr>
-                            ))}
-                        </Table.Tbody>
-                    </Table>
+                    <ConfigDiffTable overrides={overrides} />
                 </Stack>
             )}
             {preset.presetTweaks && preset.presetTweaks.length > 0 && (

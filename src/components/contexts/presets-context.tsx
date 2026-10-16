@@ -33,7 +33,6 @@ interface PresetsContextValue {
     localPresets: Preset[];
     isModified: boolean;
     selectPreset: (id: string) => void;
-    saveCurrentAsPreset: (name: string, icon?: string) => void;
     savePreset: (
         presetData: Omit<Preset, 'id' | 'isBuiltIn'>,
         id?: string
@@ -86,7 +85,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                             id: parsed.id || match[1], // fallback to folder name as id
                             name: parsed.name,
                             description: parsed.description || '',
-                            icon: parsed.icon || 'IconSparkles',
                             configuration: sanitizeConfiguration(
                                 parsed.configuration
                             ),
@@ -273,7 +271,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             const presetFields = {
                 name: presetData.name.trim(),
                 description: presetData.description || '',
-                icon: presetData.icon || 'IconSparkles',
                 status: presetData.status ?? 'enabled',
                 configuration: { ...presetData.configuration },
                 presetTweaks: presetData.presetTweaks || [],
@@ -300,21 +297,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
         [applyConfiguration, setLocalPresets, setActivePresetId]
     );
 
-    const saveCurrentAsPreset = useCallback(
-        (name: string, icon = 'IconUser') => {
-            const currentPresetTweaks = activePreset?.presetTweaks || [];
-
-            savePreset({
-                name,
-                description: 'Custom user-saved preset.',
-                icon,
-                configuration: { ...configuration },
-                presetTweaks: currentPresetTweaks,
-            });
-        },
-        [configuration, activePreset, savePreset]
-    );
-
     const deleteLocalPreset = useCallback(
         (id: string) => {
             setLocalPresets((prev) => prev.filter((p) => p.id !== id));
@@ -335,7 +317,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 version: 1,
                 name: preset.name,
                 description: preset.description,
-                icon: preset.icon,
                 status: preset.status ?? 'enabled',
                 configuration: preset.configuration,
                 presetTweaks: preset.presetTweaks || [],
@@ -366,7 +347,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             localPresets,
             isModified,
             selectPreset,
-            saveCurrentAsPreset,
             deleteLocalPreset,
             exportPreset,
             savePreset,
@@ -379,7 +359,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             localPresets,
             isModified,
             selectPreset,
-            saveCurrentAsPreset,
             deleteLocalPreset,
             exportPreset,
             savePreset,

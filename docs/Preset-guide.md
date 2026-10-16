@@ -26,11 +26,12 @@ The difficulty levels are presets too. **Easy**, **Medium** and **Hard** set the
 
 ## How to Create a Preset
 
-1. Click **New preset** (next to the Preset heading in the configurator).
-2. Fill in name, description, and pick an icon.
-3. (Optional) Add custom Lua tweaks — either a raw GitHub URL (`raw.githubusercontent.com` or `gist.githubusercontent.com`) or a local bundle path.
+1. Set up the configurator the way you want. The preset saves your current settings.
+2. Click **New preset** (next to the Preset heading in the configurator).
+3. Give it a name and, optionally, a description. The description is shown on the preset card, so say what the preset changes.
+4. (Optional) Add custom Lua tweaks — either a raw GitHub URL (`raw.githubusercontent.com` or `gist.githubusercontent.com`) or a local bundle path.
 
-    You can optionally specify which built-in tweak(s) yours replaces.
+    You can optionally pick which built-in Lua files yours replaces.
 
 ## How to Share a Preset
 
@@ -38,7 +39,7 @@ The difficulty levels are presets too. **Easy**, **Medium** and **Hard** set the
 
 Open the **⋯** menu on your preset card and click **Export JSON**. Share the downloaded `.json` file.
 
-Recipients import it via **Import Preset from JSON File** in the preset panel (click **New preset** to open it).
+Recipients click **New preset**, then **Import JSON…** at the bottom of the form, and save.
 
 ### Option 2: Host on the Configurator
 
@@ -64,7 +65,6 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
     "id": "my-preset",
     "name": "My Preset",
     "description": "What this preset does",
-    "icon": "IconBolt",
     "status": "enabled",
     "configuration": {
         "raptorHpMult": 1.3,
@@ -102,9 +102,8 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 | `version` | No | Schema version (currently `1`) |
 | `id` | No | Falls back to folder name if hosted; required for exported JSON |
 | `name` | Yes | Display name |
-| `description` | Yes | Short description |
-| `icon` | Yes | Tabler icon (e.g. `IconBolt`, `IconMoodSmile`, `IconUser`) |
-| `status` | No | `"enabled"` (default) or `"disabled"`. Disabled built-in presets stay in the bundle but are hidden from the showcase; disabled local presets stay visible (greyed out) so you can edit them back to enabled. |
+| `description` | No | Shown on the preset card. Say what the preset changes. |
+| `status` | No | `"enabled"` (default) or `"disabled"`. Disabled built-in presets stay in the bundle but are hidden from the showcase. Presets saved or imported in the configurator are always enabled. |
 | `configuration` | Yes | Settings to apply. Sparse merge — omit keys to keep defaults. |
 | `presetTweaks` | No | Array of custom Lua tweaks (see below) |
 

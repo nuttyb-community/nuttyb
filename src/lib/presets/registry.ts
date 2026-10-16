@@ -16,7 +16,6 @@ export interface Preset {
     id: string;
     name: string;
     description: string;
-    icon: string;
     configuration: Configuration;
     presetTweaks?: PresetTweak[];
     /** Presets without a status default to enabled. */

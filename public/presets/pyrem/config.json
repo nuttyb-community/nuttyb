@@ -2,7 +2,6 @@
     "id": "pyrem-showcase",
     "name": "Pyrem",
     "description": "Community configuration by Relicus",
-    "icon": "IconBolt",
     "status": "disabled",
     "configuration": {
         "challenges": "Mini Bosses",

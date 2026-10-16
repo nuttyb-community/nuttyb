@@ -1,176 +1,84 @@
 import React from 'react';
 
-import {
-    IconBolt,
-    IconDownload,
-    IconFeather,
-    IconFlame,
-    IconMoodSmile,
-    IconRotateDot,
-    IconSparkles,
-    IconUser,
-} from '@tabler/icons-react';
+import { Table } from '@mantine/core';
 
 import {
     Configuration,
     DEFAULT_CONFIGURATION,
 } from '@/lib/command-generator/data/configuration';
 
-/**
- * Unified icon registry — single source of truth for icon names,
- * display labels, and React components.
- */
-export const ICON_MAP: Record<
-    string,
-    {
-        label: string;
-        component: React.ComponentType<{ size?: number; stroke?: number }>;
-    }
-> = {
-    IconRotateDot: { label: 'Rotate', component: IconRotateDot },
-    IconMoodSmile: { label: 'Smile', component: IconMoodSmile },
-    IconFlame: { label: 'Flame', component: IconFlame },
-    IconBolt: { label: 'Energy/Bolt', component: IconBolt },
-    IconSparkles: { label: 'Sparkles', component: IconSparkles },
-    IconDownload: { label: 'Download', component: IconDownload },
-    IconUser: { label: 'User', component: IconUser },
-    IconFeather: { label: 'Feather', component: IconFeather },
+/** Display labels, matching the configurator's field labels. */
+const CONFIG_LABELS: Record<keyof Configuration, string> = {
+    raptorHpMult: 'Raptor HP multiplier',
+    queenHpMult: 'Queen HP multiplier',
+    isCrossFactionT2: 'Cross-faction T2 labs',
+    isDefencesT4: 'T4 defences',
+    lobbyName: 'Lobby name tag',
+    gameMap: 'Map',
+    start: 'Start',
+    queenCount: 'Raptor queen count',
+    incomeMult: 'Resource income multiplier',
+    buildPowerMult: 'Build power multiplier',
+    buildDistMult: 'Build distance multiplier',
+    challenges: 'Challenges',
+    isEcoT4: 'T4 Economy',
+    isRFLRPCRebalance: 'RFLRPC Rebalance',
+    isRFLRPCT4: 'T4 RFLRPC',
+    isMegaNuke: 'Mega Nuke',
+    isT3GeoWalls: 'T3 Geo + Walls',
 };
 
-/** Subset of icons available in the preset save/edit modal. */
-export const ICON_OPTIONS = [
-    'IconSparkles',
-    'IconFlame',
-    'IconBolt',
-    'IconMoodSmile',
-    'IconUser',
-] as const;
-
-/** Renders the Tabler icon component for a given icon name. */
-export function getPresetIcon(iconName: string, size = 28) {
-    const entry = ICON_MAP[iconName] ?? ICON_MAP.IconUser;
-    const Icon = entry.component;
-    return <Icon size={size} stroke={1.5} />;
+export interface ConfigDiff {
+    label: string;
+    value: string;
 }
-
-/** Metadata for each Configuration key — used in tooltips and diff displays. */
-const CONFIG_METADATA: Record<
-    keyof Configuration,
-    { label: string; tooltip: string }
-> = {
-    raptorHpMult: {
-        label: 'Raptor HP Multiplier',
-        tooltip: 'Health of regular raptors (0.1 - 10)',
-    },
-    queenHpMult: {
-        label: 'Queen HP Multiplier',
-        tooltip: 'Health of raptor queens (0.1 - 10)',
-    },
-    isCrossFactionT2: {
-        label: 'Cross-faction T2',
-        tooltip: "Build other factions' T2 labs at 70% extra cost",
-    },
-    isDefencesT4: {
-        label: 'T4 Defences',
-        tooltip: 'T4 defensive structures',
-    },
-    lobbyName: {
-        label: 'Lobby Name Tag',
-        tooltip: 'Added to auto-generated lobby name',
-    },
-    gameMap: {
-        label: 'Map',
-        tooltip: 'Selected game map',
-    },
-    start: {
-        label: 'Start',
-        tooltip:
-            'Starting conditions. "No rush" provides a 12-minute grace period.',
-    },
-    queenCount: {
-        label: 'Raptor Queen Count',
-        tooltip: 'Number of raptor queens (1 - 100)',
-    },
-    incomeMult: {
-        label: 'Resource Income Multiplier',
-        tooltip: 'Affects both energy and metal production (0.1 - 10)',
-    },
-    buildPowerMult: {
-        label: 'Build Power Multiplier',
-        tooltip: 'Affects build power (0.1 - 10)',
-    },
-    buildDistMult: {
-        label: 'Build Distance Multiplier',
-        tooltip:
-            'Defines how far you can build compared to vanilla BAR (0.5 - 10)',
-    },
-    challenges: {
-        label: 'Challenges',
-        tooltip: 'Special waves and bosses challenges',
-    },
-    isEcoT4: {
-        label: 'T4 Economy',
-        tooltip: 'Legendary fusion reactors and energy converters',
-    },
-    isRFLRPCRebalance: {
-        label: 'RFLRPC Rebalance',
-        tooltip: 'Rebalance for Ragnarok, Calamity and Starfall',
-    },
-    isRFLRPCT4: {
-        label: 'Epic RFLRPC',
-        tooltip: 'Epic Ragnarok, Calamity and Starfall',
-    },
-    isMegaNuke: {
-        label: 'Mega Nuke',
-        tooltip: 'Enable Mega Nuke capability',
-    },
-    isT3GeoWalls: {
-        label: 'T3 Geo and Walls',
-        tooltip: 'Faction Unique T3 Geos, and Walls that dont die instantly.',
-    },
-};
 
 /**
  * Computes the list of configuration overrides compared to defaults.
- * Shared by both the tooltip and the modal config-diff display.
+ * Shared by the preset details popover and the preset form.
  */
-export function computeConfigDiff(
-    config: Configuration
-): Array<{ label: string; value: string; tooltip: string }> {
-    const diffs: Array<{ label: string; value: string; tooltip: string }> = [];
+export function computeConfigDiff(config: Configuration): ConfigDiff[] {
     const defaultKeys = Object.keys(DEFAULT_CONFIGURATION) as Array<
         keyof typeof DEFAULT_CONFIGURATION
     >;
-    for (const key of defaultKeys) {
-        if (config[key] !== DEFAULT_CONFIGURATION[key]) {
-            const meta = CONFIG_METADATA[key];
-            if (meta) {
-                let valDisplay = String(config[key]);
-                if (typeof config[key] === 'boolean') {
-                    valDisplay = config[key] ? 'Enabled' : 'Disabled';
-                }
-                diffs.push({
-                    label: meta.label,
-                    value: valDisplay,
-                    tooltip: meta.tooltip,
-                });
-            }
-        }
-    }
-    return diffs;
+    return defaultKeys
+        .filter((key) => config[key] !== DEFAULT_CONFIGURATION[key])
+        .map((key) => {
+            const value = config[key];
+            return {
+                label: CONFIG_LABELS[key],
+                value:
+                    typeof value === 'boolean'
+                        ? value
+                            ? 'Enabled'
+                            : 'Disabled'
+                        : String(value),
+            };
+        });
 }
 
-/**
- * Converts a `replaces` field (string | string[] | undefined) to a
- * comma-separated display string.
- */
-function replacesToDisplayString(
-    replaces: string | string[] | undefined
-): string {
-    if (!replaces) return '';
-    if (Array.isArray(replaces)) return replaces.map(String).join(', ');
-    return typeof replaces === 'string' ? replaces : '';
-}
+/** Two-column table of setting overrides: label left, value right. */
+export const ConfigDiffTable: React.FC<{ overrides: ConfigDiff[] }> = ({
+    overrides,
+}) => (
+    <Table
+        fz='sm'
+        verticalSpacing={4}
+        horizontalSpacing={0}
+        withRowBorders={false}
+    >
+        <Table.Tbody>
+            {overrides.map((o) => (
+                <Table.Tr key={o.label}>
+                    <Table.Td>{o.label}</Table.Td>
+                    <Table.Td ta='right' fw={700}>
+                        {o.value}
+                    </Table.Td>
+                </Table.Tr>
+            ))}
+        </Table.Tbody>
+    </Table>
+);
 
 /** Form-friendly tweak row shape used by the modal. */
 export interface TweakFormRow {
@@ -178,7 +86,7 @@ export interface TweakFormRow {
     description: string;
     type: 'tweakdefs' | 'tweakunits';
     path: string;
-    replaces: string;
+    replaces: string[];
 }
 
 /**
@@ -200,6 +108,6 @@ export function mapPresetTweaksToFormRows(
                 ? ('tweakunits' as const)
                 : ('tweakdefs' as const),
         path: t.path || '',
-        replaces: replacesToDisplayString(t.replaces),
+        replaces: [t.replaces ?? []].flat().map(String),
     }));
 }

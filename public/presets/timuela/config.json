@@ -2,7 +2,6 @@
     "version": 1,
     "name": "Timuela",
     "description": "EvoEco",
-    "icon": "IconUser",
     "status": "enabled",
     "configuration": {
         "raptorHpMult": 1.3,
