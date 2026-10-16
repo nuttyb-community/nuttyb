@@ -16,12 +16,12 @@ import {
     Text,
     Tooltip,
 } from '@mantine/core';
+import { useHover } from '@mantine/hooks';
 import { IconFileExport, IconPencil, IconTrash } from '@tabler/icons-react';
 
 import { InfoTooltip } from '@/components/common/info-tooltip';
 import type { Preset } from '@/lib/presets/registry';
 
-import styles from './preset-showcase.module.css';
 import { computeConfigDiff, getPresetIcon } from './preset-showcase.utils';
 
 interface PresetTooltipContentProps {
@@ -100,6 +100,52 @@ const PresetTooltipContent: React.FC<PresetTooltipContentProps> = ({
     );
 };
 
+interface PresetCardFrameProps {
+    isActive: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
+    children: React.ReactNode;
+}
+
+const PresetCardFrame: React.FC<PresetCardFrameProps> = ({
+    isActive,
+    isDisabled,
+    onClick,
+    children,
+}) => {
+    const { hovered, ref } = useHover<HTMLDivElement>();
+    const isHighlighted = hovered && !isDisabled && !isActive;
+
+    // Same states as the landing page link cards and the difficulty cards
+    return (
+        <Card
+            ref={ref}
+            p='xs'
+            w={160}
+            h={125}
+            flex='none'
+            withBorder
+            bd={
+                isActive || isHighlighted
+                    ? '1px solid var(--mantine-primary-color-filled)'
+                    : undefined
+            }
+            bg={
+                isActive
+                    ? 'var(--mantine-primary-color-light)'
+                    : isHighlighted
+                      ? 'var(--mantine-color-default-hover)'
+                      : undefined
+            }
+            opacity={isDisabled ? 0.5 : undefined}
+            onClick={onClick}
+            style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+        >
+            {children}
+        </Card>
+    );
+};
+
 interface PresetCardListProps {
     allPresets: Preset[];
     activePresetId: string | null;
@@ -132,17 +178,13 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                     const showModified = isActive && isModified;
 
                     return (
-                        <Card
+                        <PresetCardFrame
                             key={preset.id}
-                            shadow='md'
-                            radius='md'
-                            p='xs'
-                            w={160}
-                            h={125}
+                            isActive={isActive}
+                            isDisabled={isDisabled}
                             onClick={() => {
                                 if (!isDisabled) onSelect(preset.id);
                             }}
-                            className={`${styles.presetCard} ${isActive ? styles.presetCardActive : ''} ${isDisabled ? styles.presetCardDisabled : ''}`}
                         >
                             {isDisabled && (
                                 <Tooltip label='This preset is disabled. Edit it to re-enable.'>
@@ -281,20 +323,16 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                     mt={-2}
                                     gap='xs'
                                 >
-                                    <div
-                                        style={{
-                                            color: isActive
-                                                ? 'var(--mantine-color-yellow-4)'
-                                                : 'var(--mantine-color-dark-2)',
-                                        }}
+                                    <Text
+                                        c={isActive ? 'blue' : 'dimmed'}
+                                        lh={0}
                                     >
                                         {getPresetIcon(preset.icon, 24)}
-                                    </div>
+                                    </Text>
                                     <Text
-                                        size='xs'
-                                        fw={isActive ? 700 : 500}
+                                        size='sm'
+                                        fw={700}
                                         ta='center'
-                                        c={isActive ? 'yellow.4' : 'white'}
                                         truncate='end'
                                         w='100%'
                                     >
@@ -304,7 +342,7 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
 
                                     {preset.description && (
                                         <Text
-                                            size='10px'
+                                            size='xs'
                                             c='dimmed'
                                             ta='center'
                                             truncate='end'
@@ -315,7 +353,7 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                                     )}
                                 </Flex>
                             </InfoTooltip>
-                        </Card>
+                        </PresetCardFrame>
                     );
                 })}
             </Flex>

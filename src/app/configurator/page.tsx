@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 
-import { Divider, Stack } from '@mantine/core';
+import { Box, Grid, Stack, Title } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
@@ -49,10 +49,21 @@ export default function Page() {
                 error={tweakError}
                 droppedTweaks={droppedTweaks}
             >
-                <Stack gap='xl'>
-                    <Configurator />
-                    <Divider />
-                    <GeneratedCommands />
+                <Stack gap='lg'>
+                    <Title order={1}>Configurator</Title>
+                    <Grid gap='xl'>
+                        <Grid.Col span={{ base: 12, lg: 8 }}>
+                            <Configurator />
+                        </Grid.Col>
+                        <Grid.Col span={{ base: 12, lg: 4 }}>
+                            <Box
+                                pos='sticky'
+                                top='calc(var(--app-shell-header-height) + var(--mantine-spacing-md))'
+                            >
+                                <GeneratedCommands />
+                            </Box>
+                        </Grid.Col>
+                    </Grid>
                 </Stack>
             </TweakDataProvider>
         </PageWrapper>

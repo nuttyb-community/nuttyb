@@ -2,7 +2,15 @@
 
 import React from 'react';
 
-import { Flex, List, Radio, Stack, Text, Title } from '@mantine/core';
+import {
+    Flex,
+    List,
+    Radio,
+    SimpleGrid,
+    Stack,
+    Text,
+    Title,
+} from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
@@ -52,13 +60,13 @@ export const DifficultySection: React.FC = () => {
     };
 
     return (
-        <Stack gap='sm'>
-            <Title order={3}>Difficulty</Title>
+        <Stack gap='md'>
+            <Title order={2}>Difficulty</Title>
             <Radio.Group
                 value={configuration.presetDifficulty}
                 onChange={handlePresetChange}
             >
-                <Flex align='start' gap='md'>
+                <SimpleGrid cols={{ base: 1, sm: 3 }} spacing='md'>
                     {PRESET_DIFFICULTIES.map((preset) => {
                         const details = PRESET_DETAILS[preset];
                         return (
@@ -81,7 +89,7 @@ export const DifficultySection: React.FC = () => {
                                 <Stack gap='xs' style={{ flex: 1 }}>
                                     <Flex align='center' gap='md'>
                                         <Radio.Indicator />
-                                        <Text fw={600}>{details.title}</Text>
+                                        <Text fw={700}>{details.title}</Text>
                                     </Flex>
                                     <Text size='sm' c='dimmed'>
                                         {details.description}
@@ -97,7 +105,7 @@ export const DifficultySection: React.FC = () => {
                             </Radio.Card>
                         );
                     })}
-                </Flex>
+                </SimpleGrid>
             </Radio.Group>
         </Stack>
     );

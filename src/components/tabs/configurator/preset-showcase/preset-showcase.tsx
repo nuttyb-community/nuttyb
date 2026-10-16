@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 
-import { Button, Flex, Group, Stack, Text } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconPlus } from '@tabler/icons-react';
 
@@ -50,30 +50,20 @@ export const PresetShowcase: React.FC = () => {
     };
 
     return (
-        <Stack gap='sm'>
-            <Flex justify='space-between' align='center' wrap='wrap' gap='sm'>
-                <Stack gap={0}>
-                    <Text size='sm' fw={600} c='dimmed' tt='uppercase'>
-                        Preset Showcase
-                    </Text>
-                    <Text size='xs' c='dimmed'>
-                        Select a configuration preset, upload presets, or save
-                        your current settings.
-                    </Text>
-                </Stack>
-
-                <Group gap='xs'>
-                    <Button
-                        size='xs'
-                        variant='light'
-                        color='green'
-                        leftSection={<IconPlus size={16} />}
-                        onClick={handleNewPreset}
-                    >
-                        New Preset
-                    </Button>
-                </Group>
-            </Flex>
+        <Stack gap='md'>
+            <Group justify='space-between'>
+                <Title order={2}>Preset</Title>
+                <Button
+                    variant='default'
+                    leftSection={<IconPlus size={16} />}
+                    onClick={handleNewPreset}
+                >
+                    New preset
+                </Button>
+            </Group>
+            <Text>
+                Start from a preset, or save your current settings as a new one.
+            </Text>
 
             <PresetCardList
                 allPresets={allPresets}

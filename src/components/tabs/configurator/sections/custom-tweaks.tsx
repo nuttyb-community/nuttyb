@@ -30,9 +30,8 @@ export const CustomTweaksSection: React.FC = () => {
     }
 
     return (
-        <Stack gap='sm'>
-            <Title order={3}>Custom Tweaks</Title>
-
+        <Stack gap='md'>
+            <Title order={2}>Custom tweaks</Title>
             <Flex gap='md' align='baseline' direction='row' wrap='wrap'>
                 {customTweaks
                     .toSorted((a, b) => a.priority - b.priority)

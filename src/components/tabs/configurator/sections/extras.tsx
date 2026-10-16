@@ -20,8 +20,8 @@ export const ExtrasSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
 
     return (
-        <Stack gap='sm'>
-            <Title order={3}>Extras</Title>
+        <Stack gap='md'>
+            <Title order={2}>Extras</Title>
             <SimpleGrid spacing='xl' cols={2}>
                 <Stack gap='sm'>
                     <NativeSelect

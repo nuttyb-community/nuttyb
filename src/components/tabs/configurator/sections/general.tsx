@@ -93,8 +93,8 @@ export const GeneralSection: React.FC = () => {
     };
 
     return (
-        <Stack gap='sm'>
-            <Title order={3}>General</Title>
+        <Stack gap='md'>
+            <Title order={2}>Game settings</Title>
             <SimpleGrid spacing='xl' cols={2}>
                 <Stack gap='sm'>
                     <TextInput
