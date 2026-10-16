@@ -3,29 +3,19 @@ export interface Link {
     title: string;
 }
 
-export const LINKS: { [key: string]: Link } = {
+export const LINKS = {
     configurator: {
         href: '/configurator',
         title: 'Configurator',
     },
-    data: {
-        href: '/data',
-        title: 'Data',
-    },
-    custom: {
-        href: '/custom',
-        title: 'Custom',
-    },
-    base64: {
-        href: '/base64',
-        title: 'Base64',
-    },
-    editor: {
-        href: '/editor',
-        title: 'Editor',
-    },
-    about: {
-        href: '/about',
-        title: 'About',
+    tools: {
+        editor: {
+            href: '/tools/editor',
+            title: 'Lua editor',
+        },
+        base64: {
+            href: '/tools/base64',
+            title: 'Base64',
+        },
     },
 } as const;

@@ -3,6 +3,7 @@ import {
     AppShellHeader,
     AppShellMain,
     ColorSchemeScript,
+    Container,
     mantineHtmlProps,
     MantineProvider,
 } from '@mantine/core';
@@ -10,7 +11,6 @@ import type { Metadata } from 'next';
 
 import '@mantine/core/styles.css';
 import { PageHeader } from '@/components/page-header';
-import { PageWrapper } from '@/components/page-wrapper';
 import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default function RootLayout({
                                 <PageHeader />
                             </AppShellHeader>
                             <AppShellMain>
-                                <PageWrapper>{children}</PageWrapper>
+                                <Container size={1600}>{children}</Container>
                             </AppShellMain>
                         </AppShell>
                     </Providers>
