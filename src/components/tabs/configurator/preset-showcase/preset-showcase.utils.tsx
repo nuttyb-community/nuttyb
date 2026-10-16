@@ -79,35 +79,3 @@ export const ConfigDiffTable: React.FC<{ overrides: ConfigDiff[] }> = ({
         </Table.Tbody>
     </Table>
 );
-
-/** Form-friendly tweak row shape used by the modal. */
-export interface TweakFormRow {
-    id: string;
-    description: string;
-    type: 'tweakdefs' | 'tweakunits';
-    path: string;
-    replaces: string[];
-}
-
-/**
- * Maps preset tweaks to form rows — shared by both edit and import flows.
- */
-export function mapPresetTweaksToFormRows(
-    tweaks: Array<{
-        description?: string;
-        type?: string;
-        path?: string;
-        replaces?: string | string[];
-    }>
-): TweakFormRow[] {
-    return tweaks.map((t, index: number) => ({
-        id: `tweak-${Date.now()}-${index}-${Math.random()}`,
-        description: t.description || '',
-        type:
-            t.type === 'tweakunits'
-                ? ('tweakunits' as const)
-                : ('tweakdefs' as const),
-        path: t.path || '',
-        replaces: [t.replaces ?? []].flat().map(String),
-    }));
-}

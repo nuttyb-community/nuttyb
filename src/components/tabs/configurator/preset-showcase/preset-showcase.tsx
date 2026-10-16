@@ -6,7 +6,6 @@ import { Button, Group, Stack, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconArrowBackUp, IconPlus } from '@tabler/icons-react';
 
-import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
 import type { Preset } from '@/lib/presets/registry';
 
@@ -22,10 +21,7 @@ export const PresetShowcase: React.FC = () => {
         selectPreset,
         deleteLocalPreset,
         exportPreset,
-        savePreset,
     } = usePresetsContext();
-
-    const { configuration } = useConfiguratorContext();
 
     const [isModalOpen, { open: openModal, close: closeModal }] =
         useDisclosure(false);
@@ -87,12 +83,7 @@ export const PresetShowcase: React.FC = () => {
             <PresetModal
                 opened={isModalOpen}
                 onClose={closeModal}
-                onSave={savePreset}
-                configuration={configuration}
                 editPreset={editPreset}
-                isEditPresetActive={
-                    editPreset !== null && activePresetId === editPreset.id
-                }
             />
         </Stack>
     );
