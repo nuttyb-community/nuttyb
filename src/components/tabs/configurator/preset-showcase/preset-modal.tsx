@@ -12,23 +12,19 @@ import {
     Textarea,
     TextInput,
 } from '@mantine/core';
-import {
-    IconAlertTriangle,
-    IconFileImport,
-    IconPlus,
-} from '@tabler/icons-react';
+import { IconFileImport } from '@tabler/icons-react';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { usePresetsContext } from '@/components/contexts/presets-context';
-import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';
+import { computeConfigDiff } from '@/lib/presets/config-diff';
+import { parsePresetFile } from '@/lib/presets/preset-file';
 import type { Preset } from '@/lib/presets/registry';
-import { isValidTweakUrl } from '@/lib/presets/tweak-url';
 
-import { computeConfigDiff, ConfigDiffTable } from './preset-showcase.utils';
+import { ConfigDiffTable } from './preset-details';
 import {
-    PresetTweakFields,
+    getPathError,
+    PresetTweakList,
     toFormRows,
-    type TweakFormRow,
 } from './preset-tweak-fields';
 
 /** Where the preset's settings come from, explained above the table. */
@@ -37,18 +33,6 @@ const SETTINGS_SOURCE_TEXT = {
     preset: 'Stored in this preset. Select the preset to change them.',
     import: 'Taken from the imported file.',
 } as const;
-
-const isRemotePath = (path: string) => /^https?:\/\//.test(path.trim());
-
-/** Unsupported hosts are an error right away; an empty path only with `flagEmpty`. */
-function getPathError(path: string, flagEmpty: boolean): string | undefined {
-    const trimmed = path.trim();
-    if (!trimmed)
-        return flagEmpty ? 'Enter a GitHub URL or a bundled path' : undefined;
-    if (!isValidTweakUrl(trimmed))
-        return 'Only raw.githubusercontent.com and gist.githubusercontent.com URLs are allowed';
-    return undefined;
-}
 
 interface PresetFormProps {
     /** The preset to edit; a new one is created when null. */
@@ -84,7 +68,6 @@ const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const configDiff = computeConfigDiff(presetConfiguration);
-    const hasRemoteTweaks = presetTweaks.some((t) => isRemotePath(t.path));
 
     const handleSave = () => {
         setTriedSave(true);
@@ -118,178 +101,118 @@ const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
         input.value = '';
         if (!file) return;
 
-        try {
-            const parsed = JSON.parse(await file.text()) as Partial<Preset>;
-            if (!parsed.name || typeof parsed.name !== 'string') {
-                setImportError(
-                    'The file has no preset name, so it is not a preset.'
-                );
-                return;
-            }
-
-            const tweaks = Array.isArray(parsed.presetTweaks)
-                ? parsed.presetTweaks
-                : [];
-            if (tweaks.some((t) => t.path && !isValidTweakUrl(t.path))) {
-                setImportError(
-                    'The preset loads scripts from hosts other than GitHub, which are not allowed.'
-                );
-                return;
-            }
-
-            setPresetName(parsed.name);
-            setPresetDescription(parsed.description ?? '');
-            if (
-                parsed.configuration &&
-                typeof parsed.configuration === 'object'
-            ) {
-                setPresetConfiguration(
-                    sanitizeConfiguration(parsed.configuration)
-                );
-                setSettingsSource('import');
-            }
-            setPresetTweaks(toFormRows(tweaks));
-            setImportError(null);
-        } catch {
-            setImportError('The file is not valid JSON.');
+        const result = parsePresetFile(await file.text());
+        if ('error' in result) {
+            setImportError(result.error);
+            return;
         }
-    };
 
-    const updateTweak = (id: string, changes: Partial<TweakFormRow>) => {
-        setPresetTweaks((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, ...changes } : t))
-        );
+        const { preset } = result;
+        setPresetName(preset.name);
+        setPresetDescription(preset.description);
+        if (preset.configuration) {
+            setPresetConfiguration(preset.configuration);
+            setSettingsSource('import');
+        }
+        setPresetTweaks(toFormRows(preset.presetTweaks));
+        setImportError(null);
     };
 
     return (
-        <Stack gap='lg'>
-            {importError && (
-                <Alert
-                    color='red'
-                    title='Could not import the preset'
-                    withCloseButton
-                    onClose={() => setImportError(null)}
-                >
-                    {importError}
-                </Alert>
-            )}
-
-            <Stack gap='md'>
-                <TextInput
-                    label='Name'
-                    placeholder="e.g. Pyrem's preset"
-                    value={presetName}
-                    onChange={(e) => setPresetName(e.currentTarget.value)}
-                    error={
-                        hasTriedSave && !presetName.trim()
-                            ? 'Give the preset a name'
-                            : undefined
-                    }
-                    required
-                    data-autofocus
-                />
-                <Textarea
-                    label='Description'
-                    description='Shown on the preset card. Say what the preset changes.'
-                    placeholder='e.g. 2× income, 6 queens, no mini bosses'
-                    value={presetDescription}
-                    onChange={(e) =>
-                        setPresetDescription(e.currentTarget.value)
-                    }
-                    autosize
-                    minRows={2}
-                />
-            </Stack>
-
-            <Stack gap='xs'>
-                <Text fw={700}>Settings</Text>
-                <Text size='sm'>{SETTINGS_SOURCE_TEXT[settingsSource]}</Text>
-                {configDiff.length > 0 ? (
-                    <ConfigDiffTable overrides={configDiff} />
-                ) : (
-                    <Text size='sm' c='dimmed'>
-                        Same as the default configuration.
-                    </Text>
-                )}
-            </Stack>
-
-            <Stack gap='sm'>
-                <Stack gap={2}>
-                    <Text fw={700}>Custom tweaks</Text>
-                    <Text size='sm'>
-                        Lua scripts loaded with this preset, from GitHub or the
-                        bundle.
-                    </Text>
-                </Stack>
-
-                {hasRemoteTweaks && (
+        <form
+            // Our own field errors replace the browser's required-field bubbles
+            noValidate
+            onSubmit={(event) => {
+                event.preventDefault();
+                handleSave();
+            }}
+        >
+            <Stack gap='lg'>
+                {importError && (
                     <Alert
-                        color='yellow'
-                        icon={<IconAlertTriangle size={18} />}
-                        title='This preset runs scripts from GitHub'
+                        color='red'
+                        title='Could not import the preset'
+                        withCloseButton
+                        onClose={() => setImportError(null)}
                     >
-                        They load from their authors&apos; repositories. Only
-                        use presets from people you trust.
+                        {importError}
                     </Alert>
                 )}
 
-                {presetTweaks.map((tweak, index) => (
-                    <PresetTweakFields
-                        key={tweak.id}
-                        tweak={tweak}
-                        index={index}
-                        pathError={getPathError(tweak.path, hasTriedSave)}
-                        onChange={(changes) => updateTweak(tweak.id, changes)}
-                        onRemove={() =>
-                            setPresetTweaks((prev) =>
-                                prev.filter((t) => t.id !== tweak.id)
-                            )
+                <Stack gap='md'>
+                    <TextInput
+                        label='Name'
+                        placeholder="e.g. Pyrem's preset"
+                        value={presetName}
+                        onChange={(e) => setPresetName(e.currentTarget.value)}
+                        error={
+                            hasTriedSave && !presetName.trim()
+                                ? 'Give the preset a name'
+                                : undefined
                         }
+                        required
+                        data-autofocus
                     />
-                ))}
-
-                <Group>
-                    <Button
-                        variant='default'
-                        leftSection={<IconPlus size={16} />}
-                        onClick={() =>
-                            setPresetTweaks((prev) => [
-                                ...prev,
-                                ...toFormRows([{}]),
-                            ])
+                    <Textarea
+                        label='Description'
+                        description='Shown on the preset card. Say what the preset changes.'
+                        placeholder='e.g. 2× income, 6 queens, no mini bosses'
+                        value={presetDescription}
+                        onChange={(e) =>
+                            setPresetDescription(e.currentTarget.value)
                         }
+                        autosize
+                        minRows={2}
+                    />
+                </Stack>
+
+                <Stack gap='xs'>
+                    <Text fw={700}>Settings</Text>
+                    <Text size='sm'>
+                        {SETTINGS_SOURCE_TEXT[settingsSource]}
+                    </Text>
+                    {configDiff.length > 0 ? (
+                        <ConfigDiffTable overrides={configDiff} />
+                    ) : (
+                        <Text size='sm' c='dimmed'>
+                            Same as the default configuration.
+                        </Text>
+                    )}
+                </Stack>
+
+                <PresetTweakList
+                    tweaks={presetTweaks}
+                    onChange={setPresetTweaks}
+                    showEmptyPathErrors={hasTriedSave}
+                />
+
+                <Group justify='space-between'>
+                    <input
+                        type='file'
+                        ref={fileInputRef}
+                        hidden
+                        accept='.json'
+                        onChange={(event) => void handleFileChange(event)}
+                    />
+                    <Button
+                        variant='subtle'
+                        color='gray'
+                        leftSection={<IconFileImport size={16} />}
+                        onClick={() => fileInputRef.current?.click()}
                     >
-                        Add tweak
+                        Import JSON…
                     </Button>
+                    <Group gap='sm'>
+                        <Button variant='default' onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button type='submit'>
+                            {editPreset ? 'Save changes' : 'Create preset'}
+                        </Button>
+                    </Group>
                 </Group>
             </Stack>
-
-            <Group justify='space-between'>
-                <input
-                    type='file'
-                    ref={fileInputRef}
-                    hidden
-                    accept='.json'
-                    onChange={(event) => void handleFileChange(event)}
-                />
-                <Button
-                    variant='subtle'
-                    color='gray'
-                    leftSection={<IconFileImport size={16} />}
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    Import JSON…
-                </Button>
-                <Group gap='sm'>
-                    <Button variant='default' onClick={onClose}>
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSave}>
-                        {editPreset ? 'Save changes' : 'Create preset'}
-                    </Button>
-                </Group>
-            </Group>
-        </Stack>
+        </form>
     );
 };
 

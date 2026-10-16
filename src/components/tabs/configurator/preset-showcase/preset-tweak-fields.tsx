@@ -4,18 +4,22 @@ import React from 'react';
 
 import {
     ActionIcon,
+    Alert,
+    Button,
     Group,
     Input,
     MultiSelect,
     Paper,
     SegmentedControl,
     Stack,
+    Text,
     TextInput,
 } from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
+import { IconAlertTriangle, IconPlus, IconTrash } from '@tabler/icons-react';
 
 import { LUA_PRIORITIES } from '@/lib/command-generator/data/configuration-mapping';
 import type { PresetTweak } from '@/lib/presets/registry';
+import { isRemoteTweakPath, isValidTweakUrl } from '@/lib/presets/tweak-url';
 import { LUA_TWEAK_TYPES, type LuaTweakType } from '@/types/types';
 
 /** Built-in Lua files a preset tweak can replace. */
@@ -42,6 +46,19 @@ export const toFormRows = (tweaks: Partial<PresetTweak>[]): TweakFormRow[] =>
         })
     );
 
+/** Unsupported hosts are an error right away; an empty path only with `flagEmpty`. */
+export function getPathError(
+    path: string,
+    flagEmpty: boolean
+): string | undefined {
+    const trimmed = path.trim();
+    if (!trimmed)
+        return flagEmpty ? 'Enter a GitHub URL or a bundled path' : undefined;
+    if (!isValidTweakUrl(trimmed))
+        return 'Only raw.githubusercontent.com and gist.githubusercontent.com URLs are allowed';
+    return undefined;
+}
+
 interface PresetTweakFieldsProps {
     tweak: TweakFormRow;
     index: number;
@@ -51,7 +68,7 @@ interface PresetTweakFieldsProps {
 }
 
 /** One tweak of the preset form: description, type, Lua file and replaced files. */
-export const PresetTweakFields: React.FC<PresetTweakFieldsProps> = ({
+const PresetTweakFields: React.FC<PresetTweakFieldsProps> = ({
     tweak,
     index,
     pathError,
@@ -113,3 +130,73 @@ export const PresetTweakFields: React.FC<PresetTweakFieldsProps> = ({
         </Stack>
     </Paper>
 );
+
+interface PresetTweakListProps {
+    tweaks: TweakFormRow[];
+    onChange: React.Dispatch<React.SetStateAction<TweakFormRow[]>>;
+    /** Flags empty Lua file paths, once the user tried to save */
+    showEmptyPathErrors: boolean;
+}
+
+/** The preset form's custom tweaks: remote-script warning, rows and Add button. */
+export const PresetTweakList: React.FC<PresetTweakListProps> = ({
+    tweaks,
+    onChange,
+    showEmptyPathErrors,
+}) => {
+    const updateTweak = (id: string, changes: Partial<TweakFormRow>) => {
+        onChange((prev) =>
+            prev.map((t) => (t.id === id ? { ...t, ...changes } : t))
+        );
+    };
+
+    return (
+        <Stack gap='sm'>
+            <Stack gap={2}>
+                <Text fw={700}>Custom tweaks</Text>
+                <Text size='sm'>
+                    Lua scripts loaded with this preset, from GitHub or the
+                    bundle.
+                </Text>
+            </Stack>
+
+            {tweaks.some((t) => isRemoteTweakPath(t.path)) && (
+                <Alert
+                    color='yellow'
+                    icon={<IconAlertTriangle size={18} />}
+                    title='This preset runs scripts from GitHub'
+                >
+                    They load from their authors&apos; repositories. Only use
+                    presets from people you trust.
+                </Alert>
+            )}
+
+            {tweaks.map((tweak, index) => (
+                <PresetTweakFields
+                    key={tweak.id}
+                    tweak={tweak}
+                    index={index}
+                    pathError={getPathError(tweak.path, showEmptyPathErrors)}
+                    onChange={(changes) => updateTweak(tweak.id, changes)}
+                    onRemove={() =>
+                        onChange((prev) =>
+                            prev.filter((t) => t.id !== tweak.id)
+                        )
+                    }
+                />
+            ))}
+
+            <Group>
+                <Button
+                    variant='default'
+                    leftSection={<IconPlus size={16} />}
+                    onClick={() =>
+                        onChange((prev) => [...prev, ...toFormRows([{}])])
+                    }
+                >
+                    Add tweak
+                </Button>
+            </Group>
+        </Stack>
+    );
+};

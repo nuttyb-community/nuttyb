@@ -29,6 +29,10 @@ export function isAllowedRemoteTweakUrl(url: string): boolean {
     }
 }
 
+/** True for http(s) URLs, as opposed to bundled paths like lua/eco-t3.lua. */
+export const isRemoteTweakPath = (path: string) =>
+    /^https?:\/\//.test(path.trim());
+
 /**
  * Validates a preset tweak path for UI input. Local (bundled) paths are
  * allowed; remote paths must be `https://` on an allowed host. Plain `http://`

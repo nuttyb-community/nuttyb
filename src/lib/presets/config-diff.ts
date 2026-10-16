@@ -1,9 +1,5 @@
-import React from 'react';
-
-import { Table } from '@mantine/core';
-
 import {
-    Configuration,
+    type Configuration,
     DEFAULT_CONFIGURATION,
 } from '@/lib/command-generator/data/configuration';
 import { CONFIGURATION_MAPPING } from '@/lib/command-generator/data/configuration-mapping';
@@ -14,8 +10,8 @@ export interface ConfigDiff {
 }
 
 /**
- * Computes the list of configuration overrides compared to defaults, labelled
- * with the mapping descriptions. Shared by the preset popover and form.
+ * Settings that differ from the defaults, labelled with the mapping
+ * descriptions. Shown in the preset popover and form.
  */
 export function computeConfigDiff(config: Configuration): ConfigDiff[] {
     const defaultKeys = Object.keys(DEFAULT_CONFIGURATION) as Array<
@@ -36,26 +32,3 @@ export function computeConfigDiff(config: Configuration): ConfigDiff[] {
             };
         });
 }
-
-/** Two-column table of setting overrides: label left, value right. */
-export const ConfigDiffTable: React.FC<{ overrides: ConfigDiff[] }> = ({
-    overrides,
-}) => (
-    <Table
-        fz='sm'
-        verticalSpacing={4}
-        horizontalSpacing={0}
-        withRowBorders={false}
-    >
-        <Table.Tbody>
-            {overrides.map((o) => (
-                <Table.Tr key={o.label}>
-                    <Table.Td>{o.label}</Table.Td>
-                    <Table.Td ta='right' fw={700}>
-                        {o.value}
-                    </Table.Td>
-                </Table.Tr>
-            ))}
-        </Table.Tbody>
-    </Table>
-);
