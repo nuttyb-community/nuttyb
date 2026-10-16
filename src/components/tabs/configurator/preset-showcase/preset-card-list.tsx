@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 import {
     ActionIcon,
     Badge,
     Box,
-    Card,
     Group,
     List,
     Menu,
     Popover,
+    Radio,
     ScrollArea,
     Stack,
     Text,
@@ -21,19 +21,17 @@ import {
     IconDots,
     IconFileExport,
     IconPencil,
-    IconTrash,
 } from '@tabler/icons-react';
 
+import { ConfirmDeleteMenuItem } from '@/components/common/confirm-delete-menu-item';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
+import { usePresetsContext } from '@/components/contexts/presets-context';
 import type { Preset } from '@/lib/presets/registry';
 
 import { computeConfigDiff, ConfigDiffTable } from './preset-showcase.utils';
 
 const PresetDetails: React.FC<{ preset: Preset }> = ({ preset }) => {
-    const overrides = useMemo(
-        () => computeConfigDiff(preset.configuration),
-        [preset.configuration]
-    );
+    const overrides = computeConfigDiff(preset.configuration);
 
     return (
         <Stack gap='md'>
@@ -69,24 +67,17 @@ const PresetDetails: React.FC<{ preset: Preset }> = ({ preset }) => {
     );
 };
 
-interface PresetMenuProps {
+interface PresetCardProps {
     preset: Preset;
     onEdit: (preset: Preset) => void;
-    onExport: (id: string) => void;
-    onDelete: (id: string) => void;
 }
 
-/** Actions for the user's own presets; delete asks for a second click. */
-const PresetMenu: React.FC<PresetMenuProps> = ({
-    preset,
-    onEdit,
-    onExport,
-    onDelete,
-}) => {
-    const [isConfirmingDelete, setConfirmingDelete] = useState(false);
+/** Actions for the user's own presets. */
+const PresetMenu: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
+    const { exportPreset, deleteLocalPreset } = usePresetsContext();
 
     return (
-        <Menu position='bottom-end' onClose={() => setConfirmingDelete(false)}>
+        <Menu position='bottom-end'>
             <Menu.Target>
                 <ActionIcon
                     variant='subtle'
@@ -105,48 +96,26 @@ const PresetMenu: React.FC<PresetMenuProps> = ({
                 </Menu.Item>
                 <Menu.Item
                     leftSection={<IconFileExport {...ICON_SIZE_MD} />}
-                    onClick={() => onExport(preset.id)}
+                    onClick={() => exportPreset(preset.id)}
                 >
                     Export JSON
                 </Menu.Item>
-                <Menu.Item
-                    color='red'
-                    leftSection={<IconTrash {...ICON_SIZE_MD} />}
-                    closeMenuOnClick={isConfirmingDelete}
-                    onClick={() =>
-                        isConfirmingDelete
-                            ? onDelete(preset.id)
-                            : setConfirmingDelete(true)
-                    }
-                >
-                    {isConfirmingDelete ? 'Click again to delete' : 'Delete'}
-                </Menu.Item>
+                <ConfirmDeleteMenuItem
+                    onDelete={() => deleteLocalPreset(preset.id)}
+                />
             </Menu.Dropdown>
         </Menu>
     );
 };
 
-interface PresetCardProps extends PresetMenuProps {
-    isActive: boolean;
-    isModified: boolean;
-    onSelect: (id: string) => void;
-}
-
-const PresetCard: React.FC<PresetCardProps> = ({
-    preset,
-    isActive,
-    isModified,
-    onSelect,
-    ...menuProps
-}) => {
-    const { hovered, ref } = useHover<HTMLDivElement>();
+const PresetCard: React.FC<PresetCardProps> = ({ preset, onEdit }) => {
+    const { activePresetId, isModified, selectPreset } = usePresetsContext();
+    const { hovered, ref } = useHover<HTMLButtonElement>();
     // Details open after a short hover, or right away on keyboard focus
     const [hoveredLong] = useDebouncedValue(hovered, 400);
     const [isKeyboardFocused, setKeyboardFocused] = useState(false);
+    const isActive = activePresetId === preset.id;
     const isDisabled = preset.status === 'disabled';
-    const select = () => {
-        if (!isDisabled) onSelect(preset.id);
-    };
 
     return (
         // The menu sits beside the card, not inside it: a radio can't contain a button
@@ -158,17 +127,19 @@ const PresetCard: React.FC<PresetCardProps> = ({
                 shadow='md'
             >
                 <Popover.Target>
-                    <Card
+                    {/* Arrow keys move between cards with the same name */}
+                    <Radio.Card
                         ref={ref}
-                        role='radio'
-                        aria-checked={isActive}
+                        name='preset'
+                        checked={isActive}
+                        // Not `disabled`: that would stop the arrow keys here.
+                        // selectPreset ignores disabled presets.
                         aria-disabled={isDisabled}
-                        tabIndex={0}
-                        // Mantine's focus ring utility class
-                        className='mantine-focus-auto'
-                        withBorder
-                        padding='md'
+                        onClick={() => selectPreset(preset.id)}
+                        p='md'
                         h='100%'
+                        // A button centres its content; flex puts it at the top like a Card
+                        display='flex'
                         // Selected: primary border and fill. Hover: background only.
                         bd={
                             isActive
@@ -184,16 +155,9 @@ const PresetCard: React.FC<PresetCardProps> = ({
                         }
                         opacity={isDisabled ? 0.5 : undefined}
                         style={{
-                            cursor: isDisabled ? 'not-allowed' : 'pointer',
+                            cursor: isDisabled ? 'not-allowed' : undefined,
                             // Inside the edge: the scroll area clips anything outside
                             outlineOffset: -2,
-                        }}
-                        onClick={select}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                select();
-                            }
                         }}
                         onFocus={(e) =>
                             setKeyboardFocused(
@@ -202,7 +166,7 @@ const PresetCard: React.FC<PresetCardProps> = ({
                         }
                         onBlur={() => setKeyboardFocused(false)}
                     >
-                        <Stack gap={4}>
+                        <Stack gap={4} flex={1}>
                             {/* Right padding keeps the title clear of the menu button */}
                             <Group
                                 gap={6}
@@ -244,7 +208,7 @@ const PresetCard: React.FC<PresetCardProps> = ({
                                 </Text>
                             )}
                         </Stack>
-                    </Card>
+                    </Radio.Card>
                 </Popover.Target>
                 <Popover.Dropdown>
                     <PresetDetails preset={preset} />
@@ -252,34 +216,28 @@ const PresetCard: React.FC<PresetCardProps> = ({
             </Popover>
             {!preset.isBuiltIn && (
                 <Box pos='absolute' top={10} right={10}>
-                    <PresetMenu preset={preset} {...menuProps} />
+                    <PresetMenu preset={preset} onEdit={onEdit} />
                 </Box>
             )}
         </Box>
     );
 };
 
-interface PresetCardListProps {
-    allPresets: Preset[];
-    activePresetId: string | null;
-    isModified: boolean;
-    onSelect: (id: string) => void;
+export const PresetCardList: React.FC<{
     onEdit: (preset: Preset) => void;
-    onExport: (id: string) => void;
-    onDelete: (id: string) => void;
-}
-
-export const PresetCardList: React.FC<PresetCardListProps> = ({
-    allPresets,
-    activePresetId,
-    ...cardProps
-}) => {
+}> = ({ onEdit }) => {
+    const { builtInPresets, localPresets } = usePresetsContext();
     const { ref: frameRef, width: frameWidth } = useElementSize();
     const { ref: rowRef, width: rowWidth } = useElementSize();
     const viewportRef = useRef<HTMLDivElement>(null);
     const [isAtEnd, setAtEnd] = useState(false);
     // Fade the right edge while more cards are hidden that way
     const hasMoreRight = rowWidth > frameWidth + 1 && !isAtEnd;
+    // Stored presets are never built-in, whatever the saved data says
+    const presets = [
+        ...builtInPresets,
+        ...localPresets.map((p) => ({ ...p, isBuiltIn: false })),
+    ];
 
     return (
         <Box ref={frameRef} pos='relative'>
@@ -307,12 +265,11 @@ export const PresetCardList: React.FC<PresetCardListProps> = ({
                     // Clears the overlaid 12px scrollbar with a 16px gap
                     pb={28}
                 >
-                    {allPresets.map((preset) => (
+                    {presets.map((preset) => (
                         <PresetCard
                             key={preset.id}
                             preset={preset}
-                            isActive={activePresetId === preset.id}
-                            {...cardProps}
+                            onEdit={onEdit}
                         />
                     ))}
                 </Group>

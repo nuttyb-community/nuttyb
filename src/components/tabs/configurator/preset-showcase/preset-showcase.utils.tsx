@@ -6,27 +6,7 @@ import {
     Configuration,
     DEFAULT_CONFIGURATION,
 } from '@/lib/command-generator/data/configuration';
-
-/** Display labels, matching the configurator's field labels. */
-const CONFIG_LABELS: Record<keyof Configuration, string> = {
-    raptorHpMult: 'Raptor HP multiplier',
-    queenHpMult: 'Queen HP multiplier',
-    isCrossFactionT2: 'Cross-faction T2 labs',
-    isDefencesT4: 'T4 defences',
-    lobbyName: 'Lobby name tag',
-    gameMap: 'Map',
-    start: 'Start',
-    queenCount: 'Raptor queen count',
-    incomeMult: 'Resource income multiplier',
-    buildPowerMult: 'Build power multiplier',
-    buildDistMult: 'Build distance multiplier',
-    challenges: 'Challenges',
-    isEcoT4: 'T4 Economy',
-    isRFLRPCRebalance: 'RFLRPC Rebalance',
-    isRFLRPCT4: 'T4 RFLRPC',
-    isMegaNuke: 'Mega Nuke',
-    isT3GeoWalls: 'T3 Geo + Walls',
-};
+import { CONFIGURATION_MAPPING } from '@/lib/command-generator/data/configuration-mapping';
 
 export interface ConfigDiff {
     label: string;
@@ -34,8 +14,8 @@ export interface ConfigDiff {
 }
 
 /**
- * Computes the list of configuration overrides compared to defaults.
- * Shared by the preset details popover and the preset form.
+ * Computes the list of configuration overrides compared to defaults, labelled
+ * with the mapping descriptions. Shared by the preset popover and form.
  */
 export function computeConfigDiff(config: Configuration): ConfigDiff[] {
     const defaultKeys = Object.keys(DEFAULT_CONFIGURATION) as Array<
@@ -46,7 +26,7 @@ export function computeConfigDiff(config: Configuration): ConfigDiff[] {
         .map((key) => {
             const value = config[key];
             return {
-                label: CONFIG_LABELS[key],
+                label: CONFIGURATION_MAPPING[key].description,
                 value:
                     typeof value === 'boolean'
                         ? value

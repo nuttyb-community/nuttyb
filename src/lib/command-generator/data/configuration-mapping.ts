@@ -127,7 +127,7 @@ export const BASE_TWEAKS = {
 
 export const CONFIGURATION_MAPPING: ValueMapping = {
     challenges: {
-        description: 'Extra challenges',
+        description: 'Challenges',
         values: {
             None: undefined,
             'Mini Bosses': { tweakdefs: ['lua/mini-bosses.lua'] },
@@ -255,7 +255,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         },
     },
     start: {
-        description: 'Starting conditions',
+        description: 'Start',
         values: {
             'No rush': {
                 command: [
@@ -296,7 +296,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         },
     },
     lobbyName: {
-        description: 'Custom lobby name',
+        description: 'Lobby name tag',
         values: {},
     },
     isEcoT4: {
@@ -328,7 +328,7 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         },
     },
     isT3GeoWalls: {
-        description: 'T3 Geo and T3 Walls',
+        description: 'T3 Geo + Walls',
         values: {
             true: { tweakdefs: ['lua/geo+walls-t3.lua'] },
             false: undefined,

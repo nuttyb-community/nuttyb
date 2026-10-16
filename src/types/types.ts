@@ -33,6 +33,7 @@ export type TweakValue = Partial<Record<TweakType, string[]>>;
  */
 export type ValueMapping = {
     [K in keyof Configuration]: {
+        /** The setting's label, as the preset details show it */
         description: string;
         values: Record<
             StringifyBooleans<ExtractValues<Configuration[K]>>,

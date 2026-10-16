@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 import { Button, Group, Stack, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -13,34 +13,13 @@ import { PresetCardList } from './preset-card-list';
 import { PresetModal } from './preset-modal';
 
 export const PresetShowcase: React.FC = () => {
-    const {
-        activePresetId,
-        builtInPresets,
-        localPresets,
-        isModified,
-        selectPreset,
-        deleteLocalPreset,
-        exportPreset,
-    } = usePresetsContext();
-
+    const { activePresetId, isModified, selectPreset } = usePresetsContext();
     const [isModalOpen, { open: openModal, close: closeModal }] =
         useDisclosure(false);
+    // Kept after closing, so the title doesn't change during the exit animation
     const [editPreset, setEditPreset] = useState<Preset | null>(null);
 
-    const allPresets = useMemo<Preset[]>(
-        () => [
-            ...builtInPresets.map((p) => ({ ...p, isBuiltIn: true })),
-            ...localPresets.map((p) => ({ ...p, isBuiltIn: false })),
-        ],
-        [builtInPresets, localPresets]
-    );
-
-    const handleNewPreset = () => {
-        setEditPreset(null);
-        openModal();
-    };
-
-    const handleEditPreset = (preset: Preset) => {
+    const openEditor = (preset: Preset | null) => {
         setEditPreset(preset);
         openModal();
     };
@@ -63,22 +42,14 @@ export const PresetShowcase: React.FC = () => {
                     <Button
                         variant='default'
                         leftSection={<IconPlus size={16} />}
-                        onClick={handleNewPreset}
+                        onClick={() => openEditor(null)}
                     >
                         New preset
                     </Button>
                 </Group>
             </Group>
 
-            <PresetCardList
-                allPresets={allPresets}
-                activePresetId={activePresetId}
-                isModified={isModified}
-                onSelect={selectPreset}
-                onEdit={handleEditPreset}
-                onExport={exportPreset}
-                onDelete={deleteLocalPreset}
-            />
+            <PresetCardList onEdit={openEditor} />
 
             <PresetModal
                 opened={isModalOpen}

@@ -22,9 +22,9 @@ import {
     IconDots,
     IconPencil,
     IconPlus,
-    IconTrash,
 } from '@tabler/icons-react';
 
+import { ConfirmDeleteMenuItem } from '@/components/common/confirm-delete-menu-item';
 import { FEEDBACK_DURATION_MS } from '@/components/common/feedback';
 import { ICON_SIZE_MD, ICON_STYLE } from '@/components/common/icon-style';
 import { TweakTypeBadge } from '@/components/common/type-badge';
@@ -42,10 +42,9 @@ interface TweakMenuProps {
 const TweakMenu: React.FC<TweakMenuProps> = ({ tweak, onEdit }) => {
     const { deleteTweak } = useCustomTweaksContext();
     const clipboard = useClipboard({ timeout: FEEDBACK_DURATION_MS });
-    const [isConfirmingDelete, setConfirmingDelete] = useState(false);
 
     return (
-        <Menu position='bottom-end' onClose={() => setConfirmingDelete(false)}>
+        <Menu position='bottom-end'>
             <Menu.Target>
                 <ActionIcon
                     variant='subtle'
@@ -76,18 +75,7 @@ const TweakMenu: React.FC<TweakMenuProps> = ({ tweak, onEdit }) => {
                 >
                     {clipboard.copied ? 'Copied' : 'Copy code'}
                 </Menu.Item>
-                <Menu.Item
-                    color='red'
-                    leftSection={<IconTrash {...ICON_SIZE_MD} />}
-                    closeMenuOnClick={isConfirmingDelete}
-                    onClick={() =>
-                        isConfirmingDelete
-                            ? deleteTweak(tweak.id)
-                            : setConfirmingDelete(true)
-                    }
-                >
-                    {isConfirmingDelete ? 'Click again to delete' : 'Delete'}
-                </Menu.Item>
+                <ConfirmDeleteMenuItem onDelete={() => deleteTweak(tweak.id)} />
             </Menu.Dropdown>
         </Menu>
     );
