@@ -24,7 +24,7 @@ export default function RootLayout({
         // The theme is always dark, so the HTML starts dark: no ColorSchemeScript,
         // which would default to light and flash it until hydration
         <html lang='en' {...mantineHtmlProps} data-mantine-color-scheme='dark'>
-            <body className={'antialiased'}>
+            <body>
                 <MantineProvider
                     defaultColorScheme='dark'
                     forceColorScheme='dark'

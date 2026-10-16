@@ -1,8 +1,5 @@
 // @ts-check
 
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 import eslint from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
@@ -12,9 +9,6 @@ import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import tseslint from 'typescript-eslint';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default defineConfig(
     {
@@ -32,13 +26,6 @@ export default defineConfig(
             'postcss.config.mjs',
             'old/*',
         ],
-    },
-    {
-        settings: {
-            tailwindcss: {
-                config: `${__dirname}/src/app/globals.css`,
-            },
-        },
     },
     // Base configurations applied globally
     eslint.configs.recommended,

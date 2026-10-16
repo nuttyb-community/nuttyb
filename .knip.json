@@ -4,9 +4,9 @@
         "src/app/**/*.{ts,tsx}",
         "tests/**/*.test.{ts,js}"
     ],
-    "project": ["src/**/*.{ts,tsx,js,jsx,css}", "scripts/**/*.{ts,tsx,js,jsx}"],
+    "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{ts,tsx,js,jsx}"],
     "ignore": ["**/*.config.*"],
-    "ignoreDependencies": ["eslint-nibble", "tailwindcss"],
+    "ignoreDependencies": ["eslint-nibble"],
     "ignoreExportsUsedInFile": {
         "interface": true,
         "type": true
