@@ -21,7 +21,12 @@ describe('Bundled presets', () => {
     // fall back to the default value.
     test('use only known configuration keys', () => {
         const presetsDir = './public/presets';
-        const unknownKeys = fs.readdirSync(presetsDir).flatMap((dir) => {
+        // Skip schema.json next to the preset folders
+        const dirs = fs
+            .readdirSync(presetsDir, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => entry.name);
+        const unknownKeys = dirs.flatMap((dir) => {
             const file = path.join(presetsDir, dir, 'config.json');
             const { configuration } = JSON.parse(
                 fs.readFileSync(file, 'utf8')

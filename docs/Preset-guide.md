@@ -13,8 +13,6 @@ When you select a preset:
 
 > Only one preset can be active at a time. You can export presets and manually merge them into one if needed.
 
-The difficulty levels are presets too. **Easy**, **Medium** and **Hard** set the raptor and queen HP multipliers, cross-faction T2 labs and T4 defences. **Medium** carries the default configuration, and **Reset all** returns to it.
-
 ## Why Use Presets?
 
 | Scenario | Without Presets | With Presets |
@@ -61,6 +59,7 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 
 ```json
 {
+    "$schema": "../schema.json",
     "version": 1,
     "id": "my-preset",
     "name": "My Preset",
@@ -99,6 +98,7 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 
 | Field | Required | Notes |
 |---|---|---|
+| `$schema` | No | `"../schema.json"` — editor autocomplete and validation ([`public/presets/schema.json`](../public/presets/schema.json)) |
 | `version` | No | Schema version (currently `1`) |
 | `id` | No | Falls back to folder name if hosted; required for exported JSON |
 | `name` | Yes | Display name |

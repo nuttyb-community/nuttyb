@@ -1,11 +1,20 @@
 {
-  "id": "hard",
-  "name": "Hard",
-  "description": "3× HP, no cross-faction T2 or T4 defences.",
-  "configuration": {
-    "raptorHpMult": 3,
-    "queenHpMult": 3,
-    "isCrossFactionT2": false,
-    "isDefencesT4": false
-  }
+    "$schema": "../schema.json",
+    "id": "hard",
+    "name": "Hard",
+    "description": "3× HP, no cross-faction T2 or T4 defences",
+    "configuration": {
+        "gameMap": "Full Metal Plate (12P)",
+        "lobbyName": "Raptors [Hard][Mini Bosses][3x QHP 3x HP]",
+        "raptorHpMult": 3,
+        "queenHpMult": 3,
+        "challenges": "Mini Bosses",
+        "start": "No rush",
+        "incomeMult": 1.3,
+        "buildPowerMult": 1.3,
+        "buildDistMult": 1.5,
+        "queenCount": 69,
+        "isCrossFactionT2": false,
+        "isDefencesT4": false
+    }
 }

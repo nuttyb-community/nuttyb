@@ -1,9 +1,18 @@
 {
-  "id": "easy",
-  "name": "Easy",
-  "description": "1.3× raptor and queen HP.",
-  "configuration": {
-    "raptorHpMult": 1.3,
-    "queenHpMult": 1.3
-  }
+    "$schema": "../schema.json",
+    "id": "easy",
+    "name": "Easy",
+    "description": "1.3× raptor and queen HP",
+    "configuration": {
+        "gameMap": "Full Metal Plate (12P)",
+        "lobbyName": "Raptors [Easy][Mini Bosses][1_3x QHP 1_3x HP]",
+        "raptorHpMult": 1.3,
+        "queenHpMult": 1.3,
+        "challenges": "Mini Bosses",
+        "start": "No rush",
+        "incomeMult": 1.5,
+        "buildPowerMult": 1.5,
+        "buildDistMult": 1.5,
+        "queenCount": 24
+    }
 }

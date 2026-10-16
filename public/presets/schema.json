@@ -1,0 +1,96 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "NuttyB preset",
+    "description": "See docs/Preset-guide.md",
+    "type": "object",
+    "required": ["name", "configuration"],
+    "additionalProperties": false,
+    "properties": {
+        "$schema": { "type": "string" },
+        "version": { "const": 1 },
+        "id": {
+            "type": "string",
+            "description": "Falls back to the folder name for hosted presets"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "description": {
+            "type": "string",
+            "description": "Shown on the preset card"
+        },
+        "status": { "enum": ["enabled", "disabled"], "default": "enabled" },
+        "configuration": {
+            "type": "object",
+            "description": "Sparse merge over the defaults",
+            "additionalProperties": false,
+            "properties": {
+                "challenges": {
+                    "enum": [
+                        "None",
+                        "Mini Bosses",
+                        "Mini Bosses Extended",
+                        "Experimental Wave Challenge"
+                    ]
+                },
+                "gameMap": {
+                    "enum": [
+                        "Full Metal Plate (12P)",
+                        "Raptor Crater (16P)",
+                        "Raptor Crater Inverted (16P)",
+                        "Special Hotstepper (16P)",
+                        "To Kill The Middle (12P)",
+                        "Ancient Bastion Remake (8P)",
+                        "Ancient Vault (12P)",
+                        "Bismuth Valley (8P)",
+                        "Darkside (12P)",
+                        "Flats and Forests (12P)",
+                        "Special Creek (12P)",
+                        "Starwatcher (8P)"
+                    ]
+                },
+                "start": {
+                    "enum": ["No rush", "No rush solo", "Zero grace", "Surrounded"]
+                },
+                "lobbyName": { "type": "string" },
+                "isEcoT4": { "type": "boolean" },
+                "isRFLRPCRebalance": { "type": "boolean" },
+                "isRFLRPCT4": { "type": "boolean" },
+                "isMegaNuke": { "type": "boolean" },
+                "isT3GeoWalls": { "type": "boolean" },
+                "isCrossFactionT2": { "type": "boolean" },
+                "isDefencesT4": { "type": "boolean" },
+                "raptorHpMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
+                "queenHpMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
+                "incomeMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
+                "buildDistMult": { "type": "number", "minimum": 0.5, "maximum": 10 },
+                "buildPowerMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
+                "queenCount": { "type": "integer", "minimum": 1, "maximum": 100 }
+            }
+        },
+        "presetTweaks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": ["description", "type", "path"],
+                "additionalProperties": false,
+                "properties": {
+                    "description": { "type": "string" },
+                    "type": { "enum": ["tweakdefs", "tweakunits"] },
+                    "path": {
+                        "type": "string",
+                        "description": "raw.githubusercontent.com / gist.githubusercontent.com URL or bundle path"
+                    },
+                    "replaces": {
+                        "description": "Built-in tweak path(s) to replace; omit to add alongside",
+                        "oneOf": [
+                            { "type": "string", "pattern": "^lua/.+\\.lua$" },
+                            {
+                                "type": "array",
+                                "items": { "type": "string", "pattern": "^lua/.+\\.lua$" }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
