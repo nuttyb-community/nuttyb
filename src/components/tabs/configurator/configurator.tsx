@@ -21,8 +21,8 @@ export const Configurator: React.FC = () => (
         </Group>
         <Stack gap='xl'>
             <PresetShowcase />
-            <DifficultySection />
             <GameSettingsSection />
+            <DifficultySection />
             <ExtrasSection />
             <CustomTweaksSection />
         </Stack>

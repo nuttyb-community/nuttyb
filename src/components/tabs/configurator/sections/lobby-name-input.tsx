@@ -47,7 +47,7 @@ export const LobbyNameInput: React.FC = () => {
         <TextInput
             label={
                 <LabelWithTooltip
-                    label='Lobby name tag'
+                    label='Name tag'
                     tooltip='It will be added to auto-generated lobby name'
                 />
             }
