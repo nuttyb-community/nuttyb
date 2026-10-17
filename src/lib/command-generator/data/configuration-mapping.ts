@@ -32,6 +32,9 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/unit-launchers.lua': 13,
     'lua/unit-launchers-tumbleweed.lua': 13,
     'lua/geo+walls-t3.lua': 14,
+    // Game-wide rules run after every file that creates units
+    'lua/mini-artillery-off.lua': 20,
+    'lua/shields-faint.lua': 20,
 } as const;
 
 /**
@@ -116,6 +119,8 @@ export const BASE_TWEAKS = {
         'lua/defences-t3.lua',
         'lua/lrpc-rebalance.lua',
         'lua/air-rework-t4.lua',
+        'lua/mini-artillery-off.lua',
+        'lua/shields-faint.lua',
     ],
     tweakunits: [
         'lua/main-units.lua',
