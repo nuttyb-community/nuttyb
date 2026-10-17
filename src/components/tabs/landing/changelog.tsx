@@ -12,9 +12,9 @@ import {
 import dayjs from 'dayjs';
 
 import type { ChangelogEntry } from '@/lib/changelog/types';
+import { EXTERNAL_LINKS } from '@/lib/navigation';
 
-const CHANGELOG_URL =
-    'https://github.com/nuttyb-community/nuttyb/blob/main/CHANGELOG.md';
+import { LIST_OFFSET } from './list-offset';
 
 interface ChangelogProps {
     entries: ChangelogEntry[];
@@ -31,7 +31,7 @@ export const Changelog: React.FC<ChangelogProps> = ({ entries, spacing }) => (
                     <Text fw={700}>
                         {dayjs(entry.date).format('DD.MM.YYYY')}
                     </Text>
-                    <List size='sm' ml={-7} spacing={4}>
+                    <List size='sm' ml={LIST_OFFSET} spacing={4}>
                         {entry.items.map((item, itemIndex) => (
                             <ListItem key={itemIndex}>{item}</ListItem>
                         ))}
@@ -41,7 +41,7 @@ export const Changelog: React.FC<ChangelogProps> = ({ entries, spacing }) => (
         </SimpleGrid>
         <Text size='sm'>
             See the{' '}
-            <Anchor href={CHANGELOG_URL} target='_blank'>
+            <Anchor href={EXTERNAL_LINKS.changelog} target='_blank'>
                 full changelog
             </Anchor>{' '}
             for the complete history.
