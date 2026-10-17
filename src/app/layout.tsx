@@ -7,6 +7,7 @@ import {
 import type { Metadata } from 'next';
 
 import '@mantine/core/styles.css';
+import './globals.css';
 import { PageHeader } from '@/components/page-header';
 import { Providers } from '@/components/providers';
 

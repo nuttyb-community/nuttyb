@@ -111,7 +111,7 @@ export const PresetCard: React.FC<EditablePresetProps> = ({
                                 ? 'var(--mantine-primary-color-light)'
                                 : hovered
                                   ? 'var(--mantine-color-default-hover)'
-                                  : undefined
+                                  : 'var(--mantine-color-default)'
                         }
                         // Inside the edge: the scroll area clips anything outside
                         style={{ outlineOffset: -2 }}
