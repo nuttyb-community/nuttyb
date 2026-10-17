@@ -19,7 +19,7 @@ export const Configurator: React.FC = () => (
             <Title order={1}>Configurator</Title>
             <ResetButton />
         </Group>
-        <Stack gap={48}>
+        <Stack gap='xl'>
             <PresetShowcase />
             <DifficultySection />
             <GameSettingsSection />
