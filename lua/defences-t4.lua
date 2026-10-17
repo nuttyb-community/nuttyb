@@ -191,6 +191,46 @@ do
         ensureBuildOption(builder_name, t4BastionName)
     end
 
+    -- T4 Elysium
+    -- The shield radius and power live in both the weapondef (coverage) and
+    -- customparams (the drawn bubble); keep the two in sync.
+    local t4ElysiumName = 'leggatet4'
+    unitDefs[t4ElysiumName] = tableMerge(unitDefs['leggatet3'], {
+        name = 'T4 Elysium',
+        description = 'The ultimate Legion shield. Projects a vast, fast-recharging plasma barrier.',
+        buildtime = 443700,
+        health = 45000,
+        metalcost = 24650,
+        energycost = 367200,
+        energystorage = 5000,
+        footprintx = 6,
+        footprintz = 6,
+        icontype = 'leggatet3',
+        customparams = {
+            i18n_en_humanname = 'T4 Elysium',
+            i18n_en_tooltip = 'Huge plasma shield: 2.5x the power and 1.3x the radius of the Elysium.',
+            shield_power = 123500,
+            shield_radius = 923,
+            techlevel = 4,
+        },
+        weapondefs = {
+            repulsor = {
+                range = 923,
+                shield = {
+                    power = 123500,
+                    powerregen = 2340,
+                    powerregenenergy = 4275,
+                    radius = 923,
+                    startingpower = 26245,
+                },
+            },
+        },
+    })
+
+    for _, builder_name in pairs(builders_leg) do
+        ensureBuildOption(builder_name, t4ElysiumName)
+    end
+
     -- T4 Bulwark
     local t4BulwarkName = 'cordoomt4'
     unitDefs[t4BulwarkName] = tableMerge(unitDefs['cordoomt3'], {

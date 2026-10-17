@@ -263,8 +263,8 @@
             'legnanotct3',
             'legapopupdef',
             'epic_starfall',
-            'epic_bastion',
-            'epic_sentinel',
+            'legbastiont4',
+            'leggatet4',
         },
         weapondefs = {
             legcomlaser = {
@@ -422,8 +422,8 @@
             'legapopupdef',
             'leglrpc',
             'epic_starfall',
-            'epic_bastion',
-            'epic_sentinel',
+            'legbastiont4',
+            'leggatet4',
         },
         weapondefs = {
             legcomlaser = {
@@ -579,8 +579,8 @@
             'legapopupdef',
             'leglrpc',
             'epic_starfall',
-            'epic_bastion',
-            'epic_sentinel',
+            'legbastiont4',
+            'leggatet4',
         },
         weapondefs = {
             machinegun = {
