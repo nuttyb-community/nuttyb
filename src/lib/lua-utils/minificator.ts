@@ -25,7 +25,9 @@ export function minify(lua: string): string {
         minifiedCode = luamin.Minify(data, {
             RenameVariables: true,
             RenameGlobals: false,
-            SolveMath: true,
+            // Folded negative numbers print glued to the next keyword
+            // (`-1do`), which Lua rejects as a malformed number
+            SolveMath: false,
         });
     } catch {
         minifiedCode = minifyNonMinifiable(data);
