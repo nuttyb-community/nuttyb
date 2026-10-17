@@ -31,7 +31,7 @@ export default function RootLayout({
                 <MantineProvider forceColorScheme='dark'>
                     <Providers>
                         <AppShell header={{ height: 60 }}>
-                            <AppShellHeader bg='dark' withBorder={false}>
+                            <AppShellHeader bg='dark.9' withBorder={false}>
                                 <PageHeader />
                             </AppShellHeader>
                             <AppShellMain>{children}</AppShellMain>

@@ -2,8 +2,12 @@
 
 import React from 'react';
 
-import { Anchor, Button, Group, Menu, Text } from '@mantine/core';
-import { IconChevronDown } from '@tabler/icons-react';
+import { ActionIcon, Anchor, Button, Group, Menu, Text } from '@mantine/core';
+import {
+    IconBrandDiscord,
+    IconBrandGithub,
+    IconChevronDown,
+} from '@tabler/icons-react';
 import NextImage, { type StaticImageData } from 'next/image';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -11,7 +15,7 @@ import { usePathname } from 'next/navigation';
 import logo from '@/assets/logo.svg';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { PageWrapper } from '@/components/page-wrapper';
-import { Link, LINKS } from '@/lib/navigation';
+import { EXTERNAL_LINKS, Link, LINKS } from '@/lib/navigation';
 
 const toolLinks: Link[] = Object.values(LINKS.tools);
 
@@ -44,6 +48,26 @@ export const PageHeader: React.FC = () => {
                     </Group>
                 </Anchor>
                 <Group gap='md'>
+                    <ActionIcon
+                        component='a'
+                        href={EXTERNAL_LINKS.repo}
+                        target='_blank'
+                        variant='subtle'
+                        size='lg'
+                        aria-label='GitHub repository'
+                    >
+                        <IconBrandGithub size={22} />
+                    </ActionIcon>
+                    <ActionIcon
+                        component='a'
+                        href={EXTERNAL_LINKS.discord}
+                        target='_blank'
+                        variant='subtle'
+                        size='lg'
+                        aria-label='Discord'
+                    >
+                        <IconBrandDiscord size={22} />
+                    </ActionIcon>
                     <Button
                         component={NextLink}
                         href={LINKS.configurator.href}
