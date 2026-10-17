@@ -1,4 +1,7 @@
-import { expect, test } from 'bun:test';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { describe, expect, test } from 'bun:test';
 
 import {
     CHALLENGES,
@@ -23,4 +26,28 @@ test('preset schema matches Configuration and tweak types', () => {
     expect(schema.properties.presetTweaks.items.properties.type.enum).toEqual([
         ...LUA_TWEAK_TYPES,
     ]);
+});
+
+describe('Bundled presets', () => {
+    // Unknown keys are dropped silently on load, so a stale key would quietly
+    // fall back to the default value.
+    test('use only known configuration keys', () => {
+        const presetsDir = './public/presets';
+        // Skip schema.json next to the preset folders
+        const dirs = fs
+            .readdirSync(presetsDir, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => entry.name);
+        const unknownKeys = dirs.flatMap((dir) => {
+            const file = path.join(presetsDir, dir, 'config.json');
+            const { configuration } = JSON.parse(
+                fs.readFileSync(file, 'utf8')
+            ) as { configuration: Record<string, unknown> };
+            return Object.keys(configuration)
+                .filter((key) => !(key in DEFAULT_CONFIGURATION))
+                .map((key) => `${dir}: ${key}`);
+        });
+
+        expect(unknownKeys).toEqual([]);
+    });
 });

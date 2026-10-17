@@ -36,12 +36,7 @@ export const LabelWithTooltip: React.FC<LabelWithTooltipProps> = ({
     label,
     tooltip,
 }) => (
-    <Group
-        gap={4}
-        align='center'
-        wrap='nowrap'
-        style={{ display: 'inline-flex' }}
-    >
+    <Group gap={4} align='center' wrap='nowrap' display='inline-flex'>
         <span>{label}</span>
         <InfoTooltip label={tooltip} />
     </Group>

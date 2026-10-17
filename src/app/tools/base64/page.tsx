@@ -22,27 +22,27 @@ import {
     PAGE_PADDING,
     PageWrapper,
 } from '@/components/page-wrapper';
-import { decode, encode } from '@/lib/encoders/base64';
-import { beautify } from '@/lib/lua-utils/beautifier';
-import { minify } from '@/lib/lua-utils/minificator';
+import {
+    CONVERT_MODES,
+    convertLua,
+    type ConvertMode,
+} from '@/lib/encoders/convert';
 
-type Mode = 'encode' | 'decode';
-
-const MODES: { value: Mode; label: string }[] = [
-    { value: 'encode', label: 'Encode' },
-    { value: 'decode', label: 'Decode' },
-];
-
-/** What each box holds, so the labels say Lua or Base64URL, not input and output. */
-const BOX_LABELS: Record<Mode, { input: string; output: string }> = {
-    encode: { input: 'Lua', output: 'Base64URL' },
-    decode: { input: 'Base64URL', output: 'Lua' },
-};
-
-const FORMATTER_LABELS: Record<Mode, string> = {
-    encode: 'Minify the Lua first',
-    decode: 'Format the decoded Lua',
-};
+/** Per mode: the switch label, what each box holds and the formatter checkbox. */
+const MODES = {
+    encode: {
+        label: 'Encode',
+        input: 'Lua',
+        output: 'Base64URL',
+        formatter: 'Minify the Lua first',
+    },
+    decode: {
+        label: 'Decode',
+        input: 'Base64URL',
+        output: 'Lua',
+        formatter: 'Format the decoded Lua',
+    },
+} as const;
 
 /** Box height when the boxes stack on narrow screens instead of filling the window. */
 const BOX_ROWS = 12;
@@ -57,37 +57,16 @@ const BOX_STYLES = {
     },
 } as const;
 
-/** Decoding throws on anything that isn't Base64URL; that becomes an error. */
-const convert = (
-    input: string,
-    mode: Mode,
-    isFormatterEnabled: boolean
-): { output: string; error?: string } => {
-    if (!input.trim()) return { output: '' };
-    if (mode === 'encode')
-        return { output: encode(isFormatterEnabled ? minify(input) : input) };
-
-    try {
-        const decoded = decode(input.trim());
-        return { output: isFormatterEnabled ? beautify(decoded) : decoded };
-    } catch {
-        return {
-            output: '',
-            error: "This isn't Base64URL. To encode Lua, switch to Encode.",
-        };
-    }
-};
-
 export default function Page() {
-    const [mode, setMode] = useState<Mode>('encode');
+    const [mode, setMode] = useState<ConvertMode>('encode');
     const [isFormatterEnabled, setFormatterEnabled] = useState(true);
     const [inputText, setInputText] = useState('');
     const clipboard = useClipboard();
 
-    const { output, error } = convert(inputText, mode, isFormatterEnabled);
+    const { output, error } = convertLua(inputText, mode, isFormatterEnabled);
 
     // The result becomes the new input, so switching checks the round trip
-    const handleModeChange = (newMode: Mode) => {
+    const handleModeChange = (newMode: ConvertMode) => {
         if (output) setInputText(output);
         setMode(newMode);
     };
@@ -107,12 +86,15 @@ export default function Page() {
 
                 <Group gap='xl'>
                     <SegmentedControl
-                        data={MODES}
+                        data={CONVERT_MODES.map((value) => ({
+                            value,
+                            label: MODES[value].label,
+                        }))}
                         value={mode}
                         onChange={handleModeChange}
                     />
                     <Checkbox
-                        label={FORMATTER_LABELS[mode]}
+                        label={MODES[mode].formatter}
                         checked={isFormatterEnabled}
                         onChange={(event) =>
                             setFormatterEnabled(event.currentTarget.checked)
@@ -127,8 +109,8 @@ export default function Page() {
                     mih={0}
                 >
                     <Textarea
-                        label={BOX_LABELS[mode].input}
-                        placeholder={`Paste ${BOX_LABELS[mode].input} here`}
+                        label={MODES[mode].input}
+                        placeholder={`Paste ${MODES[mode].input} here`}
                         value={inputText}
                         onChange={(event) =>
                             setInputText(event.currentTarget.value)
@@ -139,7 +121,7 @@ export default function Page() {
                     />
                     <Stack gap='sm' mih={0}>
                         <Textarea
-                            label={BOX_LABELS[mode].output}
+                            label={MODES[mode].output}
                             readOnly
                             value={output}
                             rows={BOX_ROWS}
@@ -162,7 +144,7 @@ export default function Page() {
                             >
                                 {clipboard.copied
                                     ? 'Copied!'
-                                    : `Copy ${BOX_LABELS[mode].output}`}
+                                    : `Copy ${MODES[mode].output}`}
                             </Button>
                         </Group>
                     </Stack>

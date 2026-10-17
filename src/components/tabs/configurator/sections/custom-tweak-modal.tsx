@@ -23,6 +23,7 @@ import {
     validateBase64UrlTweak,
 } from '@/lib/command-generator/command-generator';
 import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
+import { LINKS } from '@/lib/navigation';
 import { LUA_TWEAK_TYPES, type LuaTweakType } from '@/types/types';
 
 interface CustomTweakFormProps {
@@ -108,7 +109,7 @@ const CustomTweakForm: React.FC<CustomTweakFormProps> = ({
                                 Base64URL-encoded Lua. Encode yours with the{' '}
                                 <Anchor
                                     component={Link}
-                                    href='/tools/base64'
+                                    href={LINKS.tools.base64.href}
                                     target='_blank'
                                     inherit
                                 >

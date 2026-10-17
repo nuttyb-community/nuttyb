@@ -3,42 +3,14 @@
  * are present in lua-bundle.json
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { describe, expect, test } from 'bun:test';
 
-import { DEFAULT_CONFIGURATION } from '@/lib/command-generator/data/configuration';
 import {
     BASE_TWEAKS,
     CONFIGURATION_MAPPING,
 } from '@/lib/command-generator/data/configuration-mapping';
 
 import { extractLuaReferences, getBundle } from './utils/bundle';
-
-describe('Bundled presets', () => {
-    // Unknown keys are dropped silently on load, so a stale key would quietly
-    // fall back to the default value.
-    test('use only known configuration keys', () => {
-        const presetsDir = './public/presets';
-        // Skip schema.json next to the preset folders
-        const dirs = fs
-            .readdirSync(presetsDir, { withFileTypes: true })
-            .filter((entry) => entry.isDirectory())
-            .map((entry) => entry.name);
-        const unknownKeys = dirs.flatMap((dir) => {
-            const file = path.join(presetsDir, dir, 'config.json');
-            const { configuration } = JSON.parse(
-                fs.readFileSync(file, 'utf8')
-            ) as { configuration: Record<string, unknown> };
-            return Object.keys(configuration)
-                .filter((key) => !(key in DEFAULT_CONFIGURATION))
-                .map((key) => `${dir}: ${key}`);
-        });
-
-        expect(unknownKeys).toEqual([]);
-    });
-});
 
 describe('Lua Bundle Validation', () => {
     test('Bundle exists and not empty', () => {

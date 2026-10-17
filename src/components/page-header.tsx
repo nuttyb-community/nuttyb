@@ -59,7 +59,11 @@ export const PageHeader: React.FC = () => {
                         <Menu.Target>
                             <Button
                                 variant={
-                                    isActive('/tools') ? 'filled' : 'subtle'
+                                    toolLinks.some((link) =>
+                                        isActive(link.href)
+                                    )
+                                        ? 'filled'
+                                        : 'subtle'
                                 }
                                 rightSection={
                                     <IconChevronDown {...ICON_SIZE_MD} />
