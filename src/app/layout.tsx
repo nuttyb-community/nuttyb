@@ -2,7 +2,6 @@ import {
     AppShell,
     AppShellHeader,
     AppShellMain,
-    mantineHtmlProps,
     MantineProvider,
 } from '@mantine/core';
 import type { Metadata } from 'next';
@@ -12,7 +11,7 @@ import { PageHeader } from '@/components/page-header';
 import { Providers } from '@/components/providers';
 
 export const metadata: Metadata = {
-    title: 'NuttyB CE Configurator',
+    title: 'NuttyB CE',
 };
 
 export default function RootLayout({
@@ -21,14 +20,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        // The theme is always dark, so the HTML starts dark: no ColorSchemeScript,
-        // which would default to light and flash it until hydration
-        <html lang='en' {...mantineHtmlProps} data-mantine-color-scheme='dark'>
+        // The theme is always dark, so a static attribute replaces ColorSchemeScript:
+        // no inline script, and nothing to flash before hydration
+        <html
+            lang='en'
+            data-mantine-color-scheme='dark'
+            suppressHydrationWarning
+        >
             <body>
-                <MantineProvider
-                    defaultColorScheme='dark'
-                    forceColorScheme='dark'
-                >
+                <MantineProvider forceColorScheme='dark'>
                     <Providers>
                         <AppShell header={{ height: 60 }}>
                             <AppShellHeader bg='dark' withBorder={false}>

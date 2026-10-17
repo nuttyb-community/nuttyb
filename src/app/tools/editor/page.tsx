@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack, Text, Title } from '@mantine/core';
+import { Alert, Stack, Text, Title } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
@@ -20,7 +20,14 @@ export default function Page() {
     const isLoading = isLuaLoading || isConfigLoading;
 
     if (isLoading) return <PageLoader />;
-    if (error) return <div>Error loading Lua bundle: {error.message}</div>;
+    if (error)
+        return (
+            <PageWrapper py={PAGE_PADDING}>
+                <Alert color='red' title="Couldn't load the Lua bundle">
+                    {error.message}
+                </Alert>
+            </PageWrapper>
+        );
 
     return (
         <PageWrapper py={PAGE_PADDING}>

@@ -2,13 +2,13 @@ import React from 'react';
 
 import { Stack, Text, Title } from '@mantine/core';
 
-import { PageWrapper } from '@/components/page-wrapper';
+import { PAGE_PADDING, PageWrapper } from '@/components/page-wrapper';
 
 export default function Page() {
     return (
-        <PageWrapper py='md'>
+        <PageWrapper py={PAGE_PADDING}>
             <Stack gap='sm'>
-                <Title order={2}>404</Title>
+                <Title order={1}>404</Title>
                 <Text>Page not found</Text>
             </Stack>
         </PageWrapper>

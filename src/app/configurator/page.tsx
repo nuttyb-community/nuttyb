@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 
-import { Box, Grid } from '@mantine/core';
+import { Alert, Box, Grid } from '@mantine/core';
 
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import { useCustomTweaksContext } from '@/components/contexts/custom-tweaks-context';
@@ -51,7 +51,14 @@ export default function Page() {
     const isLoading = isLuaLoading || isConfigLoading || isTweaksLoading;
 
     if (isLoading) return <PageLoader />;
-    if (error) return <div>Error loading Lua bundle: {error.message}</div>;
+    if (error)
+        return (
+            <PageWrapper py={PAGE_PADDING}>
+                <Alert color='red' title="Couldn't load the Lua bundle">
+                    {error.message}
+                </Alert>
+            </PageWrapper>
+        );
 
     return (
         <PageWrapper py={PAGE_PADDING}>
