@@ -27,10 +27,10 @@ Known pitfalls and ranked defects in this pipeline are catalogued in `docs/propo
 Work top-down; the `ValueMapping` type makes step 2 a compile error until step 1 is done.
 
 1. **`src/lib/command-generator/data/configuration.ts`** — add the field to `Configuration` and `DEFAULT_CONFIGURATION`. For enums, add a `const` array + derived type (see `START_OPTIONS`).
-2. **`src/lib/command-generator/data/configuration-mapping.ts`** — add the `CONFIGURATION_MAPPING` entry mapping each value to `command` / `tweakdefs` / `tweakunits` arrays (Lua refs are bare paths like `lua/foo.lua`, optionally with a `{VAR=value}` template suffix). Boolean options use string keys `true`/`false`. Any newly referenced Lua file also needs a `LUA_PRIORITIES` entry with the same bare path key (see the `lua-tweaks` skill).
-3. **Numeric options** get an empty `values: {}` and flow through templates instead: add the variable to `buildTemplateContext()` in `command-template.ts` and use `$varName$` inside a `BASE_COMMANDS` entry (`$?...?$` for optional sections).
-4. **UI** — add the control in `src/components/tabs/configurator/sections/`: `game-settings.tsx` (inputs/selects), `difficulty.tsx`, or `extras.tsx` (feature toggles). Use `useConfiguratorContext().setProperty`.
-5. **`src/components/tabs/configurator/preset-showcase/preset-showcase.utils.tsx`** — add a `CONFIG_METADATA` entry (label + tooltip). Without it the option is invisible in preset tooltips and diff chips.
+2. **`src/lib/command-generator/data/configuration-mapping.ts`** — add the `CONFIGURATION_MAPPING` entry mapping each value to `command` / `tweakdefs` / `tweakunits` arrays (Lua refs are bare paths like `lua/foo.lua`, optionally with a `{VAR=value}` template suffix). Boolean options use string keys `true`/`false`. The entry's `description` is the option's label in the preset diff (`src/lib/presets/config-diff.ts`, shown in the preset popover and form). Any newly referenced Lua file also needs a `LUA_PRIORITIES` entry with the same bare path key (see the `lua-tweaks` skill).
+3. **Numeric options** get an empty `values: {}` and flow through templates instead: either add the variable to `buildTemplateContext()` in `command-template.ts` and use `$varName$` inside a `BASE_COMMANDS` entry (`$?...?$` for optional sections), or — for values a Lua file needs — build a templated reference like `lua/foo.lua{VAR=${configuration.x}}` in `getMappedData()` (`mapper.ts`), as the HP templates do.
+4. **UI** — add the control in `src/components/tabs/configurator/sections/`: `game-settings.tsx` (inputs/selects), `difficulty.tsx` (numbers, via `useNumberSetting`), or `extras.tsx` (feature toggles). Use `useConfiguratorContext().setProperty`.
+5. **`public/presets/schema.json`** — add the key to `configuration.properties` (with type and range). `tests/preset-schema.test.ts` fails until the schema's keys match `Configuration`.
 6. **Tests** — extend `tests/command-generator.test.ts` (and `command-template.test.ts` for template vars) to pin the new output.
 7. **Storage migration is automatic** — `validateStoredConfiguration` merges stored configs over `DEFAULT_CONFIGURATION` and drops unknown keys, so renames/removals need no manual migration.
 
@@ -45,8 +45,7 @@ Removing an option is the same list in reverse; stale localStorage keys are drop
     "id": "my-preset",
     "name": "Display Name",
     "description": "One sentence.",
-    "icon": "IconFlame",
-    "configuration": { "presetDifficulty": "Hard" },
+    "configuration": { "raptorHpMult": 3, "queenHpMult": 3 },
     "presetTweaks": [
         {
             "description": "Replacement eco",
@@ -59,13 +58,13 @@ Removing an option is the same list in reverse; stale localStorage keys are drop
 ```
 
 - `configuration` is a **partial** — unspecified keys fall back to defaults.
-- `icon` must be a key of `ICON_MAP` in `preset-showcase.utils.tsx`.
+- `"status": "disabled"` hides a preset without deleting it.
 - `presetTweaks[].path` is a bundled path (`lua/...`) or an `https://raw.githubusercontent.com/...` / gist URL — remote hosts are whitelisted in `src/lib/presets/tweak-url.ts`.
 - `replaces` (string or array) disables the listed built-in file(s) while the preset is active; the tweak inherits the replaced file's load priority.
 
 2. Run `bun run sync -p .` — presets ship inside `public/data/lua-bundle.json`; without a sync the new preset does not appear.
-3. Preset ordering on the showcase is hardcoded in `presets-context.tsx` (`default`, `casual`, then alphabetical).
+3. Preset ordering on the showcase is hardcoded in `presets-context.tsx` (`casual`, `easy`, `default`, `hard`, then the rest by name).
 
 ## Verifying changes
 
-`bun test && bun lint`, then `bun dev` and check: the option renders, toggling it changes the Generated Commands block, slot usage stays within limits (shown next to the "Generated Commands" title), and the option appears in a preset tooltip after saving a preset.
+`bun test && bun lint`, then `bun dev` and check: the option renders, toggling it changes the Generated Commands block, slot usage stays within limits (shown next to the "Generated Commands" title), and a changed value appears with its `description` label in the preset popover.
