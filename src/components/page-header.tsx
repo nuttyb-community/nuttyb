@@ -19,6 +19,11 @@ import { EXTERNAL_LINKS, Link, LINKS } from '@/lib/navigation';
 
 const toolLinks: Link[] = Object.values(LINKS.tools);
 
+const VERSION =
+    process.env.NODE_ENV === 'development'
+        ? '[dev]'
+        : `[${process.env.NEXT_PUBLIC_BUILD_DATE} · ${process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7)}]`;
+
 export const PageHeader: React.FC = () => {
     const pathname = usePathname();
     const isActive = (href: string) => pathname.startsWith(href);
@@ -26,27 +31,45 @@ export const PageHeader: React.FC = () => {
     return (
         <PageWrapper h='100%'>
             <Group h='100%' justify='space-between'>
-                <Anchor
-                    component={NextLink}
-                    href='/'
-                    aria-label='NuttyB CE home'
-                    underline='never'
-                    c='inherit'
-                >
-                    <Group gap='sm' wrap='nowrap'>
-                        <NextImage
-                            src={logo as StaticImageData}
-                            alt=''
-                            width={42}
-                            height={42}
-                        />
-                        {/* ponytail: logo-only below xs keeps the header on one line down to ~380px; burger menu if the nav grows */}
-                        {/* Brand, not a heading: the page title is the page's only h1 */}
-                        <Text fz='h2' fw={700} visibleFrom='xs'>
-                            NuttyB CE
-                        </Text>
-                    </Group>
-                </Anchor>
+                <Group gap='sm' wrap='nowrap' align='baseline'>
+                    <Anchor
+                        component={NextLink}
+                        href='/'
+                        aria-label='NuttyB CE home'
+                        underline='never'
+                        c='inherit'
+                    >
+                        <Group gap='sm' wrap='nowrap'>
+                            <NextImage
+                                src={logo as StaticImageData}
+                                alt=''
+                                width={42}
+                                height={42}
+                            />
+                            {/* ponytail: logo-only below xs keeps the header on one line down to ~380px; burger menu if the nav grows */}
+                            {/* Brand, not a heading: the page title is the page's only h1 */}
+                            {/* Baseline-aligned so the row's baseline is the text's, not the logo's bottom edge; the version tag lines up with it */}
+                            <Text
+                                fz='h2'
+                                fw={700}
+                                visibleFrom='xs'
+                                style={{ alignSelf: 'baseline' }}
+                            >
+                                NuttyB CE
+                            </Text>
+                        </Group>
+                    </Anchor>
+                    {/* Separate link: an <a> can't nest inside the home link */}
+                    <Anchor
+                        component={NextLink}
+                        href='/#latest-changes'
+                        size='xs'
+                        c='dimmed'
+                        visibleFrom='xs'
+                    >
+                        {VERSION}
+                    </Anchor>
+                </Group>
                 <Group gap='md'>
                     <ActionIcon
                         component='a'

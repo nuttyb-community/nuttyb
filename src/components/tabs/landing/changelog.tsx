@@ -26,8 +26,15 @@ interface ChangelogProps {
 export const Changelog: React.FC<ChangelogProps> = ({ entries, spacing }) => (
     <Stack gap='md'>
         <SimpleGrid cols={{ base: 1, md: 3 }} spacing={spacing}>
-            {entries.slice(0, 3).map((entry) => (
-                <Stack key={entry.date} gap='xs'>
+            {entries.slice(0, 3).map((entry, index) => (
+                <Stack
+                    key={entry.date}
+                    gap='xs'
+                    id={index === 0 ? 'latest-changes' : undefined}
+                    style={{
+                        scrollMarginTop: 'var(--app-shell-header-height)',
+                    }}
+                >
                     <Text fw={700}>
                         {dayjs(entry.date).format('DD.MM.YYYY')}
                     </Text>
