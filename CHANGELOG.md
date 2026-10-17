@@ -4,6 +4,19 @@ Notable changes to the NuttyB CE configurator and tweaks, grouped by date with
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-10-18
+
+- Choose which combat unit tiers can be built. Only T3 by default.
+- One T3 Unit Launcher replaces the faction launchers. The Epic Tumbleweed launcher is optional.
+- New T4 Elysium shield.
+- T4 Ragnarok and Calamity fire less often but hit harder, at the same DPS.
+- Removed Mini Ragnarok, Calamity and Starfall.
+- Fainter shields, so stacked ones no longer hide the battle.
+- Adjustable T3 aide cap, 10 by default.
+- New Performance section with lighter weapon and death effects.
+- Fixed a bug that could stop a tweak slot from loading in game.
+- Adapted from [Willzyboi's configurator](https://github.com/willzyboi/nuttyb), with the T4 Elysium by Pyrem.
+
 ## 2026-10-17
 
 - Fresh new look, with a new home page that has a quick guide, recommended widgets and community links.

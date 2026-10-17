@@ -26,7 +26,9 @@ This project has been made possible by the contributions of:
 - [timuela](https://github.com/timuela) - Unit launcher range adjustments
 - [Lu5ck](https://github.com/Lu5ck) - Base64 automation, LRPC rebalance review
 - [autolumn](https://github.com/autolumn) - Helper commands
-- [Insider](https://github.com/goldjee) - Configurator web application, CI/CD
+- [Willzyboi](https://github.com/willzyboi) - Original tweaks for buildable unit tiers, the single unit launcher, faint shields, slower T4 artillery and performance options, from [his configurator](https://github.com/willzyboi/nuttyb)
+- [Pyrem](https://github.com/relicus) - T4 Elysium
+- [Insider](https://github.com/goldjee) - Configurator web application, CI/CD, tweak improvements
 
 ## 📜 License
 
