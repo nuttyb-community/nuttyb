@@ -205,6 +205,7 @@ do
         energystorage = 5000,
         footprintx = 6,
         footprintz = 6,
+        yardmap = string.rep('o', 36),
         icontype = 'leggatet3',
         customparams = {
             i18n_en_humanname = 'T4 Elysium',
