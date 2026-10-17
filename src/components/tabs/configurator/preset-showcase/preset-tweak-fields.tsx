@@ -34,17 +34,17 @@ export interface TweakFormRow {
     replaces: string[];
 }
 
-/** Turns stored or imported tweaks into form rows; `[{}]` gives one blank row. */
+/** Turns a stored or imported tweak into a form row; `{}` gives a blank row. */
+const toFormRow = (t: Partial<PresetTweak>): TweakFormRow => ({
+    id: crypto.randomUUID(),
+    description: t.description || '',
+    type: t.type === 'tweakunits' ? 'tweakunits' : 'tweakdefs',
+    path: t.path || '',
+    replaces: [t.replaces ?? []].flat().map(String),
+});
+
 export const toFormRows = (tweaks: Partial<PresetTweak>[]): TweakFormRow[] =>
-    tweaks.map(
-        (t): TweakFormRow => ({
-            id: crypto.randomUUID(),
-            description: t.description || '',
-            type: t.type === 'tweakunits' ? 'tweakunits' : 'tweakdefs',
-            path: t.path || '',
-            replaces: [t.replaces ?? []].flat().map(String),
-        })
-    );
+    tweaks.map((t) => toFormRow(t));
 
 /** Unsupported hosts are an error right away; an empty path only with `flagEmpty`. */
 export function getPathError(
@@ -190,9 +190,7 @@ export const PresetTweakList: React.FC<PresetTweakListProps> = ({
                 <Button
                     variant='default'
                     leftSection={<IconPlus size={16} />}
-                    onClick={() =>
-                        onChange((prev) => [...prev, ...toFormRows([{}])])
-                    }
+                    onClick={() => onChange((prev) => [...prev, toFormRow({})])}
                 >
                     Add tweak
                 </Button>

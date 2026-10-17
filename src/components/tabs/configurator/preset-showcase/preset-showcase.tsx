@@ -17,10 +17,10 @@ export const PresetShowcase: React.FC = () => {
     const [isModalOpen, { open: openModal, close: closeModal }] =
         useDisclosure(false);
     // Kept after closing, so the title doesn't change during the exit animation
-    const [editPreset, setEditPreset] = useState<Preset | null>(null);
+    const [editedPreset, setEditedPreset] = useState<Preset | null>(null);
 
     const openEditor = (preset: Preset | null) => {
-        setEditPreset(preset);
+        setEditedPreset(preset);
         openModal();
     };
 
@@ -54,7 +54,7 @@ export const PresetShowcase: React.FC = () => {
             <PresetModal
                 opened={isModalOpen}
                 onClose={closeModal}
-                editPreset={editPreset}
+                preset={editedPreset}
             />
         </Stack>
     );

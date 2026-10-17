@@ -36,30 +36,29 @@ const SETTINGS_SOURCE_TEXT = {
 
 interface PresetFormProps {
     /** The preset to edit; a new one is created when null. */
-    editPreset: Preset | null;
+    preset: Preset | null;
     onClose: () => void;
 }
 
-// The modal unmounts it on close, so every opening starts from `editPreset`
-const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
+// The modal unmounts it on close, so every opening starts from `preset`
+const PresetForm: React.FC<PresetFormProps> = ({ preset, onClose }) => {
     const { configuration } = useConfiguratorContext();
     const { activePresetId, savePreset } = usePresetsContext();
     // The active preset saves the current settings; any other keeps its own
-    const useStoredSettings =
-        editPreset !== null && editPreset.id !== activePresetId;
+    const useStoredSettings = preset !== null && preset.id !== activePresetId;
 
-    const [presetName, setPresetName] = useState(editPreset?.name ?? '');
+    const [presetName, setPresetName] = useState(preset?.name ?? '');
     const [presetDescription, setPresetDescription] = useState(
-        editPreset?.description ?? ''
+        preset?.description ?? ''
     );
     const [presetConfiguration, setPresetConfiguration] = useState(
-        useStoredSettings ? editPreset.configuration : configuration
+        useStoredSettings ? preset.configuration : configuration
     );
     const [settingsSource, setSettingsSource] = useState<
         keyof typeof SETTINGS_SOURCE_TEXT
     >(useStoredSettings ? 'preset' : 'current');
     const [presetTweaks, setPresetTweaks] = useState(() =>
-        toFormRows(editPreset?.presetTweaks ?? [])
+        toFormRows(preset?.presetTweaks ?? [])
     );
     const [importError, setImportError] = useState<string | null>(null);
     // Empty tweak paths are only flagged after a save attempt
@@ -86,7 +85,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
                     ...(t.replaces.length > 0 && { replaces: t.replaces }),
                 })),
             },
-            editPreset?.id
+            preset?.id
         );
 
         onClose();
@@ -107,14 +106,14 @@ const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
             return;
         }
 
-        const { preset } = result;
-        setPresetName(preset.name);
-        setPresetDescription(preset.description);
-        if (preset.configuration) {
-            setPresetConfiguration(preset.configuration);
+        const imported = result.preset;
+        setPresetName(imported.name);
+        setPresetDescription(imported.description);
+        if (imported.configuration) {
+            setPresetConfiguration(imported.configuration);
             setSettingsSource('import');
         }
-        setPresetTweaks(toFormRows(preset.presetTweaks));
+        setPresetTweaks(toFormRows(imported.presetTweaks));
         setImportError(null);
     };
 
@@ -207,7 +206,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ editPreset, onClose }) => {
                             Cancel
                         </Button>
                         <Button type='submit'>
-                            {editPreset ? 'Save changes' : 'Create preset'}
+                            {preset ? 'Save changes' : 'Create preset'}
                         </Button>
                     </Group>
                 </Group>
@@ -220,23 +219,19 @@ interface PresetModalProps extends PresetFormProps {
     opened: boolean;
 }
 
-/** Creates a preset, or edits one when `editPreset` is set. */
+/** Creates a preset, or edits one when `preset` is set. */
 export const PresetModal: React.FC<PresetModalProps> = ({
     opened,
     onClose,
-    editPreset,
+    preset,
 }) => (
     <Modal
         opened={opened}
         onClose={onClose}
-        title={editPreset ? 'Edit preset' : 'New preset'}
+        title={preset ? 'Edit preset' : 'New preset'}
         size='lg'
         centered
     >
-        <PresetForm
-            key={editPreset?.id}
-            editPreset={editPreset}
-            onClose={onClose}
-        />
+        <PresetForm key={preset?.id} preset={preset} onClose={onClose} />
     </Modal>
 );

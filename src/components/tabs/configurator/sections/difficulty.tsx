@@ -4,7 +4,7 @@ import React from 'react';
 
 import { NumberInput, SimpleGrid, Stack, Title } from '@mantine/core';
 
-import { LabelWithTooltip } from '@/components/common/info-tooltip';
+import { LabelWithTooltip } from '@/components/common/label-with-tooltip';
 import { useNumberSetting } from '@/hooks/use-number-setting';
 
 export const DifficultySection: React.FC = () => {

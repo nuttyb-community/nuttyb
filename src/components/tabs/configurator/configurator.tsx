@@ -9,7 +9,7 @@ import { ResetButton } from './reset-button';
 import { CustomTweaksSection } from './sections/custom-tweaks';
 import { DifficultySection } from './sections/difficulty';
 import { ExtrasSection } from './sections/extras';
-import { GeneralSection } from './sections/general';
+import { GameSettingsSection } from './sections/game-settings';
 
 export const Configurator: React.FC = () => (
     <Stack gap='lg'>
@@ -22,7 +22,7 @@ export const Configurator: React.FC = () => (
         <Stack gap={48}>
             <PresetShowcase />
             <DifficultySection />
-            <GeneralSection />
+            <GameSettingsSection />
             <ExtrasSection />
             <CustomTweaksSection />
         </Stack>
