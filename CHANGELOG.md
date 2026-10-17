@@ -4,6 +4,15 @@ Notable changes to the NuttyB CE configurator and tweaks, grouped by date with
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-10-17
+
+- Fresh new look, with a new home page that has a quick guide, recommended widgets and community links.
+- Difficulties are now presets: Casual, Easy, Medium and Hard. Pick one, then adjust raptor and queen HP to taste.
+- Easier-to-browse presets, each with a short summary of what it changes.
+- Custom tweaks are now added right in the configurator.
+- More room for tweaks, and you'll see which ones didn't fit.
+- The Lua editor and Base64 tools are now under "Developer tools".
+
 ## 2026-10-15
 
 - Fixed T3 Construction Turrets jumping away from their build spot and jittering next to walls and small defences. A recent BAR anti-stacking change started treating them as stacked whenever a small structure stood next to them.
