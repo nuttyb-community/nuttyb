@@ -2,7 +2,7 @@
     "$schema": "../schema.json",
     "id": "hard",
     "name": "Hard",
-    "description": "3× HP, no cross-faction T2 or T4 defences",
+    "description": "3× HP, 1.3× income, Mini Bosses, no cross-faction T2 or T4 defences",
     "configuration": {
         "gameMap": "Full Metal Plate (12P)",
         "lobbyName": "Raptors [Hard][Mini Bosses][3x QHP 3x HP]",

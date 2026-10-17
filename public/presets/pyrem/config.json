@@ -2,7 +2,7 @@
     "$schema": "../schema.json",
     "id": "pyrem-showcase",
     "name": "Pyrem",
-    "description": "Community configuration by Relicus",
+    "description": "1.5× HP, 1× income, Mini Bosses, Relicus's tweak set",
     "status": "disabled",
     "configuration": {
         "challenges": "Mini Bosses",

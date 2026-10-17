@@ -2,7 +2,7 @@
     "$schema": "../schema.json",
     "id": "easy",
     "name": "Easy",
-    "description": "1.3× raptor and queen HP",
+    "description": "1.3× HP, 1.5× income, Mini Bosses",
     "configuration": {
         "gameMap": "Full Metal Plate (12P)",
         "lobbyName": "Raptors [Easy][Mini Bosses][1_3x QHP 1_3x HP]",
