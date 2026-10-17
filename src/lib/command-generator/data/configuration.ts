@@ -53,6 +53,7 @@ export interface Configuration {
     buildDistMult: number;
     buildPowerMult: number;
     queenCount: number;
+    t3AideCap: number;
 }
 
 export const DEFAULT_CONFIGURATION: Configuration = {
@@ -77,6 +78,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     buildDistMult: 1.5,
     buildPowerMult: 1,
     queenCount: 12,
+    t3AideCap: 10,
 };
 
 /**

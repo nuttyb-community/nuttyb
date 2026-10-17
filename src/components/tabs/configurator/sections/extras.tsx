@@ -6,13 +6,16 @@ import {
     Checkbox,
     Input,
     NativeSelect,
+    NumberInput,
     SegmentedControl,
     SimpleGrid,
     Stack,
     Title,
 } from '@mantine/core';
 
+import { LabelWithTooltip } from '@/components/common/label-with-tooltip';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
+import { useNumberSetting } from '@/hooks/use-number-setting';
 import {
     Challenges,
     CHALLENGES,
@@ -21,6 +24,7 @@ import {
 
 export const ExtrasSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
+    const t3AideCap = useNumberSetting('t3AideCap', 1, 100);
 
     return (
         <Stack gap='md'>
@@ -51,6 +55,19 @@ export const ExtrasSection: React.FC = () => {
                             }
                         />
                     </Input.Wrapper>
+                    <NumberInput
+                        label={
+                            <LabelWithTooltip
+                                label='T3 aide cap'
+                                tooltip='How many ground and air T3 aides each player can have (1 - 100)'
+                            />
+                        }
+                        {...t3AideCap}
+                        step={1}
+                        allowNegative={false}
+                        allowDecimal={false}
+                        required
+                    />
                     <Checkbox
                         label='Cross-faction T2 labs'
                         description="Build other factions' T2 labs at 70% extra cost"

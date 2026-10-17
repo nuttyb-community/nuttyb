@@ -31,7 +31,7 @@
             "description": "T3 Builders",
             "type": "tweakdefs",
             "path": "https://raw.githubusercontent.com/Relicus/pyrem-bar-nuttyconfigurator/refs/heads/gh-pages/tweaks/Defs_T3_Builders.lua",
-            "replaces": "lua/builders-t3.lua"
+            "replaces": "lua/builders-t3-template.lua"
         },
         {
             "description": "T3 Eco",

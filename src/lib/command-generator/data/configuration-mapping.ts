@@ -19,7 +19,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     // eco-t3 patches base storage defs that builders-t3 copies, so it must
     // load first (matches the pre-rewrite tweakdefs7 -> tweakdefs8 slot order)
     'lua/eco-t3.lua': 3,
-    'lua/builders-t3.lua': 4,
+    'lua/builders-t3-template.lua': 4,
     'lua/defences-t3.lua': 4,
     'lua/defences-t4.lua': 4,
     'lua/mini-bosses.lua': 5,
@@ -118,7 +118,6 @@ export const BASE_TWEAKS = {
     tweakdefs: [
         'lua/main-defs.lua',
         'lua/eco-t3.lua',
-        'lua/builders-t3.lua',
         'lua/defences-t3.lua',
         'lua/lrpc-rebalance.lua',
         'lua/air-rework-t4.lua',
@@ -407,6 +406,10 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
     },
     queenCount: {
         description: 'Raptor queen count',
+        values: {},
+    },
+    t3AideCap: {
+        description: 'T3 aide cap',
         values: {},
     },
 } as const;

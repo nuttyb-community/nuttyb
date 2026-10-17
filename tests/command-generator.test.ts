@@ -240,6 +240,19 @@ describe('HP multipliers', () => {
     });
 });
 
+describe('T3 aide cap', () => {
+    test('fills the builders template parameter', () => {
+        const { tweakdefs } = getMappedData({
+            ...DEFAULT_CONFIGURATION,
+            t3AideCap: 40,
+        });
+
+        expect(tweakdefs).toContain(
+            'lua/builders-t3-template.lua{T3_AIDE_CAP=40}'
+        );
+    });
+});
+
 describe('Enabled military tiers', () => {
     const militaryTemplate = 'lua/military-units-template.lua';
 
@@ -662,11 +675,10 @@ describe('Preset replacement tweaks', () => {
             /^public\/presets\/[^/]+\/config\.json$/.test(f.path)
         );
 
-        // Get the active paths under DEFAULT_CONFIGURATION
+        // Get the active paths under DEFAULT_CONFIGURATION, templates included
+        const { tweakdefs, tweakunits } = getMappedData(DEFAULT_CONFIGURATION);
         const activePaths = new Set(
-            mapSettingsToConfig(DEFAULT_CONFIGURATION).map((p) =>
-                cleanLuaPath(p)
-            )
+            [...tweakdefs, ...tweakunits].map((p) => cleanLuaPath(p))
         );
 
         for (const config of configs) {
