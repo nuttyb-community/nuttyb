@@ -30,7 +30,7 @@ const LinkContent: React.FC<LinkContentProps> = ({ item, align }) => (
     </Group>
 );
 
-/** Card link: lighter background and a primary border on hover. */
+/** Card link: lighter background on hover, like a preset card. */
 export const LinkCard: React.FC<{ item: LinkItem }> = ({ item }) => {
     const { hovered, ref } = useHover<HTMLAnchorElement>();
 
@@ -43,11 +43,6 @@ export const LinkCard: React.FC<{ item: LinkItem }> = ({ item }) => {
             withBorder
             padding='md'
             bg={hovered ? 'var(--mantine-color-default-hover)' : undefined}
-            bd={
-                hovered
-                    ? '1px solid var(--mantine-primary-color-filled)'
-                    : undefined
-            }
         >
             <LinkContent item={item} />
         </Card>

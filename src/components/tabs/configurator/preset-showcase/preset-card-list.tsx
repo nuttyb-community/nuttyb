@@ -17,9 +17,12 @@ export const PresetCardList: React.FC<{
     const { ref: frameRef, width: frameWidth } = useElementSize();
     const { ref: rowRef, width: rowWidth } = useElementSize();
     const viewportRef = useRef<HTMLDivElement>(null);
+    const [isAtStart, setAtStart] = useState(true);
     const [isAtEnd, setAtEnd] = useState(false);
-    // Fade the right edge while more cards are hidden that way
-    const hasMoreRight = rowWidth > frameWidth + 1 && !isAtEnd;
+    // Fade each edge while more cards are hidden that way
+    const overflows = rowWidth > frameWidth + 1;
+    const hasMoreLeft = overflows && !isAtStart;
+    const hasMoreRight = overflows && !isAtEnd;
     const presets = [...builtInPresets, ...localPresets];
 
     return (
@@ -32,6 +35,7 @@ export const PresetCardList: React.FC<{
                 onScrollPositionChange={({ x }) => {
                     const viewport = viewportRef.current;
                     if (!viewport) return;
+                    setAtStart(x <= 1);
                     setAtEnd(
                         x + viewport.clientWidth >= viewport.scrollWidth - 1
                     );
@@ -57,6 +61,20 @@ export const PresetCardList: React.FC<{
                     ))}
                 </Group>
             </ScrollArea>
+            <Box
+                pos='absolute'
+                top={0}
+                left={0}
+                bottom={0}
+                w={64}
+                opacity={hasMoreLeft ? 1 : 0}
+                style={{
+                    background:
+                        'linear-gradient(to left, transparent, var(--mantine-color-body))',
+                    pointerEvents: 'none',
+                    transition: 'opacity 150ms ease',
+                }}
+            />
             <Box
                 pos='absolute'
                 top={0}
