@@ -38,6 +38,9 @@ export const LUA_PRIORITIES: Record<string, number> = {
     // Game-wide rules run after every file that creates units
     'lua/mini-artillery-off.lua': 20,
     'lua/shields-faint.lua': 20,
+    // Performance options cover every unit, so they run last
+    'lua/effects-reduction-template.lua': 30,
+    'lua/death-effects-reduction.lua': 31,
 } as const;
 
 /**
@@ -379,6 +382,28 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'Epic Tumbleweed launcher',
         values: {
             true: { tweakdefs: ['lua/unit-launchers-tumbleweed.lua'] },
+            false: undefined,
+        },
+    },
+    effectsReduction: {
+        description: 'Effects reduction',
+        values: {
+            Off: undefined,
+            Light: {
+                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=1}'],
+            },
+            Medium: {
+                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=2}'],
+            },
+            Heavy: {
+                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=3}'],
+            },
+        },
+    },
+    isReducedDeathEffects: {
+        description: 'Reduced death effects',
+        values: {
+            true: { tweakdefs: ['lua/death-effects-reduction.lua'] },
             false: undefined,
         },
     },

@@ -61,6 +61,8 @@
                 "isDefencesT4": { "type": "boolean" },
                 "isT3UnitLauncher": { "type": "boolean" },
                 "isTumbleweedLauncher": { "type": "boolean" },
+                "effectsReduction": { "enum": ["Off", "Light", "Medium", "Heavy"] },
+                "isReducedDeathEffects": { "type": "boolean" },
                 "raptorHpMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
                 "queenHpMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
                 "incomeMult": { "type": "number", "minimum": 0.1, "maximum": 10 },

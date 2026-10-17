@@ -10,6 +10,7 @@ import { CustomTweaksSection } from './sections/custom-tweaks';
 import { DifficultySection } from './sections/difficulty';
 import { ExtrasSection } from './sections/extras';
 import { GameSettingsSection } from './sections/game-settings';
+import { PerformanceSection } from './sections/performance';
 
 export const Configurator: React.FC = () => (
     <Stack gap='lg'>
@@ -24,6 +25,7 @@ export const Configurator: React.FC = () => (
             <GameSettingsSection />
             <DifficultySection />
             <ExtrasSection />
+            <PerformanceSection />
             <CustomTweaksSection />
         </Stack>
     </Stack>

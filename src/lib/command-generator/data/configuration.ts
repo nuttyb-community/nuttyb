@@ -25,11 +25,18 @@ export const START_OPTIONS = [
     'Surrounded',
 ] as const;
 export const ENABLED_MILITARY_TIERS = ['None', 'T3', 'T2-T3', 'T1-T3'] as const;
+export const EFFECTS_REDUCTION_LEVELS = [
+    'Off',
+    'Light',
+    'Medium',
+    'Heavy',
+] as const;
 
 export type Challenges = (typeof CHALLENGES)[number];
 export type GameMap = (typeof MAPS)[number];
 export type StartOption = (typeof START_OPTIONS)[number];
 export type EnabledMilitaryTiers = (typeof ENABLED_MILITARY_TIERS)[number];
+export type EffectsReductionLevel = (typeof EFFECTS_REDUCTION_LEVELS)[number];
 
 export interface Configuration {
     challenges: Challenges;
@@ -46,6 +53,8 @@ export interface Configuration {
     isDefencesT4: boolean;
     isT3UnitLauncher: boolean;
     isTumbleweedLauncher: boolean;
+    effectsReduction: EffectsReductionLevel;
+    isReducedDeathEffects: boolean;
     // Numeric multipliers
     raptorHpMult: number;
     queenHpMult: number;
@@ -71,6 +80,8 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     isDefencesT4: true,
     isT3UnitLauncher: true,
     isTumbleweedLauncher: false,
+    effectsReduction: 'Light',
+    isReducedDeathEffects: true,
     // Numeric multipliers
     raptorHpMult: 1.5,
     queenHpMult: 1.5,
