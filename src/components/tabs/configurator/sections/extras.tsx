@@ -4,7 +4,9 @@ import React from 'react';
 
 import {
     Checkbox,
+    Input,
     NativeSelect,
+    SegmentedControl,
     SimpleGrid,
     Stack,
     Title,
@@ -14,6 +16,7 @@ import { useConfiguratorContext } from '@/components/contexts/configurator-conte
 import {
     Challenges,
     CHALLENGES,
+    ENABLED_MILITARY_TIERS,
 } from '@/lib/command-generator/data/configuration';
 
 export const ExtrasSection: React.FC = () => {
@@ -35,6 +38,19 @@ export const ExtrasSection: React.FC = () => {
                             )
                         }
                     />
+                    <Input.Wrapper
+                        label='Buildable military units'
+                        description='Combat unit tiers that factories and commanders offer. Builders, transports and satellites are always available.'
+                    >
+                        <SegmentedControl
+                            display='flex'
+                            data={[...ENABLED_MILITARY_TIERS]}
+                            value={configuration.enabledMilitaryTiers}
+                            onChange={(value) =>
+                                setProperty('enabledMilitaryTiers', value)
+                            }
+                        />
+                    </Input.Wrapper>
                     <Checkbox
                         label='Cross-faction T2 labs'
                         description="Build other factions' T2 labs at 70% extra cost"

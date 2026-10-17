@@ -18,6 +18,7 @@ import {
 import {
     Configuration,
     DEFAULT_CONFIGURATION,
+    type EnabledMilitaryTiers,
 } from '@/lib/command-generator/data/configuration';
 import {
     BASE_COMMANDS,
@@ -235,6 +236,27 @@ describe('HP multipliers', () => {
         );
         expect(tweakdefs).toContain(
             'lua/queen-hp-template.lua{HP_MULTIPLIER=2.5}'
+        );
+    });
+});
+
+describe('Enabled military tiers', () => {
+    const militaryTemplate = 'lua/military-units-template.lua';
+
+    test('fill the lowest enabled tier, or leave the file out when all are enabled', () => {
+        const references = (enabledMilitaryTiers: EnabledMilitaryTiers) =>
+            getMappedData({
+                ...DEFAULT_CONFIGURATION,
+                enabledMilitaryTiers,
+            }).tweakdefs.filter((path) => path.startsWith(militaryTemplate));
+
+        expect(references('T1-T3')).toEqual([]);
+        expect(references('None')).toEqual([`${militaryTemplate}{MIN_TIER=4}`]);
+    });
+
+    test('load before every other tweak, so later tweaks keep the units they add', () => {
+        expect(LUA_PRIORITIES[militaryTemplate]).toBe(
+            Math.min(...Object.values(LUA_PRIORITIES))
         );
     });
 });

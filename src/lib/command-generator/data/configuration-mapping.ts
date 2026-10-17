@@ -9,6 +9,9 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/main-units.lua': 0,
     'lua/raptor-hp-template.lua': 0,
     'lua/queen-hp-template.lua': 0,
+    // Runs before every other tweakdefs (custom ones included), so military
+    // units that later tweaks add to build menus stay buildable
+    'lua/military-units-template.lua': 0,
     'lua/evocom-arm.lua': 1,
     'lua/evocom-cor.lua': 1,
     'lua/evocom-leg.lua': 1,
@@ -303,6 +306,19 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
     lobbyName: {
         description: 'Lobby name tag',
         values: {},
+    },
+    enabledMilitaryTiers: {
+        description: 'Military units',
+        values: {
+            None: {
+                tweakdefs: ['lua/military-units-template.lua{MIN_TIER=4}'],
+            },
+            T3: { tweakdefs: ['lua/military-units-template.lua{MIN_TIER=3}'] },
+            'T2-T3': {
+                tweakdefs: ['lua/military-units-template.lua{MIN_TIER=2}'],
+            },
+            'T1-T3': undefined,
+        },
     },
     isEcoT4: {
         description: 'T4 Economy',

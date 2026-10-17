@@ -24,16 +24,19 @@ export const START_OPTIONS = [
     'Zero grace',
     'Surrounded',
 ] as const;
+export const ENABLED_MILITARY_TIERS = ['None', 'T3', 'T2-T3', 'T1-T3'] as const;
 
 export type Challenges = (typeof CHALLENGES)[number];
 export type GameMap = (typeof MAPS)[number];
 export type StartOption = (typeof START_OPTIONS)[number];
+export type EnabledMilitaryTiers = (typeof ENABLED_MILITARY_TIERS)[number];
 
 export interface Configuration {
     challenges: Challenges;
     gameMap: GameMap;
     start: StartOption;
     lobbyName: string;
+    enabledMilitaryTiers: EnabledMilitaryTiers;
     isEcoT4: boolean;
     isRFLRPCRebalance: boolean;
     isRFLRPCT4: boolean;
@@ -57,6 +60,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     gameMap: 'Full Metal Plate (12P)',
     start: 'No rush',
     lobbyName: '',
+    enabledMilitaryTiers: 'T3',
     isEcoT4: true,
     isRFLRPCRebalance: true,
     isRFLRPCT4: true,

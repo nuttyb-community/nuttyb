@@ -51,6 +51,7 @@
                     "enum": ["No rush", "No rush solo", "Zero grace", "Surrounded"]
                 },
                 "lobbyName": { "type": "string" },
+                "enabledMilitaryTiers": { "enum": ["None", "T3", "T2-T3", "T1-T3"] },
                 "isEcoT4": { "type": "boolean" },
                 "isRFLRPCRebalance": { "type": "boolean" },
                 "isRFLRPCT4": { "type": "boolean" },
