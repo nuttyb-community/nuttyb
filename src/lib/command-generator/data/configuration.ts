@@ -41,6 +41,8 @@ export interface Configuration {
     isT3GeoWalls: boolean;
     isCrossFactionT2: boolean;
     isDefencesT4: boolean;
+    isT3UnitLauncher: boolean;
+    isTumbleweedLauncher: boolean;
     // Numeric multipliers
     raptorHpMult: number;
     queenHpMult: number;
@@ -62,6 +64,8 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     isT3GeoWalls: false,
     isCrossFactionT2: true,
     isDefencesT4: true,
+    isT3UnitLauncher: true,
+    isTumbleweedLauncher: false,
     // Numeric multipliers
     raptorHpMult: 1.5,
     queenHpMult: 1.5,

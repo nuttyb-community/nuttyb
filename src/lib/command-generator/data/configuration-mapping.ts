@@ -30,6 +30,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
     'lua/unit-launchers.lua': 13,
+    'lua/unit-launchers-tumbleweed.lua': 13,
     'lua/geo+walls-t3.lua': 14,
 } as const;
 
@@ -113,7 +114,6 @@ export const BASE_TWEAKS = {
         'lua/eco-t3.lua',
         'lua/builders-t3.lua',
         'lua/defences-t3.lua',
-        'lua/unit-launchers.lua',
         'lua/lrpc-rebalance.lua',
         'lua/air-rework-t4.lua',
     ],
@@ -345,6 +345,20 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'T4 defences',
         values: {
             true: { tweakdefs: ['lua/defences-t4.lua'] },
+            false: undefined,
+        },
+    },
+    isT3UnitLauncher: {
+        description: 'T3 unit launcher',
+        values: {
+            true: { tweakdefs: ['lua/unit-launchers.lua'] },
+            false: undefined,
+        },
+    },
+    isTumbleweedLauncher: {
+        description: 'Epic Tumbleweed launcher',
+        values: {
+            true: { tweakdefs: ['lua/unit-launchers-tumbleweed.lua'] },
             false: undefined,
         },
     },

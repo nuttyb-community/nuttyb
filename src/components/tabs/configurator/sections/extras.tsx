@@ -100,6 +100,28 @@ export const ExtrasSection: React.FC = () => {
                         }
                     />
                     <Checkbox
+                        label='T3 unit launcher'
+                        description='Launches a random Titan, Behemoth, Juggernaut or Sol Invictus'
+                        checked={configuration.isT3UnitLauncher}
+                        onChange={(event) =>
+                            setProperty(
+                                'isT3UnitLauncher',
+                                event.currentTarget.checked
+                            )
+                        }
+                    />
+                    <Checkbox
+                        label='Epic Tumbleweed launcher'
+                        description='Launches Epic Tumbleweeds: huge damage, with friendly fire'
+                        checked={configuration.isTumbleweedLauncher}
+                        onChange={(event) =>
+                            setProperty(
+                                'isTumbleweedLauncher',
+                                event.currentTarget.checked
+                            )
+                        }
+                    />
+                    <Checkbox
                         label='T3 Geo + Walls'
                         checked={configuration.isT3GeoWalls}
                         onChange={(event) =>
