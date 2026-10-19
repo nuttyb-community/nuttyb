@@ -38,6 +38,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     // Game-wide rules run after every file that creates units
     'lua/mini-artillery-off.lua': 20,
     'lua/shields-faint.lua': 20,
+    'lua/beams-ignore-holos.lua': 20,
     // Performance options cover every unit, so they run last
     'lua/effects-reduction-template.lua': 30,
     'lua/death-effects-reduction.lua': 31,
@@ -126,6 +127,7 @@ export const BASE_TWEAKS = {
         'lua/air-rework-t4.lua',
         'lua/mini-artillery-off.lua',
         'lua/shields-faint.lua',
+        'lua/beams-ignore-holos.lua',
     ],
     tweakunits: [
         'lua/main-units.lua',

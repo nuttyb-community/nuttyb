@@ -4,6 +4,10 @@ Notable changes to the NuttyB CE configurator and tweaks, grouped by date with
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-10-19
+
+- Fixed beam defences like the Pulsar, Bulwark, Bastion and T4 Ragnarok destroying freshly placed holos in front of them.
+
 ## 2026-10-18
 
 - Adapted tweaks and ideas from Willzyboi's configurator, with the T4 Elysium by Pyrem.
