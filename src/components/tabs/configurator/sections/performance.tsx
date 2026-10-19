@@ -23,7 +23,7 @@ export const PerformanceSection: React.FC = () => {
             <SimpleGrid spacing='xl' cols={2}>
                 <Input.Wrapper
                     label='Effects reduction'
-                    description='Light trims trails on the T4 units, Medium also on raptors with smaller impacts, Heavy on every unit and drops tracks and building decals. Combat stays the same.'
+                    description='Light trims trails on the T4 units and shrinks harmless raptor death blasts, Medium also on raptors with smaller impacts, Heavy on every unit and drops tracks and building decals. Combat stays the same.'
                 >
                     <SegmentedControl
                         display='flex'

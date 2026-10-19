@@ -7,6 +7,7 @@ visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`
 ## 2026-10-19
 
 - Fixed beam defences like the Pulsar, Bulwark, Bastion and T4 Ragnarok destroying freshly placed holos in front of them.
+- Shrinked raptor's harmless death blasts in attempt to improve the performance.
 
 ## 2026-10-18
 
