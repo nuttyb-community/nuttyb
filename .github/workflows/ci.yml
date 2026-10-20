@@ -1,0 +1,43 @@
+# Lint, type-check and test pull requests; mark this job as required in branch protection to block merges
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint
+        run: bunx biome ci
+
+      - name: Type-check
+        run: bunx next typegen && bunx tsc --noEmit
+
+      - name: Knip
+        run: bun knip
+
+      - name: Generate Lua bundle
+        run: bun run sync -p .
+
+      - name: Run tests
+        run: bun test
