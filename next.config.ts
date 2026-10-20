@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
 
 import type { NextConfig } from 'next';
 
@@ -27,11 +28,16 @@ const isGitHubPages = process.env.GITHUB_PAGES === 'true';
  */
 const basePath = isGitHubPages ? process.env.NEXT_PUBLIC_BASE_PATH || '' : '';
 
+const gitSha = getGitSha();
+
+// Deployed copy of the build's SHA; open tabs poll it to detect a newer deploy (see update-prompt.tsx)
+writeFileSync('public/version.txt', gitSha);
+
 const nextConfig: NextConfig = {
     /* config options here */
     reactCompiler: true,
     env: {
-        NEXT_PUBLIC_GIT_SHA: getGitSha(),
+        NEXT_PUBLIC_GIT_SHA: gitSha,
         NEXT_PUBLIC_BUILD_DATE: new Date().toISOString().slice(0, 10),
         NEXT_PUBLIC_BASE_PATH: basePath,
     },

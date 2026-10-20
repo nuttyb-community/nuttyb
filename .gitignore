@@ -85,6 +85,7 @@ next-env.d.ts
 
 # auto-generated Lua bundle
 /public/data/lua-bundle.json
+/public/version.txt
 
 # agentic coding
 CLAUDE.local.md

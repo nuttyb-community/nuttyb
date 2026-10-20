@@ -10,6 +10,7 @@ import '@mantine/core/styles.css';
 import './globals.css';
 import { PageHeader } from '@/components/page-header';
 import { Providers } from '@/components/providers';
+import { UpdatePrompt } from '@/components/update-prompt';
 
 export const metadata: Metadata = {
     title: 'NuttyB CE',
@@ -37,6 +38,7 @@ export default function RootLayout({
                             </AppShellHeader>
                             <AppShellMain>{children}</AppShellMain>
                         </AppShell>
+                        <UpdatePrompt />
                     </Providers>
                 </MantineProvider>
             </body>

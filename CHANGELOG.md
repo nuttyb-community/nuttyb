@@ -8,6 +8,7 @@ visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`
 
 - New Economy & Production section. Pick the economy style: classic T4 eco, or evolving economy adapted from timuela's tweak.
 - Evolving economy: upgrade fusion reactors and energy converters by building the next tier on top, up to the tier you pick (T4–T11). Each tier produces more, but is slightly less effective. T4+ structures are non-explosive.
+- Added an update notification, so you never miss a new version.
 - Fixed beam defences like the Pulsar, Bulwark, Bastion and T4 Ragnarok destroying freshly placed holos in front of them.
 - Shrinked raptor's harmless death blasts in attempt to improve the performance.
 - Improved the configurator's layout.
