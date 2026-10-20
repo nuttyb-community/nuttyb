@@ -52,7 +52,7 @@ export const PageHeader: React.FC = () => {
                             <Text
                                 fz='h2'
                                 fw={700}
-                                visibleFrom='xs'
+                                visibleFrom='md'
                                 style={{ alignSelf: 'baseline' }}
                             >
                                 NuttyB CE
