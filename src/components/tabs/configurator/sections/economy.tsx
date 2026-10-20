@@ -4,7 +4,7 @@ import React from 'react';
 
 import {
     Alert,
-    Divider,
+    Checkbox,
     Input,
     NumberInput,
     SegmentedControl,
@@ -28,6 +28,7 @@ export const EconomySection: React.FC = () => {
     const incomeMult = useNumberSetting('incomeMult', 0.1, 10);
     const buildPowerMult = useNumberSetting('buildPowerMult', 0.1, 10);
     const buildDistMult = useNumberSetting('buildDistMult', 0.5, 10);
+    const t3AideCap = useNumberSetting('t3AideCap', 1, 100);
 
     return (
         <Stack gap='md'>
@@ -74,7 +75,32 @@ export const EconomySection: React.FC = () => {
                         required
                     />
                 </SimpleGrid>
-                <Divider />
+                <Checkbox
+                    label='Cross-faction T2 labs'
+                    description="Build other factions' T2 labs at 70% extra cost"
+                    checked={configuration.isCrossFactionT2}
+                    onChange={(event) =>
+                        setProperty(
+                            'isCrossFactionT2',
+                            event.currentTarget.checked
+                        )
+                    }
+                />
+                <NumberInput
+                    label={
+                        <LabelWithTooltip
+                            label='T3 aide cap'
+                            tooltip='How many ground and air T3 aides each player can have (1 - 100)'
+                        />
+                    }
+                    {...t3AideCap}
+                    step={1}
+                    allowNegative={false}
+                    allowDecimal={false}
+                    required
+                />
+            </Stack>
+            <Stack gap='sm'>
                 <Input.Wrapper
                     label='Economy style'
                     description='Classic NuttyB experience or fully upgradeable fusion reactors and energy converters.'

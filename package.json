@@ -41,7 +41,6 @@
         "eslint-config-prettier": "^10.1.8",
         "eslint-nibble": "^9.1.1",
         "eslint-plugin-file-progress": "4.0.0-beta.1",
-        "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-prettier": "^5.5.7",
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-unicorn": "^78.0.0",

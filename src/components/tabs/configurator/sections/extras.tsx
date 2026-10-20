@@ -2,162 +2,32 @@
 
 import React from 'react';
 
-import {
-    Checkbox,
-    Input,
-    NativeSelect,
-    NumberInput,
-    SegmentedControl,
-    SimpleGrid,
-    Stack,
-    Title,
-} from '@mantine/core';
+import { Checkbox, Stack, Title } from '@mantine/core';
 
-import { LabelWithTooltip } from '@/components/common/label-with-tooltip';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
-import { useNumberSetting } from '@/hooks/use-number-setting';
-import {
-    Challenges,
-    CHALLENGES,
-    ENABLED_MILITARY_TIERS,
-} from '@/lib/command-generator/data/configuration';
 
 export const ExtrasSection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();
-    const t3AideCap = useNumberSetting('t3AideCap', 1, 100);
 
     return (
         <Stack gap='md'>
             <Title order={2}>Extras</Title>
-            <SimpleGrid spacing='xl' cols={2}>
-                <Stack gap='sm'>
-                    <NativeSelect
-                        label='Challenges'
-                        data={CHALLENGES}
-                        value={configuration.challenges}
-                        onChange={(event) =>
-                            setProperty(
-                                'challenges',
-                                event.currentTarget.value as Challenges
-                            )
-                        }
-                    />
-                    <Input.Wrapper
-                        label='Buildable military units'
-                        description='Combat unit tiers that factories and commanders offer. Builders, transports and satellites are always available.'
-                    >
-                        <SegmentedControl
-                            display='flex'
-                            data={[...ENABLED_MILITARY_TIERS]}
-                            value={configuration.enabledMilitaryTiers}
-                            onChange={(value) =>
-                                setProperty('enabledMilitaryTiers', value)
-                            }
-                        />
-                    </Input.Wrapper>
-                    <NumberInput
-                        label={
-                            <LabelWithTooltip
-                                label='T3 aide cap'
-                                tooltip='How many ground and air T3 aides each player can have (1 - 100)'
-                            />
-                        }
-                        {...t3AideCap}
-                        step={1}
-                        allowNegative={false}
-                        allowDecimal={false}
-                        required
-                    />
-                    <Checkbox
-                        label='Cross-faction T2 labs'
-                        description="Build other factions' T2 labs at 70% extra cost"
-                        checked={configuration.isCrossFactionT2}
-                        onChange={(event) =>
-                            setProperty(
-                                'isCrossFactionT2',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='T4 defences'
-                        description='Tier 4 defensive structures'
-                        checked={configuration.isDefencesT4}
-                        onChange={(event) =>
-                            setProperty(
-                                'isDefencesT4',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                </Stack>
-                <Stack gap='sm'>
-                    <Checkbox
-                        label='RFLRPC Rebalance'
-                        description='Rebalance for Ragnarok, Calamity and Starfall'
-                        checked={configuration.isRFLRPCRebalance}
-                        onChange={(event) =>
-                            setProperty(
-                                'isRFLRPCRebalance',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='T4 RFLRPC'
-                        description='More powerful, T4 versions of Ragnarok, Calamity and Starfall'
-                        checked={configuration.isRFLRPCT4}
-                        onChange={(event) =>
-                            setProperty(
-                                'isRFLRPCT4',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='Mega Nuke'
-                        checked={configuration.isMegaNuke}
-                        onChange={(event) =>
-                            setProperty(
-                                'isMegaNuke',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='T3 unit launcher'
-                        description='Launches a random Titan, Behemoth, Juggernaut or Sol Invictus'
-                        checked={configuration.isT3UnitLauncher}
-                        onChange={(event) =>
-                            setProperty(
-                                'isT3UnitLauncher',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='Epic Tumbleweed launcher'
-                        description='Launches Epic Tumbleweeds: huge damage, with friendly fire'
-                        checked={configuration.isTumbleweedLauncher}
-                        onChange={(event) =>
-                            setProperty(
-                                'isTumbleweedLauncher',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                    <Checkbox
-                        label='T3 Geo + Walls'
-                        checked={configuration.isT3GeoWalls}
-                        onChange={(event) =>
-                            setProperty(
-                                'isT3GeoWalls',
-                                event.currentTarget.checked
-                            )
-                        }
-                    />
-                </Stack>
-            </SimpleGrid>
+            <Stack gap='sm'>
+                <Checkbox
+                    label='Mega Nuke'
+                    checked={configuration.isMegaNuke}
+                    onChange={(event) =>
+                        setProperty('isMegaNuke', event.currentTarget.checked)
+                    }
+                />
+                <Checkbox
+                    label='T3 Geo + Walls'
+                    checked={configuration.isT3GeoWalls}
+                    onChange={(event) =>
+                        setProperty('isT3GeoWalls', event.currentTarget.checked)
+                    }
+                />
+            </Stack>
         </Stack>
     );
 };

@@ -10,7 +10,8 @@ import { CustomTweaksSection } from './sections/custom-tweaks';
 import { DifficultySection } from './sections/difficulty';
 import { EconomySection } from './sections/economy';
 import { ExtrasSection } from './sections/extras';
-import { GameSettingsSection } from './sections/game-settings';
+import { GeneralSettingsSection } from './sections/general-settings';
+import { MilitarySection } from './sections/military';
 import { PerformanceSection } from './sections/performance';
 
 export const Configurator: React.FC = () => (
@@ -23,12 +24,15 @@ export const Configurator: React.FC = () => (
         </Group>
         <Stack gap='xl'>
             <PresetShowcase />
-            <GameSettingsSection />
-            <SimpleGrid spacing='xl' cols={2}>
+            <SimpleGrid spacing='xl' cols={{ base: 1, md: 2 }}>
+                <GeneralSettingsSection />
                 <DifficultySection />
                 <EconomySection />
+                <Stack gap='xl'>
+                    <MilitarySection />
+                    <ExtrasSection />
+                </Stack>
             </SimpleGrid>
-            <ExtrasSection />
             <PerformanceSection />
             <CustomTweaksSection />
         </Stack>

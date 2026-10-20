@@ -4,7 +4,8 @@ import eslint from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import eslintPluginProgress from 'eslint-plugin-file-progress';
-import eslintPluginImport from 'eslint-plugin-import';
+// disabled due to compatibility issues
+// import eslintPluginImport from 'eslint-plugin-import';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 import eslintPluginUnicorn from 'eslint-plugin-unicorn';
@@ -51,7 +52,8 @@ export default defineConfig(
         plugins: {
             '@typescript-eslint': tseslint.plugin,
             prettier: eslintPluginPrettier,
-            import: eslintPluginImport,
+            // disabled due to compatibility issues
+            // import: eslintPluginImport,
         },
         settings: {
             react: {
@@ -114,42 +116,28 @@ export default defineConfig(
 
             'unicorn/no-null': 'off', // subject to change
 
-            'import/order': [
-                'error',
-                {
-                    groups: ['builtin', 'external', 'internal'],
-                    pathGroups: [
-                        {
-                            pattern: 'react',
-                            group: 'external',
-                            position: 'before',
-                        },
-                    ],
-                    pathGroupsExcludedImportTypes: ['react'],
-                    'newlines-between': 'always',
-                    alphabetize: {
-                        order: 'asc',
-                        caseInsensitive: true,
-                    },
-                    named: true,
-                },
-            ],
-            'import/no-duplicates': 'error',
-            // 'import/no-internal-modules': [
+            // disabled due to compatibility issues
+            // 'import/order': [
             //     'error',
             //     {
-            //         allow: [
-            //             'next/*',
-            //             'dayjs/**/*',
-            //             'motion/react',
-            //             'next/font/*',
-            //             'public/**/*',
-            //             'eslint/*',
-            //             'eslint-config-next/*',
-            //             '@mantine/*/**',
+            //         groups: ['builtin', 'external', 'internal'],
+            //         pathGroups: [
+            //             {
+            //                 pattern: 'react',
+            //                 group: 'external',
+            //                 position: 'before',
+            //             },
             //         ],
+            //         pathGroupsExcludedImportTypes: ['react'],
+            //         'newlines-between': 'always',
+            //         alphabetize: {
+            //             order: 'asc',
+            //             caseInsensitive: true,
+            //         },
+            //         named: true,
             //     },
             // ],
+            // 'import/no-duplicates': 'error',
         },
     },
 

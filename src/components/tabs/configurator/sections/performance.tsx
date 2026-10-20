@@ -20,7 +20,7 @@ export const PerformanceSection: React.FC = () => {
     return (
         <Stack gap='md'>
             <Title order={2}>Performance</Title>
-            <SimpleGrid spacing='xl' cols={2}>
+            <SimpleGrid spacing='xl' cols={{ base: 1, md: 2 }}>
                 <Input.Wrapper
                     label='Effects reduction'
                     description='Light trims trails on the T4 units and shrinks harmless raptor death blasts, Medium also on raptors with smaller impacts, Heavy on every unit and drops tracks and building decals. Combat stays the same.'
