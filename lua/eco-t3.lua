@@ -36,19 +36,6 @@ do
             or faction .. 'mmkrt3'
     end
 
-    do
-        local builderName = 'legck'
-        local nBuildOptions = #unitDefs[builderName].buildoptions
-        unitDefs[builderName].buildoptions[nBuildOptions + 1] = 'legdtf'
-    end
-
-    for _, unitName in pairs({ 'coruwadves', 'legadvestore' }) do
-        table.mergeInPlace(
-            unitDefs[unitName],
-            { footprintx = 4, footprintz = 4 }
-        )
-    end
-
     -- Recompute production tooltips from the actually assigned values so the
     -- text never goes stale when the numbers change.
     local function round(value)

@@ -80,14 +80,6 @@ export const ExtrasSection: React.FC = () => {
                         }
                     />
                     <Checkbox
-                        label='T4 Economy'
-                        description='T4 fusion reactors and energy converters'
-                        checked={configuration.isEcoT4}
-                        onChange={(event) =>
-                            setProperty('isEcoT4', event.currentTarget.checked)
-                        }
-                    />
-                    <Checkbox
                         label='T4 defences'
                         description='Tier 4 defensive structures'
                         checked={configuration.isDefencesT4}

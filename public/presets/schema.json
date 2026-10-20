@@ -52,7 +52,7 @@
                 },
                 "lobbyName": { "type": "string" },
                 "enabledMilitaryTiers": { "enum": ["None", "T3", "T2-T3", "T1-T3"] },
-                "isEcoT4": { "type": "boolean" },
+                "ecoStyle": { "enum": ["Classic", "Evolving"] },
                 "isRFLRPCRebalance": { "type": "boolean" },
                 "isRFLRPCT4": { "type": "boolean" },
                 "isMegaNuke": { "type": "boolean" },
@@ -69,7 +69,8 @@
                 "buildDistMult": { "type": "number", "minimum": 0.5, "maximum": 10 },
                 "buildPowerMult": { "type": "number", "minimum": 0.1, "maximum": 10 },
                 "queenCount": { "type": "integer", "minimum": 1, "maximum": 100 },
-                "t3AideCap": { "type": "integer", "minimum": 1, "maximum": 100 }
+                "t3AideCap": { "type": "integer", "minimum": 1, "maximum": 100 },
+                "ecoMaxTier": { "enum": [4, 5, 6, 7, 8, 9, 10, 11] }
             }
         },
         "presetTweaks": {

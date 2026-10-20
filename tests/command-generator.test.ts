@@ -18,6 +18,7 @@ import {
 import {
     Configuration,
     DEFAULT_CONFIGURATION,
+    type EcoStyle,
     type EnabledMilitaryTiers,
 } from '@/lib/command-generator/data/configuration';
 import {
@@ -250,6 +251,33 @@ describe('T3 aide cap', () => {
         expect(tweakdefs).toContain(
             'lua/builders-t3-template.lua{T3_AIDE_CAP=40}'
         );
+    });
+});
+
+const ecoTweaks = (ecoStyle: EcoStyle, ecoMaxTier: number) =>
+    getMappedData({
+        ...DEFAULT_CONFIGURATION,
+        ecoStyle,
+        ecoMaxTier,
+    }).tweakdefs.filter((path) =>
+        /^lua\/eco-(t3|t4|evo-template)\.lua/.test(path)
+    );
+
+describe('Economy style', () => {
+    test('classic uses T3 and T4 eco, not evolving eco', () => {
+        expect(ecoTweaks('Classic', 6)).toEqual([
+            'lua/eco-t3.lua',
+            'lua/eco-t4.lua',
+        ]);
+    });
+
+    test('evolving replaces T3 and T4 eco, at the chosen max tier', () => {
+        expect(ecoTweaks('Evolving', 6)).toEqual([
+            'lua/eco-evo-template.lua{MAX_TIER=6}',
+        ]);
+        expect(ecoTweaks('Evolving', 11)).toEqual([
+            'lua/eco-evo-template.lua{MAX_TIER=11}',
+        ]);
     });
 });
 

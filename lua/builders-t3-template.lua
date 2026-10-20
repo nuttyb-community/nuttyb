@@ -56,7 +56,7 @@ do
         end
 
         -- Storage footprints are declared explicitly: the base defs differ
-        -- (coruwadves/legadvestore are 5x5) and eco-t3.lua's 4x4 base patch
+        -- (coruwadves/legadvestore are 5x5) and main-defs.lua's 4x4 base patch
         -- must not be a load-order dependency of these copies.
 
         -- T3 Metal Storage

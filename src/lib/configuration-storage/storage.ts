@@ -2,17 +2,32 @@ import {
     CHALLENGES,
     Configuration,
     DEFAULT_CONFIGURATION,
+    ECO_MAX_TIERS,
+    ECO_STYLES,
+    EFFECTS_REDUCTION_LEVELS,
+    ENABLED_MILITARY_TIERS,
     MAPS,
     START_OPTIONS,
 } from '@/lib/command-generator/data/configuration';
 
 /** Enum fields mapped to their allowed value sets, for sanitization. */
 const ENUM_FIELDS: {
-    [K in 'challenges' | 'gameMap' | 'start']: readonly Configuration[K][];
+    [K in
+        | 'challenges'
+        | 'gameMap'
+        | 'start'
+        | 'enabledMilitaryTiers'
+        | 'ecoStyle'
+        | 'effectsReduction'
+        | 'ecoMaxTier']: readonly Configuration[K][];
 } = {
     challenges: CHALLENGES,
     gameMap: MAPS,
     start: START_OPTIONS,
+    enabledMilitaryTiers: ENABLED_MILITARY_TIERS,
+    ecoStyle: ECO_STYLES,
+    effectsReduction: EFFECTS_REDUCTION_LEVELS,
+    ecoMaxTier: ECO_MAX_TIERS,
 };
 
 /**

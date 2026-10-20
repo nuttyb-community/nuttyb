@@ -31,12 +31,16 @@ export const EFFECTS_REDUCTION_LEVELS = [
     'Medium',
     'Heavy',
 ] as const;
+export const ECO_STYLES = ['Classic', 'Evolving'] as const;
+// Evolving eco's max tier
+export const ECO_MAX_TIERS = [4, 5, 6, 7, 8, 9, 10, 11] as const;
 
 export type Challenges = (typeof CHALLENGES)[number];
 export type GameMap = (typeof MAPS)[number];
 export type StartOption = (typeof START_OPTIONS)[number];
 export type EnabledMilitaryTiers = (typeof ENABLED_MILITARY_TIERS)[number];
 export type EffectsReductionLevel = (typeof EFFECTS_REDUCTION_LEVELS)[number];
+export type EcoStyle = (typeof ECO_STYLES)[number];
 
 export interface Configuration {
     challenges: Challenges;
@@ -44,7 +48,7 @@ export interface Configuration {
     start: StartOption;
     lobbyName: string;
     enabledMilitaryTiers: EnabledMilitaryTiers;
-    isEcoT4: boolean;
+    ecoStyle: EcoStyle;
     isRFLRPCRebalance: boolean;
     isRFLRPCT4: boolean;
     isMegaNuke: boolean;
@@ -63,6 +67,7 @@ export interface Configuration {
     buildPowerMult: number;
     queenCount: number;
     t3AideCap: number;
+    ecoMaxTier: number;
 }
 
 export const DEFAULT_CONFIGURATION: Configuration = {
@@ -71,7 +76,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     start: 'No rush',
     lobbyName: '',
     enabledMilitaryTiers: 'T3',
-    isEcoT4: true,
+    ecoStyle: 'Classic',
     isRFLRPCRebalance: true,
     isRFLRPCT4: true,
     isMegaNuke: false,
@@ -90,6 +95,7 @@ export const DEFAULT_CONFIGURATION: Configuration = {
     buildPowerMult: 1,
     queenCount: 12,
     t3AideCap: 10,
+    ecoMaxTier: 4,
 };
 
 /**

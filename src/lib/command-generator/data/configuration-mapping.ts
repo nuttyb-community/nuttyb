@@ -16,8 +16,6 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/evocom-cor.lua': 1,
     'lua/evocom-leg.lua': 1,
     'lua/main-defs.lua': 2,
-    // eco-t3 patches base storage defs that builders-t3 copies, so it must
-    // load first (matches the pre-rewrite tweakdefs7 -> tweakdefs8 slot order)
     'lua/eco-t3.lua': 3,
     'lua/builders-t3-template.lua': 4,
     'lua/defences-t3.lua': 4,
@@ -29,6 +27,8 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/cross-faction-t2.lua': 7,
     'lua/lrpc-rebalance.lua': 7,
     'lua/eco-t4.lua': 9,
+    // Adds build options to the T3 aides builders-t3 creates
+    'lua/eco-evo-template.lua': 9,
     'lua/rflrpc-rebalance.lua': 10,
     'lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
@@ -121,7 +121,6 @@ export const BASE_COMMANDS = [
 export const BASE_TWEAKS = {
     tweakdefs: [
         'lua/main-defs.lua',
-        'lua/eco-t3.lua',
         'lua/defences-t3.lua',
         'lua/lrpc-rebalance.lua',
         'lua/air-rework-t4.lua',
@@ -324,11 +323,12 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
             'T1-T3': undefined,
         },
     },
-    isEcoT4: {
-        description: 'T4 Economy',
+    ecoStyle: {
+        description: 'Economy style',
         values: {
-            true: { tweakdefs: ['lua/eco-t4.lua'] },
-            false: undefined,
+            Classic: { tweakdefs: ['lua/eco-t3.lua', 'lua/eco-t4.lua'] },
+            // Evolving eco is added with its max tier in getMappedData()
+            Evolving: undefined,
         },
     },
     isRFLRPCRebalance: {
@@ -437,6 +437,11 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
     },
     t3AideCap: {
         description: 'T3 aide cap',
+        values: {},
+    },
+    // Added as a template parameter in getMappedData()
+    ecoMaxTier: {
+        description: 'Evolving eco max tier',
         values: {},
     },
 } as const;

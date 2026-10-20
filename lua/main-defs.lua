@@ -483,3 +483,16 @@ function UnitDef_Post(unitID, unitDef)
         end
     end
 end
+
+-- Moved from eco-t3.lua, which only loads with the classic economy.
+do
+    local legck = unitDefs.legck
+    legck.buildoptions[#legck.buildoptions + 1] = 'legdtf'
+
+    for _, unitName in pairs({ 'coruwadves', 'legadvestore' }) do
+        table.mergeInPlace(
+            unitDefs[unitName],
+            { footprintx = 4, footprintz = 4 }
+        )
+    end
+end

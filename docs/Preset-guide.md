@@ -74,7 +74,7 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
         "gameMap": "Full Metal Plate (12P)",
         "start": "No rush",
         "lobbyName": "My Lobby",
-        "isEcoT4": false,
+        "ecoStyle": "Classic",
         "isRFLRPCRebalance": true,
         "isRFLRPCT4": true,
         "isMegaNuke": false,
@@ -119,7 +119,8 @@ Adding a *new* tweak to your preset (modifying the `presetTweaks` array in `conf
 | `gameMap` | string | Map name (e.g. `"Full Metal Plate (12P)"`) |
 | `start` | string | `"No rush"`, `"No rush solo"`, `"Zero grace"`, `"Surrounded"` |
 | `lobbyName` | string | Default lobby name |
-| `isEcoT4` | boolean | Enable T4 economy |
+| `ecoStyle` | string | `"Classic"` (T4 eco) or `"Evolving"` (upgradeable fusion reactors and energy converters) |
+| `ecoMaxTier` | number | Highest evolving eco tier: `4` – `11` |
 | `isRFLRPCRebalance` | boolean | Enable LRPC rebalance |
 | `isRFLRPCT4` | boolean | Enable T4 LRPC |
 | `isMegaNuke` | boolean | Enable mega nuke |

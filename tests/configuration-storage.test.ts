@@ -47,8 +47,15 @@ describe('sanitizeConfiguration', () => {
     });
 
     test('replaces invalid enum values with the default', () => {
-        const result = sanitizeConfiguration({ gameMap: 'Not A Map' });
-        expect(result.gameMap).toBe(DEFAULT_CONFIGURATION.gameMap);
+        const result = sanitizeConfiguration({
+            gameMap: 'Not A Map',
+            enabledMilitaryTiers: 'T4',
+            ecoStyle: 'Hybrid',
+            effectsReduction: 'Max',
+            // Valid before the evolving tiers started at T4
+            ecoMaxTier: 0,
+        });
+        expect(result).toEqual(DEFAULT_CONFIGURATION);
     });
 
     test('replaces wrong-typed values with the default', () => {
@@ -63,7 +70,8 @@ describe('sanitizeConfiguration', () => {
             gameMap: 'Darkside (12P)',
             start: 'Zero grace',
             lobbyName: 'Custom Lobby',
-            isEcoT4: false,
+            ecoStyle: 'Evolving',
+            ecoMaxTier: 6,
             isRFLRPCRebalance: false,
             isRFLRPCT4: false,
             isMegaNuke: true,

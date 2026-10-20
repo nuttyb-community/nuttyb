@@ -141,7 +141,7 @@ const PresetForm: React.FC<PresetFormProps> = ({ preset, onClose }) => {
                 <Stack gap='md'>
                     <TextInput
                         label='Name'
-                        placeholder="e.g. Pyrem's preset"
+                        placeholder='e.g. My preset'
                         value={presetName}
                         onChange={(e) => setPresetName(e.currentTarget.value)}
                         error={

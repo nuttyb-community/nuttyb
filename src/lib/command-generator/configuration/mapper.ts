@@ -25,6 +25,9 @@ export function getMappedData(configuration: Configuration): {
         `lua/raptor-hp-template.lua{HP_MULTIPLIER=${configuration.raptorHpMult}}`,
         `lua/queen-hp-template.lua{HP_MULTIPLIER=${configuration.queenHpMult}}`,
         `lua/builders-t3-template.lua{T3_AIDE_CAP=${configuration.t3AideCap}}`,
+        ...(configuration.ecoStyle === 'Evolving'
+            ? [`lua/eco-evo-template.lua{MAX_TIER=${configuration.ecoMaxTier}}`]
+            : []),
     ];
 
     for (const configKey in configuration) {

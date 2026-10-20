@@ -4,6 +4,11 @@ Notable changes to the NuttyB CE configurator and tweaks, grouped by date with
 the newest first. Entries are curated to highlight what's relevant to players and repo
 visitors. To scaffold a draft from recent commits, run `bun run changelog-draft`.
 
+## 2026-10-20
+
+- New Economy & Production section. Pick the economy style: classic T4 eco, or evolving economy adapted from timuela's tweak.
+- Evolving economy: upgrade fusion reactors and energy converters by building the next tier on top, up to the tier you pick (T4–T11). Each tier makes 1.5× more than the one before and costs 1.8× more. All fusion reactor tiers share the T3 footprint, model and icon, and all energy converter tiers the T3 footprint.
+
 ## 2026-10-19
 
 - Fixed beam defences like the Pulsar, Bulwark, Bastion and T4 Ragnarok destroying freshly placed holos in front of them.

@@ -2,12 +2,13 @@
 
 import React from 'react';
 
-import { Group, Stack, Title } from '@mantine/core';
+import { Group, SimpleGrid, Stack, Title } from '@mantine/core';
 
 import { PresetShowcase } from './preset-showcase';
 import { ResetButton } from './reset-button';
 import { CustomTweaksSection } from './sections/custom-tweaks';
 import { DifficultySection } from './sections/difficulty';
+import { EconomySection } from './sections/economy';
 import { ExtrasSection } from './sections/extras';
 import { GameSettingsSection } from './sections/game-settings';
 import { PerformanceSection } from './sections/performance';
@@ -23,7 +24,10 @@ export const Configurator: React.FC = () => (
         <Stack gap='xl'>
             <PresetShowcase />
             <GameSettingsSection />
-            <DifficultySection />
+            <SimpleGrid spacing='xl' cols={2}>
+                <DifficultySection />
+                <EconomySection />
+            </SimpleGrid>
             <ExtrasSection />
             <PerformanceSection />
             <CustomTweaksSection />
