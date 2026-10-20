@@ -1,6 +1,6 @@
-import { TweakValue } from '@/types/types';
+import type { TweakValue } from '@/types/types';
 
-import { Configuration } from '../data/configuration';
+import type { Configuration } from '../data/configuration';
 import {
     BASE_COMMANDS,
     BASE_TWEAKS,

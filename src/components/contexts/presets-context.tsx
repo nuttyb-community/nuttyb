@@ -1,6 +1,7 @@
 'use client';
 
-import React, {
+import type React from 'react';
+import {
     createContext,
     useCallback,
     useContext,
@@ -14,13 +15,13 @@ import { useConfiguratorContext } from '@/components/contexts/configurator-conte
 import { useLuaBundleContext } from '@/components/contexts/lua-bundle-context';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { EnabledCustomTweak } from '@/lib/command-generator/command-generator';
-import { type Configuration } from '@/lib/command-generator/data/configuration';
+import type { Configuration } from '@/lib/command-generator/data/configuration';
 import {
     ACTIVE_PRESET_ID_STORAGE_KEY,
     LOCAL_PRESETS_STORAGE_KEY,
 } from '@/lib/configuration-storage/keys';
 import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';
-import { parsePresetStatus, type Preset } from '@/lib/presets/registry';
+import { type Preset, parsePresetStatus } from '@/lib/presets/registry';
 import { resolvePresetTweaks } from '@/lib/presets/resolver';
 import { isAllowedRemoteTweakUrl } from '@/lib/presets/tweak-url';
 
@@ -104,7 +105,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                         });
                     }
                 } catch (error) {
-                    // eslint-disable-next-line no-console
                     console.error(
                         `Failed to parse preset config from ${file.path}:`,
                         error
@@ -171,7 +171,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
             // Enforce the host whitelist at the fetch boundary, not just in the
             // import UI — this is the actual network/trust boundary.
             if (!isAllowedRemoteTweakUrl(url)) {
-                // eslint-disable-next-line no-console
                 console.warn(
                     `Skipped remote preset tweak from untrusted host: ${url}`
                 );
@@ -189,7 +188,6 @@ export function PresetsProvider({ children }: { children: React.ReactNode }) {
                 })
                 .catch((error) => {
                     fetchedUrlsRef.current.delete(url);
-                    // eslint-disable-next-line no-console
                     console.error(
                         `Failed to fetch remote preset tweak from ${url}:`,
                         error

@@ -6,6 +6,7 @@
  */
 
 import { describe, expect, test } from 'bun:test';
+
 import { LuaFactory } from 'wasmoon';
 
 import { ECO_MAX_TIERS } from '@/lib/command-generator/data/configuration';

@@ -6,6 +6,7 @@
 
 import type { LuaFile, LuaTweakType, TweakType } from '@/types/types';
 
+import { decode } from '../encoders/base64';
 import { interpolateCommands } from './command-template';
 import { getMappedData } from './configuration/mapper';
 import { MAX_SLOT_SIZE, MAX_SLOTS_PER_TYPE } from './constants';
@@ -18,7 +19,6 @@ import { resolveLuaReference } from './interpolator';
 import type { LuaSource } from './packer';
 import { extractFirstCommentAndRemaining, packLuaSources } from './packer';
 import { formatSlotName } from './slot';
-import { decode } from '../encoders/base64';
 
 /** Result of validating a Base64URL-encoded tweak code */
 export interface TweakValidationResult {

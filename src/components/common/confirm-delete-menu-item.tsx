@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { Menu } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';

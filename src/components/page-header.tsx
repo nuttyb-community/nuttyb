@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import { ActionIcon, Anchor, Button, Group, Menu, Text } from '@mantine/core';
 import {
@@ -15,7 +15,7 @@ import { usePathname } from 'next/navigation';
 import logo from '@/assets/logo.svg';
 import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { PageWrapper } from '@/components/page-wrapper';
-import { EXTERNAL_LINKS, Link, LINKS } from '@/lib/navigation';
+import { EXTERNAL_LINKS, LINKS, type Link } from '@/lib/navigation';
 
 const toolLinks: Link[] = Object.values(LINKS.tools);
 

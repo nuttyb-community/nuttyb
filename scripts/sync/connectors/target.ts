@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { LuaFile } from '@/types/types';
+import type { LuaFile } from '@/types/types';
 
 const DATA_STORE_PATH = './public/data' as const;
 const BUNDLE_FILE_NAME = 'lua-bundle.json' as const;

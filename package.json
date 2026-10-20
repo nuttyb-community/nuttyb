@@ -9,7 +9,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint",
+        "lint": "biome check",
+        "format": "biome check --write",
         "prepare": "husky"
     },
     "dependencies": {
@@ -28,6 +29,7 @@
         "react-dom": "19.3.1"
     },
     "devDependencies": {
+        "@biomejs/biome": "2.5.15",
         "@types/bun": "^1.4.3",
         "@types/command-line-args": "^5.2.3",
         "@types/command-line-usage": "^5.0.4",
@@ -36,21 +38,12 @@
         "@types/react-dom": "^19.3.0",
         "ajv": "^8.17.1",
         "babel-plugin-react-compiler": "1.0.0",
-        "eslint": "^10.13.0",
-        "eslint-config-next": "16.4.1",
-        "eslint-config-prettier": "^10.1.8",
-        "eslint-nibble": "^9.1.1",
-        "eslint-plugin-file-progress": "4.0.0-beta.1",
-        "eslint-plugin-prettier": "^5.5.7",
-        "eslint-plugin-react-hooks": "^7.1.1",
-        "eslint-plugin-unicorn": "^78.0.0",
         "husky": "^9.1.7",
         "knip": "^6.41.0",
         "postcss": "^8.5.30",
         "postcss-preset-mantine": "^1.18.0",
         "postcss-simple-vars": "^7.0.1",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.71.2",
         "wasmoon": "^1.16.0"
     }
 }

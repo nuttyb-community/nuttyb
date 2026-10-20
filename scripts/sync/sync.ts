@@ -82,7 +82,6 @@ async function main() {
         log('Sync completed');
     } catch (error_) {
         console.error((error_ as Error).message);
-        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
     }
 }

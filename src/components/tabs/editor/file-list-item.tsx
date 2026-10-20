@@ -60,7 +60,8 @@ export const FileListItem: React.FC<FileListItemProps> = ({
                                 key={idx}
                                 type={slot.slotType}
                                 index={Number.parseInt(
-                                    slot.slotName.match(/\d+$/)?.[0] ?? '0'
+                                    slot.slotName.match(/\d+$/)?.[0] ?? '0',
+                                    10
                                 )}
                             />
                         ))}

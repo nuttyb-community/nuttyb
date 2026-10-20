@@ -40,7 +40,7 @@ The sync script generates the Lua bundle (`public/data/lua-bundle.json`) that Co
 
 ```bash
 bun test                   # Run tests (required before commits)
-bun lint                   # ESLint checks
+bun lint                   # Biome lint + format check (bun format to fix)
 bun knip                   # Detect unused files and dependencies
 ```
 
@@ -117,8 +117,7 @@ end
 - Avoid inline styles; use Mantine props
 - Extract business logic from components into utilities/hooks
 - Follow existing folder structure and naming conventions
-- Prettier for formatting
-- ESLint enforces import order, React hooks, and Next.js best practices
+- Biome formats and lints (import order, React hooks, Next.js rules)
 - Knip detects unused exports and dependencies
 
 ### Git

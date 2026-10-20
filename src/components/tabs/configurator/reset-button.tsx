@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 
 import { Button, Group, Popover, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';

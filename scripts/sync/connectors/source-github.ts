@@ -1,4 +1,4 @@
-import { LuaFile } from '@/types/types';
+import type { LuaFile } from '@/types/types';
 
 // Github types
 export interface GitHubCommit {

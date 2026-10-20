@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Container, type ContainerProps } from '@mantine/core';
 

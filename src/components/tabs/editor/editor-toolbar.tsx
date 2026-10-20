@@ -14,7 +14,7 @@ import { TweakTypeBadge } from '@/components/common/type-badge';
 import { MAX_SLOT_SIZE } from '@/lib/command-generator/constants';
 import type { LuaTweakType } from '@/types/types';
 
-import { ViewMode } from './types';
+import type { ViewMode } from './types';
 
 interface EditorToolbarProps {
     viewMode: ViewMode;

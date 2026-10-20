@@ -1,4 +1,8 @@
 {
+    "editor.defaultFormatter": "biomejs.biome",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports.biome": "explicit"
+    },
     "[lua]": {
         "editor.defaultFormatter": "JohnnyMorganz.stylua"
     },
@@ -11,6 +15,6 @@
     "trailing-spaces.trimOnSave": true,
     "makefile.configureOnOpen": false,
     "stylua.targetReleaseVersion": "latest",
-    "editor.formatOnSaveMode": "modificationsIfAvailable",
+    "editor.formatOnSaveMode": "file",
     "files.eol": "\n"
 }

@@ -72,6 +72,7 @@ export function useLocalStorage<T>(
     const [, forceRender] = useReducer((x: number) => x + 1, 0);
 
     // Load from localStorage after hydration
+    // biome-ignore lint/correctness/useExhaustiveDependencies: reload only when key changes
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
@@ -98,7 +99,6 @@ export function useLocalStorage<T>(
 
         isLoadedRef.current = true;
         forceRender();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [key]);
 
     // Setter that updates ref and persists to localStorage
@@ -122,6 +122,5 @@ export function useLocalStorage<T>(
     );
 
     // ponytail: ref+forceRender hydration pattern by design (see doc above); compiler skips this hook
-    // eslint-disable-next-line react-hooks/refs
     return [valueRef.current, setValue, isLoadedRef.current];
 }

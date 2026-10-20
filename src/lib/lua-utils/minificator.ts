@@ -85,7 +85,7 @@ function minifyNonMinifiable(code: string): string {
             (prev === '-' && next === '-') ||
             (prev === '.' && next === '.');
 
-        output += needsSeparator ? '\n' + compacted : compacted;
+        output += needsSeparator ? `\n${compacted}` : compacted;
     }
 
     return output.trim();

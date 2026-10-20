@@ -18,12 +18,12 @@ import { ICON_SIZE_MD } from '@/components/common/icon-style';
 import { FileListItem } from '@/components/tabs/editor/file-list-item';
 import { SlotListItem } from '@/components/tabs/editor/slot-list-item';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { SlotContent } from '@/hooks/use-slot-content';
+import type { SlotContent } from '@/hooks/use-slot-content';
 import { cleanLuaPath } from '@/lib/command-generator/command-generator';
 import { EDITOR_SORT_MODE_STORAGE_KEY } from '@/lib/configuration-storage/keys';
 import type { LuaFile, LuaTweakType } from '@/types/types';
 
-import { ViewMode } from './types';
+import type { ViewMode } from './types';
 
 interface EditorSidebarProps {
     viewMode: ViewMode;

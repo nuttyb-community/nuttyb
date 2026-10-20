@@ -2,8 +2,8 @@
 
 import { Checkbox, Input, SegmentedControl, Stack, Title } from '@mantine/core';
 
-import { ENABLED_MILITARY_TIERS } from '@/lib/command-generator/data/configuration';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
+import { ENABLED_MILITARY_TIERS } from '@/lib/command-generator/data/configuration';
 
 export const MilitarySection: React.FC = () => {
     const { configuration, setProperty } = useConfiguratorContext();

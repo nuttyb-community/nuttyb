@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Stack, Text, Title } from '@mantine/core';
 
 import { PAGE_PADDING, PageWrapper } from '@/components/page-wrapper';

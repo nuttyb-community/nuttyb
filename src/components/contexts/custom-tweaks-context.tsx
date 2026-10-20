@@ -1,6 +1,7 @@
 'use client';
 
-import React, {
+import type React from 'react';
+import {
     createContext,
     useCallback,
     useContext,
@@ -15,7 +16,7 @@ import type {
     EnabledCustomTweak,
 } from '@/lib/command-generator/command-generator';
 import { CUSTOM_TWEAKS_STORAGE_KEY } from '@/lib/configuration-storage/keys';
-import { LuaTweakType } from '@/types/types';
+import type { LuaTweakType } from '@/types/types';
 
 interface CustomTweaksContextValue {
     /** All saved custom tweaks */
@@ -153,12 +154,12 @@ export function CustomTweaksProvider({ children }: CustomTweaksProviderProps) {
 
     // Persist migrated data back to localStorage after initial load,
     // but only when a migration actually changed something
+    // biome-ignore lint/correctness/useExhaustiveDependencies: only run once when data finishes loading
     useEffect(() => {
         if (isLoaded && didMigrateRef.current) {
             didMigrateRef.current = false;
             setStoredData(storedData);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoaded]); // Only run once when data finishes loading
 
     const customTweaks = storedData.tweaks;

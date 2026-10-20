@@ -20,7 +20,6 @@ function main(): void {
     const bundle = getBundle();
     if (!bundle) {
         console.error('ERROR: Could not read lua-bundle.json');
-        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
     }
 
@@ -62,7 +61,6 @@ function main(): void {
         for (const file of missingFiles) {
             console.error(`  - ${file}`);
         }
-        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
     }
 

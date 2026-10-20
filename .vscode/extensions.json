@@ -1,8 +1,8 @@
 {
-	"recommendations": [
-		"esbenp.prettier-vscode",
-		"shardulm94.trailing-spaces",
-		"johnnymorganz.stylua",
-		"sumneko.lua",
-	]
+    "recommendations": [
+        "biomejs.biome",
+        "shardulm94.trailing-spaces",
+        "johnnymorganz.stylua",
+        "sumneko.lua"
+    ]
 }

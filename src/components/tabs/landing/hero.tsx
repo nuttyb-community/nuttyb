@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Box, Button, Group, Stack, Text, Title } from '@mantine/core';
 import { IconBrandDiscord } from '@tabler/icons-react';

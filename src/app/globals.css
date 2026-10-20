@@ -1,6 +1,6 @@
 /* Blueprint grid backdrop, faded out away from the top */
 body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     z-index: -1;
@@ -10,10 +10,10 @@ body::before {
     background:
         linear-gradient(var(--major) 1px, transparent 1px) 0 0 / 120px 120px,
         linear-gradient(90deg, var(--major) 1px, transparent 1px) 0 0 / 120px
-            120px,
+        120px,
         linear-gradient(var(--minor) 1px, transparent 1px) 0 0 / 24px 24px,
         linear-gradient(90deg, var(--minor) 1px, transparent 1px) 0 0 / 24px
-            24px;
+        24px;
     mask-image: radial-gradient(
         ellipse 90% 70% at 50% 0%,
         #000 20%,

@@ -98,7 +98,7 @@ function replaceRequiredVariables(
 ): string {
     return template.replaceAll(
         VARIABLE_REPLACE_PATTERN,
-        (match: string, varName: string) => {
+        (_match: string, varName: string) => {
             const value = context[varName];
 
             if (value === undefined || value === '') {

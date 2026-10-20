@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
 
 import { List, Stack, Table, Text } from '@mantine/core';
 
-import { computeConfigDiff, type ConfigDiff } from '@/lib/presets/config-diff';
+import { type ConfigDiff, computeConfigDiff } from '@/lib/presets/config-diff';
 import type { Preset } from '@/lib/presets/registry';
 
 /** Two-column table of setting overrides: label left, value right. */

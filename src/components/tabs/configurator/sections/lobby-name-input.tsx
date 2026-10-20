@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { ActionIcon, TextInput, Tooltip } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
@@ -21,7 +22,6 @@ export const LobbyNameInput: React.FC = () => {
     // Sync local state when external configuration changes (e.g. preset switch)
     useEffect(() => {
         // ponytail: deliberate prop→state resync; key-based remount if this grows
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalLobbyName(lobbyName);
     }, [lobbyName]);
 

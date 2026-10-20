@@ -1,8 +1,8 @@
-import React from 'react';
+import type React from 'react';
 
 import { Badge } from '@mantine/core';
 
-import { TweakType } from '@/types/types';
+import type { TweakType } from '@/types/types';
 
 interface TweakTypeProps {
     type: TweakType;

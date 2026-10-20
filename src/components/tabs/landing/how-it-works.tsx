@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { Box, Center, Stepper, StepperStep } from '@mantine/core';
 

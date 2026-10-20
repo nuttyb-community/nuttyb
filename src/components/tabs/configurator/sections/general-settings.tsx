@@ -1,16 +1,16 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import { NativeSelect, Stack, Title } from '@mantine/core';
 
 import { LabelWithTooltip } from '@/components/common/label-with-tooltip';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
 import {
-    GameMap,
+    type GameMap,
     MAPS,
     START_OPTIONS,
-    StartOption,
+    type StartOption,
 } from '@/lib/command-generator/data/configuration';
 
 import { LobbyNameInput } from './lobby-name-input';

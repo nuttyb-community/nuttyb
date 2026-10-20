@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import type React from 'react';
+import { useRef, useState } from 'react';
 
 import { Box, Group, ScrollArea } from '@mantine/core';
 import { useElementSize } from '@mantine/hooks';

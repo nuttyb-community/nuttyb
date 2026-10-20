@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import type React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Flex } from '@mantine/core';
 
@@ -15,7 +16,7 @@ import { useSlotContent } from '@/hooks/use-slot-content';
 import type { Configuration } from '@/lib/command-generator/data/configuration';
 import type { LuaFile } from '@/types/types';
 
-import { ViewMode } from './types';
+import type { ViewMode } from './types';
 
 interface LuaEditorProps {
     luaFiles: LuaFile[];

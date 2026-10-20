@@ -1,14 +1,15 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import type React from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { type Configuration } from '@/lib/command-generator/data/configuration';
+import type { Configuration } from '@/lib/command-generator/data/configuration';
 import { CONFIGURATION_STORAGE_KEY } from '@/lib/configuration-storage/keys';
 import {
     createStoredConfiguration,
     getDefaultStoredConfiguration,
-    StoredConfiguration,
+    type StoredConfiguration,
     validateStoredConfiguration,
 } from '@/lib/configuration-storage/storage';
 

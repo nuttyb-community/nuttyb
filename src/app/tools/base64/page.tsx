@@ -24,8 +24,8 @@ import {
 } from '@/components/page-wrapper';
 import {
     CONVERT_MODES,
-    convertLua,
     type ConvertMode,
+    convertLua,
 } from '@/lib/encoders/convert';
 
 /** Per mode: the switch label, what each box holds and the formatter checkbox. */

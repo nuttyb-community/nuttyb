@@ -26,7 +26,6 @@ describe('isAllowedRemoteTweakUrl (fetch boundary)', () => {
         // http is never allowed, even on a whitelisted host
         expect(
             isAllowedRemoteTweakUrl(
-                // eslint-disable-next-line unicorn/prefer-https -- testing http rejection
                 'http://raw.githubusercontent.com/owner/repo/main/tweak.lua'
             )
         ).toBe(false);
@@ -56,7 +55,6 @@ describe('isValidTweakUrl (UI input)', () => {
         expect(isValidTweakUrl('https://evil.example.com/tweak.lua')).toBe(
             false
         );
-        // eslint-disable-next-line unicorn/prefer-https -- testing http rejection
         expect(isValidTweakUrl('http://example.com/tweak.lua')).toBe(false);
     });
 });

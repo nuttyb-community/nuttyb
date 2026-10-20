@@ -1,12 +1,7 @@
 {
     "$schema": "https://unpkg.com/knip@6/schema.json",
-    "entry": [
-        "src/app/**/*.{ts,tsx}",
-        "tests/**/*.test.{ts,js}"
-    ],
+    "entry": ["src/app/**/*.{ts,tsx}", "tests/**/*.test.{ts,js}"],
     "project": ["src/**/*.{ts,tsx,js,jsx}", "scripts/**/*.{ts,tsx,js,jsx}"],
-    "ignore": ["**/*.config.*"],
-    "ignoreDependencies": ["eslint-nibble"],
     "ignoreExportsUsedInFile": {
         "interface": true,
         "type": true

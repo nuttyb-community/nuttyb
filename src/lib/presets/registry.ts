@@ -1,4 +1,4 @@
-import { Configuration } from '@/lib/command-generator/data/configuration';
+import type { Configuration } from '@/lib/command-generator/data/configuration';
 import type { LuaTweakType } from '@/types/types';
 
 export interface PresetTweak {

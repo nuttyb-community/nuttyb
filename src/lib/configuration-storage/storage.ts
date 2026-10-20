@@ -1,6 +1,6 @@
 import {
     CHALLENGES,
-    Configuration,
+    type Configuration,
     DEFAULT_CONFIGURATION,
     ECO_MAX_TIERS,
     ECO_STYLES,

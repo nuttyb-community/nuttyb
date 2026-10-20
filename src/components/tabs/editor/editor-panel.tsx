@@ -10,7 +10,7 @@ import { EditorToolbar } from '@/components/tabs/editor/editor-toolbar';
 import type { LuaTweakType } from '@/types/types';
 
 import { encodeMinified } from './editor-utils';
-import { ViewMode } from './types';
+import type { ViewMode } from './types';
 
 interface EditorPanelProps {
     viewMode: ViewMode;

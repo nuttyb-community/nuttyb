@@ -9,8 +9,10 @@
  * Executable code format files (using `do...end` blocks) can be merged together.
  */
 
-import { LuaTweakType } from '@/types/types';
+import type { LuaTweakType } from '@/types/types';
 
+import { encode } from '../encoders/base64';
+import { minify } from '../lua-utils/minificator';
 import type { Command } from './command-generator';
 import {
     COMMAND_PREFIX_RESERVE,
@@ -18,8 +20,6 @@ import {
     MAX_SLOTS_PER_TYPE,
 } from './constants';
 import { formatSlotName } from './slot';
-import { encode } from '../encoders/base64';
-import { minify } from '../lua-utils/minificator';
 
 /**
  * Detects if Lua content is a plain table format (starts with `{` after comments).
@@ -135,7 +135,7 @@ function canFitInSlot(
         ? [...existingComments, newComment]
         : existingComments;
     const combinedContent = existingMinifiedContent
-        ? existingMinifiedContent + '\n' + newMinifiedContent
+        ? `${existingMinifiedContent}\n${newMinifiedContent}`
         : newMinifiedContent;
 
     const finalContent = buildFinalContent(
@@ -261,8 +261,8 @@ export function packLuaSources(
         if (fitsInCurrentSlot) {
             // Source fits in current slot
             if (currentSlot.remainingContent) {
-                currentSlot.remainingContent += '\n\n' + remainingContent;
-                currentSlot.minifiedContent += '\n' + minifiedRemaining;
+                currentSlot.remainingContent += `\n\n${remainingContent}`;
+                currentSlot.minifiedContent += `\n${minifiedRemaining}`;
             } else {
                 currentSlot.remainingContent = remainingContent;
                 currentSlot.minifiedContent = minifiedRemaining;

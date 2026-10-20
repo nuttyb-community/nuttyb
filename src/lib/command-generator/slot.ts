@@ -1,4 +1,4 @@
-import { LuaTweakType } from '@/types/types';
+import type { LuaTweakType } from '@/types/types';
 
 /**
  * Formats slot name for custom tweaks.

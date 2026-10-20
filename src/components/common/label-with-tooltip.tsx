@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { IconInfoCircle } from '@tabler/icons-react';

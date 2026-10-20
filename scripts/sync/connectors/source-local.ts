@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { LuaFile } from '@/types/types';
+import type { LuaFile } from '@/types/types';
 
 /**
  * Recursively collects all .lua file paths from a directory.

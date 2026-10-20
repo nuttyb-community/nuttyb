@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import {
     NativeSelect,
@@ -11,11 +11,11 @@ import {
 } from '@mantine/core';
 
 import { LabelWithTooltip } from '@/components/common/label-with-tooltip';
-import { useNumberSetting } from '@/hooks/use-number-setting';
 import { useConfiguratorContext } from '@/components/contexts/configurator-context';
+import { useNumberSetting } from '@/hooks/use-number-setting';
 import {
-    Challenges,
     CHALLENGES,
+    type Challenges,
 } from '@/lib/command-generator/data/configuration';
 
 export const DifficultySection: React.FC = () => {

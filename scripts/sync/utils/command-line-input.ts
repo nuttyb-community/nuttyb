@@ -1,5 +1,5 @@
-import commandLineArgs, { OptionDefinition } from 'command-line-args';
-import commandLineUsage, { Section } from 'command-line-usage';
+import commandLineArgs, { type OptionDefinition } from 'command-line-args';
+import commandLineUsage, { type Section } from 'command-line-usage';
 
 import { REPO_BRANCH, REPO_NAME, REPO_OWNER } from '../sync';
 

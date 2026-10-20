@@ -6,7 +6,7 @@ import { describe, expect, test } from 'bun:test';
 
 import { getMappedData } from '@/lib/command-generator/configuration/mapper';
 import {
-    Configuration,
+    type Configuration,
     DEFAULT_CONFIGURATION,
 } from '@/lib/command-generator/data/configuration';
 import { sanitizeConfiguration } from '@/lib/configuration-storage/storage';

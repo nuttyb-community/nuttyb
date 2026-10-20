@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import { Anchor, Card, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { useHover } from '@mantine/hooks';

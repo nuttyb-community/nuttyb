@@ -16,7 +16,7 @@ import {
     MAX_SLOTS_PER_TYPE,
 } from '@/lib/command-generator/constants';
 import {
-    Configuration,
+    type Configuration,
     DEFAULT_CONFIGURATION,
     type EcoStyle,
     type EnabledMilitaryTiers,
@@ -28,7 +28,7 @@ import {
     DEFAULT_LUA_PRIORITY,
     LUA_PRIORITIES,
 } from '@/lib/command-generator/data/configuration-mapping';
-import { LuaSource, packLuaSources } from '@/lib/command-generator/packer';
+import { type LuaSource, packLuaSources } from '@/lib/command-generator/packer';
 import { decode, encode } from '@/lib/encoders/base64';
 import {
     extractSourceManifest,
@@ -36,7 +36,7 @@ import {
 } from '@/lib/lua-utils/comment-handler';
 import type { Preset } from '@/lib/presets/registry';
 import { resolvePresetTweaks } from '@/lib/presets/resolver';
-import { TweakValue } from '@/types/types';
+import type { TweakValue } from '@/types/types';
 
 import { getBundle } from './utils/bundle';
 
