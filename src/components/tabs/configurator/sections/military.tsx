@@ -15,6 +15,7 @@ export const MilitarySection: React.FC = () => {
                 <Input.Wrapper
                     label='Buildable military units'
                     description='Combat unit tiers that factories and commanders offer. Builders, transports and satellites are always available.'
+                    size='md'
                 >
                     <SegmentedControl
                         display='flex'

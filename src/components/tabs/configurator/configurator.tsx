@@ -28,10 +28,8 @@ export const Configurator: React.FC = () => (
                 <GeneralSettingsSection />
                 <DifficultySection />
                 <EconomySection />
-                <Stack gap='xl'>
-                    <MilitarySection />
-                    <ExtrasSection />
-                </Stack>
+                <MilitarySection />
+                <ExtrasSection />
             </SimpleGrid>
             <PerformanceSection />
             <CustomTweaksSection />
