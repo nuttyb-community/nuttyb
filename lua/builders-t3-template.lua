@@ -224,7 +224,7 @@ do
                 techlevel = 3,
                 unitgroup = 'buildert3',
                 i18n_en_humanname = 'T3 Ground Construction Aide',
-                i18n_en_tooltip = 'Your Aide that helps you construct buildings',
+                i18n_en_tooltip = 'Your Aide that helps you construct buildings. Max: $T3_AIDE_CAP$',
             },
             buildoptions = t3AideBuildoptions,
         })
