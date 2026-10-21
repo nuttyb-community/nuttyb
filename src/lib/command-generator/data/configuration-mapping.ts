@@ -7,17 +7,17 @@ import type { ValueMapping } from '@/types/types';
 export const LUA_PRIORITIES: Record<string, number> = {
     // Priority 0: Core framework files
     'lua/main-units.lua': 0,
-    'lua/raptor-hp-template.lua': 0,
-    'lua/queen-hp-template.lua': 0,
+    'lua/raptor-hp.template.lua': 0,
+    'lua/queen-hp.template.lua': 0,
     // Runs before every other tweakdefs (custom ones included), so military
     // units that later tweaks add to build menus stay buildable
-    'lua/military-units-template.lua': 0,
+    'lua/military-units.template.lua': 0,
     'lua/evocom-arm.lua': 1,
     'lua/evocom-cor.lua': 1,
     'lua/evocom-leg.lua': 1,
     'lua/main-defs.lua': 2,
     'lua/eco-t3.lua': 3,
-    'lua/builders-t3-template.lua': 4,
+    'lua/builders-t3.template.lua': 4,
     'lua/defences-t3.lua': 4,
     'lua/defences-t4.lua': 4,
     'lua/mini-bosses.lua': 5,
@@ -28,7 +28,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/lrpc-rebalance.lua': 7,
     'lua/eco-t4.lua': 9,
     // Adds build options to the T3 aides builders-t3 creates
-    'lua/eco-evo-template.lua': 9,
+    'lua/eco-evo.template.lua': 9,
     'lua/rflrpc-rebalance.lua': 10,
     'lua/rflrpc-t4.lua': 11,
     'lua/air-rework-t4.lua': 12,
@@ -40,7 +40,7 @@ export const LUA_PRIORITIES: Record<string, number> = {
     'lua/shields-faint.lua': 20,
     'lua/beams-ignore-holos.lua': 20,
     // Performance options cover every unit, so they run last
-    'lua/effects-reduction-template.lua': 30,
+    'lua/effects-reduction.template.lua': 30,
     'lua/death-effects-reduction.lua': 31,
 } as const;
 
@@ -314,11 +314,11 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         description: 'Military units',
         values: {
             None: {
-                tweakdefs: ['lua/military-units-template.lua{MIN_TIER=4}'],
+                tweakdefs: ['lua/military-units.template.lua{MIN_TIER=4}'],
             },
-            T3: { tweakdefs: ['lua/military-units-template.lua{MIN_TIER=3}'] },
+            T3: { tweakdefs: ['lua/military-units.template.lua{MIN_TIER=3}'] },
             'T2-T3': {
-                tweakdefs: ['lua/military-units-template.lua{MIN_TIER=2}'],
+                tweakdefs: ['lua/military-units.template.lua{MIN_TIER=2}'],
             },
             'T1-T3': undefined,
         },
@@ -392,13 +392,13 @@ export const CONFIGURATION_MAPPING: ValueMapping = {
         values: {
             Off: undefined,
             Light: {
-                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=1}'],
+                tweakdefs: ['lua/effects-reduction.template.lua{LEVEL=1}'],
             },
             Medium: {
-                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=2}'],
+                tweakdefs: ['lua/effects-reduction.template.lua{LEVEL=2}'],
             },
             Heavy: {
-                tweakdefs: ['lua/effects-reduction-template.lua{LEVEL=3}'],
+                tweakdefs: ['lua/effects-reduction.template.lua{LEVEL=3}'],
             },
         },
     },

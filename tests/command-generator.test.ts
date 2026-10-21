@@ -233,10 +233,10 @@ describe('HP multipliers', () => {
         });
 
         expect(tweakdefs).toContain(
-            'lua/raptor-hp-template.lua{HP_MULTIPLIER=3}'
+            'lua/raptor-hp.template.lua{HP_MULTIPLIER=3}'
         );
         expect(tweakdefs).toContain(
-            'lua/queen-hp-template.lua{HP_MULTIPLIER=2.5}'
+            'lua/queen-hp.template.lua{HP_MULTIPLIER=2.5}'
         );
     });
 });
@@ -249,7 +249,7 @@ describe('T3 aide cap', () => {
         });
 
         expect(tweakdefs).toContain(
-            'lua/builders-t3-template.lua{T3_AIDE_CAP=40}'
+            'lua/builders-t3.template.lua{T3_AIDE_CAP=40}'
         );
     });
 });
@@ -260,7 +260,7 @@ const ecoTweaks = (ecoStyle: EcoStyle, ecoMaxTier: number) =>
         ecoStyle,
         ecoMaxTier,
     }).tweakdefs.filter((path) =>
-        /^lua\/eco-(t3|t4|evo-template)\.lua/.test(path)
+        /^lua\/eco-(t3|t4|evo\.template)\.lua/.test(path)
     );
 
 describe('Economy style', () => {
@@ -273,16 +273,16 @@ describe('Economy style', () => {
 
     test('evolving replaces T3 and T4 eco, at the chosen max tier', () => {
         expect(ecoTweaks('Evolving', 6)).toEqual([
-            'lua/eco-evo-template.lua{MAX_TIER=6}',
+            'lua/eco-evo.template.lua{MAX_TIER=6}',
         ]);
         expect(ecoTweaks('Evolving', 11)).toEqual([
-            'lua/eco-evo-template.lua{MAX_TIER=11}',
+            'lua/eco-evo.template.lua{MAX_TIER=11}',
         ]);
     });
 });
 
 describe('Enabled military tiers', () => {
-    const militaryTemplate = 'lua/military-units-template.lua';
+    const militaryTemplate = 'lua/military-units.template.lua';
 
     test('fill the lowest enabled tier, or leave the file out when all are enabled', () => {
         const references = (enabledMilitaryTiers: EnabledMilitaryTiers) =>
@@ -417,7 +417,7 @@ end`,
 describe('Slot comment preservation', () => {
     test('Preserves the first comment line and inserts source manifest right after it', () => {
         const source: LuaSource = {
-            path: 'lua/raptor-hp-template.lua',
+            path: 'lua/raptor-hp.template.lua',
             content:
                 '\n\n-- Raptor HP multiplier\n-- Authors: Name\ndo\n    local hp = 1.5\nend',
             priority: 1,
@@ -434,7 +434,7 @@ describe('Slot comment preservation', () => {
 
         const lines = decoded.split('\n');
         expect(lines[0]).toBe('-- Raptor HP multiplier');
-        expect(lines[1]).toBe('-- Source: ["lua/raptor-hp-template.lua"]');
+        expect(lines[1]).toBe('-- Source: ["lua/raptor-hp.template.lua"]');
         expect(lines[2]).toContain('local'); // Should contain minified remaining code
     });
 

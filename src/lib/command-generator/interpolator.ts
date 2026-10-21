@@ -14,12 +14,12 @@ export interface ParsedReference {
 /**
  * Parses a Lua file reference into path and variables.
  *
- * @param ref Reference string (e.g., 'lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
+ * @param ref Reference string (e.g., 'lua/raptor-hp.template.lua{HP_MULTIPLIER=1.5}')
  * @returns Parsed components or null if invalid
  *
  * @example
- * parseReference('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}')
- * // { filePath: 'lua/raptor-hp-template.lua', variables: { HP_MULTIPLIER: '1.5' } }
+ * parseReference('lua/raptor-hp.template.lua{HP_MULTIPLIER=1.5}')
+ * // { filePath: 'lua/raptor-hp.template.lua', variables: { HP_MULTIPLIER: '1.5' } }
  *
  * parseReference('lua/main-defs.lua')
  * // { filePath: 'lua/main-defs.lua', variables: {} }
@@ -95,13 +95,13 @@ function interpolateTemplate(
 /**
  * Resolves a Lua file reference with optional variable interpolation.
  *
- * @param ref Lua file reference (e.g., 'lua/template.lua{VAR=value}')
+ * @param ref Lua file reference (e.g., 'lua/foo.template.lua{VAR=value}')
  * @param luaFileMap Map of file paths to Lua source code
  * @returns Resolved Lua source code
  * @throws Error if reference is invalid or file not found
  *
  * @example
- * resolveLuaReference('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}', luaFileMap)
+ * resolveLuaReference('lua/raptor-hp.template.lua{HP_MULTIPLIER=1.5}', luaFileMap)
  */
 export function resolveLuaReference(
     ref: string,

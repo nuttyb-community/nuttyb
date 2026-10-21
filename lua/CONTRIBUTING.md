@@ -152,7 +152,7 @@ Template files use **placeholder variables** that get replaced by the configurat
 
 Because a placeholder is a valid Lua identifier, templates stay parseable: the language server reads `TPL_HP_MULTIPLIER` as a global, and `.luarc.json` allows any global matching `^TPL_` (via `diagnostics.globalsRegex`) while still flagging other undefined globals. Use placeholders only where a Lua expression, a string or a comment goes.
 
-The configurator references a template as `lua/foo-template.lua{HP_MULTIPLIER=1.5}` (variable names without the `TPL_` prefix) and replaces every `TPL_HP_MULTIPLIER` in the file literally, including inside strings and comments. An uninterpolated template still loads, but the placeholder evaluates to `nil` at runtime, so keep the `-template` suffix on these files.
+The configurator references a template as `lua/foo.template.lua{HP_MULTIPLIER=1.5}` (variable names without the `TPL_` prefix) and replaces every `TPL_HP_MULTIPLIER` in the file literally, including inside strings and comments. An uninterpolated template still loads, but the placeholder evaluates to `nil` at runtime, so name these files `*.template.lua`.
 
 ### Example: HP Multiplier Template
 

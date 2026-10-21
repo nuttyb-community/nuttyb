@@ -1,5 +1,5 @@
 /**
- * Runs lua/eco-evo-template.lua from the bundle in a Lua VM against mock BAR
+ * Runs lua/eco-evo.template.lua from the bundle in a Lua VM against mock BAR
  * unit defs, for every max tier. The generated yardmaps are checked against a
  * model of Recoil's build placement, the build options against BAR's Quick
  * Build (mex/geo) widget.
@@ -51,7 +51,7 @@ type Faction = (typeof FACTIONS)[number];
 
 // BAR's table helpers (common/tablefunctions.lua) and the unit defs the
 // template reads. Build option orders follow BAR's T2 constructors,
-// builders-t3-template.lua's T3 aides and evocom-arm.lua's commanders.
+// builders-t3.template.lua's T3 aides and evocom-arm.lua's commanders.
 const MOCK_DEFS = `
 function table.copy(t)
     local copy = {}
@@ -145,7 +145,7 @@ const luaFactory = new LuaFactory();
 
 async function runTemplate(maxTier: number): Promise<UnitDefs> {
     const template = resolveLuaReference(
-        `lua/eco-evo-template.lua{MAX_TIER=${maxTier}}`,
+        `lua/eco-evo.template.lua{MAX_TIER=${maxTier}}`,
         luaFileMap
     );
     const lua = await luaFactory.createEngine();

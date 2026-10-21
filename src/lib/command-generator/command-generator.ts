@@ -119,7 +119,7 @@ export interface GenerationResult {
  * from a Lua file path. Used for normalising paths before comparison or
  * priority lookup.
  *
- * @example cleanLuaPath('lua/raptor-hp-template.lua{HP_MULTIPLIER=1.5}') → 'lua/raptor-hp-template.lua'
+ * @example cleanLuaPath('lua/raptor-hp.template.lua{HP_MULTIPLIER=1.5}') → 'lua/raptor-hp.template.lua'
  */
 export function cleanLuaPath(path: string): string {
     return path.replace(/^~/, '').replace(/\{[^}]*\}$/, '');
