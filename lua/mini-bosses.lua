@@ -35,8 +35,10 @@ do
 
     -- Anger thresholds for mini-queen spawning
     local mqAnger = { 70, 85, 90, 105, 110, 125 }
-    local mqTimeMult =
-        math.max(1, spring.GetModOptions().raptor_queentimemult or 1.3)
+    local mqTimeMult = math.max(
+        1,
+        tonumber(spring.GetModOptions().raptor_queentimemult) or 1.3
+    )
     local mqStart, mqLast = mqAnger[1], mqAnger[#mqAnger]
     local mqTargetLast = mqTimeMult * mqAnger[#mqAnger] / 1.3
     local mqFactor = (mqTargetLast - mqStart) / (mqLast - mqStart)
@@ -47,7 +49,7 @@ do
     end
 
     -- Calculate queen-related values for Doombringer spawning
-    local mqNumQueens = spring.GetModOptions().raptor_queen_count or 1
+    local mqNumQueens = tonumber(spring.GetModOptions().raptor_queen_count) or 1
     local mqDoomAngerScale = math.min(10, nbQhpMult / 1.3 * 0.9)
 
     -- Extra anger % required before Doombringers spawn. 0 = vanilla timing.

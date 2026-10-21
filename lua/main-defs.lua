@@ -466,6 +466,7 @@ function UnitDef_Post(unitID, unitDef)
         if def then
             for key, value in pairs(patch) do
                 if key == 'weapondefs' then
+                    ---@cast value table
                     def.weapondefs = def.weapondefs or {}
                     for weaponName, weaponPatch in pairs(value) do
                         def.weapondefs[weaponName] = def.weapondefs[weaponName]

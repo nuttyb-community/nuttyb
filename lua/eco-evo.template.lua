@@ -241,7 +241,7 @@ do
             end
         end
         preferred = preferred or fusion
-        if preferred and preferred > firstGeo then
+        if preferred and firstGeo and preferred > firstGeo then
             options[firstGeo], options[preferred] =
                 options[preferred], options[firstGeo]
         end
