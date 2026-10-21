@@ -605,7 +605,7 @@
                 laserflaresize = 30,
                 name = 'Rapid-fire close quarters g2g armor-piercing laser',
                 noselfdamage = true,
-                pulsespeed = q8,
+                pulsespeed = 8,
                 range = 1100,
                 reloadtime = 0.50,
                 rgbcolor = '0.7 0.3 1.0',
