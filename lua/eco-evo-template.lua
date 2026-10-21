@@ -1,11 +1,11 @@
 -- EvoEco
--- Evolving Eco (Fusion Reactors & Energy Converters upgradeable up to T$MAX_TIER$)
+-- Evolving Eco (Fusion Reactors & Energy Converters upgradeable up to TTPL_MAX_TIER)
 -- Authors: timuela, Insider
 -- https://github.com/timuela/BAR-widgets/blob/main/tweaks/evo_eco-yardmaps.lua
 
 do
     local unitDefs, tableMerge, mergeInPlace, maxTier =
-        UnitDefs or {}, table.merge, table.mergeInPlace, $MAX_TIER$
+        UnitDefs or {}, table.merge, table.mergeInPlace, TPL_MAX_TIER
 
     local function round(value)
         return math.floor(value + 0.5)

@@ -22,7 +22,7 @@ A new `lua/foo.lua` does nothing until referenced. In `src/lib/command-generator
 
 1. Reference it by its bare path (`lua/foo.lua`), either in `BASE_TWEAKS` (always on) or in a `CONFIGURATION_MAPPING` entry's `tweakdefs`/`tweakunits` array (toggleable — see the `configurator-data` skill for adding a new option). A legacy `~` prefix is still tolerated by the parsers but must not be used in new references.
 2. Add a `LUA_PRIORITIES` entry with the same bare path (`'lua/foo.lua': N`) — a guard test enforces that keys are clean paths and that every referenced file has an explicit priority. Lower numbers load first; pick a value that places the file after everything it depends on.
-3. Template files use `$VAR$` placeholders and are referenced as `lua/foo.lua{VAR=value}`.
+3. Template files (`*-template.lua`) use `TPL_VAR` placeholders (plain Lua identifiers, so LuaLS can parse them; `.luarc.json` allows `^TPL_` globals) and are referenced as `lua/foo-template.lua{VAR=value}` — no `TPL_` prefix in the reference. See `lua/CONTRIBUTING.md`.
 
 ## Engine gotchas (load-bearing, easy to break)
 

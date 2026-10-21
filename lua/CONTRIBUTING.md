@@ -148,12 +148,16 @@ end
 
 ## Template Files
 
-Template files use **placeholder variables** that get replaced by the configurator at runtime. Use the `$VARIABLE_NAME$` syntax.
+Template files use **placeholder variables** that get replaced by the configurator at runtime. A placeholder is an uppercase identifier with a `TPL_` prefix, e.g. `TPL_HP_MULTIPLIER`.
+
+Because a placeholder is a valid Lua identifier, templates stay parseable: the language server reads `TPL_HP_MULTIPLIER` as a global, and `.luarc.json` allows any global matching `^TPL_` (via `diagnostics.globalsRegex`) while still flagging other undefined globals. Use placeholders only where a Lua expression, a string or a comment goes.
+
+The configurator references a template as `lua/foo-template.lua{HP_MULTIPLIER=1.5}` (variable names without the `TPL_` prefix) and replaces every `TPL_HP_MULTIPLIER` in the file literally, including inside strings and comments. An uninterpolated template still loads, but the placeholder evaluates to `nil` at runtime, so keep the `-template` suffix on these files.
 
 ### Example: HP Multiplier Template
 
 ```lua
--- NuttyB v1.52 $HP_MULTIPLIER$X HP
+-- NuttyB v1.52 TPL_HP_MULTIPLIERX HP
 -- https://github.com/nuttyb-community/nuttyb
 
 for unitName, unitDef in pairs(UnitDefs) do
@@ -163,7 +167,7 @@ for unitName, unitDef in pairs(UnitDefs) do
         and unitDef.health
         and not unitName:match('^raptor_queen_.*')
     then
-        unitDef.health = unitDef.health * $HP_MULTIPLIER$
+        unitDef.health = unitDef.health * TPL_HP_MULTIPLIER
     end
 end
 ```

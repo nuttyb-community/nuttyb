@@ -5,7 +5,7 @@
 do
     local unitDefs = UnitDefs or {}
     -- Lowest enabled tech level: 2 = T2-T3, 3 = T3 only, 4 = none
-    local minTier = $MIN_TIER$
+    local minTier = TPL_MIN_TIER
 
     local factions = { arm = true, cor = true, leg = true }
     -- Not military, even though they aren't builders

@@ -8,7 +8,7 @@ do
     -- shrunk to a point (every level)
     -- 2 = Medium: also raptors, with smaller impact effects
     -- 3 = Heavy: every unit, no tracks or building decals
-    local level = $LEVEL$
+    local level = TPL_LEVEL
 
     local customUnits = {
         epic_ragnarok = true,

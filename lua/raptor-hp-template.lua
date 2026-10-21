@@ -1,5 +1,5 @@
--- $HP_MULTIPLIER$X.HP
--- NuttyB v1.52 $HP_MULTIPLIER$X HP
+-- TPL_HP_MULTIPLIERX.HP
+-- NuttyB v1.52 TPL_HP_MULTIPLIERX HP
 -- https://github.com/nuttyb-community/nuttyb
 
 for unitName, unitDef in pairs(UnitDefs) do
@@ -18,7 +18,7 @@ for unitName, unitDef in pairs(UnitDefs) do
         and unitDef.health
         and not unitName:match('^raptor_queen_.*')
     then
-        unitDef.health = unitDef.health * $HP_MULTIPLIER$
+        unitDef.health = unitDef.health * TPL_HP_MULTIPLIER
         unitDef.sfxtypes = {}
     end
 end
@@ -35,7 +35,7 @@ function UnitDef_Post(unitID, unitDef)
     then
         unitDef.nochasecategory = 'OBJECT'
         if unitDef.metalcost and unitDef.health then
-            unitDef.metalcost = math.floor(unitDef.health * 0.75 / $HP_MULTIPLIER$)
+            unitDef.metalcost = math.floor(unitDef.health * 0.75 / TPL_HP_MULTIPLIER)
         end
     end
 end

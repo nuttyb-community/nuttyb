@@ -4,8 +4,8 @@
     "completion.requireSeparator": "/",
     "runtime.path": ["?", "?.lua"],
     "workspace.library": ["recoil-lua-library", "types"],
-    "workspace.ignoreDir": ["lua/*-template.lua"],
     "diagnostics.globals": ["BAR", "Json", "UnitDefs"],
+    "diagnostics.globalsRegex": ["^TPL_"],
     "diagnostics.disable": ["exp-in-action"],
     "runtime.special": {
         "VFS.Include": "require",

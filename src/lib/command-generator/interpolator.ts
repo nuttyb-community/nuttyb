@@ -2,7 +2,7 @@
  * Template interpolation for Lua file references.
  *
  * Supports syntax: lua/file.lua{VAR1=value1,VAR2=value2}
- * Replaces $VARIABLE$ placeholders in templates with provided values.
+ * Replaces TPL_VARIABLE placeholders in templates with provided values.
  * A legacy `~` prefix on references is tolerated and stripped.
  */
 
@@ -53,36 +53,40 @@ function parseReference(ref: string): ParsedReference | null {
 }
 
 /**
- * Interpolates $VARIABLE$ placeholders with values.
+ * Interpolates TPL_VARIABLE placeholders with values.
  *
- * @param template Template string with $PLACEHOLDER$ markers
- * @param variables Variable name to value mapping
+ * Placeholders are plain Lua identifiers so templates stay parseable by the
+ * linter. Each provided name is replaced literally (not via a word regex), so
+ * a placeholder glued to text in a comment (`TPL_HP_MULTIPLIERX`) still works.
+ *
+ * @param template Template string with TPL_PLACEHOLDER markers
+ * @param variables Variable name (without TPL_ prefix) to value mapping
  * @returns Interpolated string
  */
 function interpolateTemplate(
     template: string,
     variables: Record<string, string>
 ): string {
-    const usedVariables = new Set<string>();
+    let result = template;
+    const unused: string[] = [];
 
-    const result = template.replaceAll(
-        /\$(\w+)\$/g,
-        (match, varName: string) => {
-            if (varName in variables) {
-                usedVariables.add(varName);
-                return variables[varName];
-            }
-            console.warn(`Undefined template variable: ${varName}`);
-            return match;
+    for (const [name, value] of Object.entries(variables)) {
+        const placeholder = `TPL_${name}`;
+        if (!result.includes(placeholder)) {
+            unused.push(name);
         }
-    );
+        result = result.replaceAll(placeholder, value);
+    }
 
     // Warn about unused variables (potential typos)
-    const unused = Object.keys(variables).filter((v) => !usedVariables.has(v));
     if (unused.length > 0) {
         console.warn(
             `Template variables provided but not used: ${unused.join(', ')}`
         );
+    }
+
+    for (const leftover of result.match(/TPL_\w+/g) ?? []) {
+        console.warn(`Undefined template variable: ${leftover}`);
     }
 
     return result;
@@ -115,10 +119,6 @@ export function resolveLuaReference(
         throw new Error(
             `Lua file not found in bundle: ${filePath} (from: ${ref})`
         );
-    }
-
-    if (Object.keys(variables).length === 0) {
-        return template;
     }
 
     return interpolateTemplate(template, variables);
